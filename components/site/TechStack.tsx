@@ -8,16 +8,16 @@ type Item = { name: string; color: string; Glyph: Glyph }
 
 // monochrome brand glyphs — inherit currentColor, brand colour reveals on hover
 const STACK: Item[] = [
-  { name: "React", color: "#61DAFB", Glyph: ReactMark },
-  { name: "Next.js", color: "#FFFFFF", Glyph: NextMark },
+  { name: "React", color: "#149ECA", Glyph: ReactMark },
+  { name: "Next.js", color: "#0A0E13", Glyph: NextMark },
   { name: "Vue", color: "#42B883", Glyph: VueMark },
   { name: "TypeScript", color: "#3178C6", Glyph: TsMark },
-  { name: "Node.js", color: "#83CD29", Glyph: NodeMark },
-  { name: "PHP", color: "#8993BE", Glyph: PhpMark },
+  { name: "Node.js", color: "#5FA04E", Glyph: NodeMark },
+  { name: "PHP", color: "#6E7BB8", Glyph: PhpMark },
   { name: "Claude", color: "#D97757", Glyph: ClaudeMark },
-  { name: "OpenAI Codex", color: "#FFFFFF", Glyph: OpenAIMark },
-  { name: "Perplexity", color: "#20B8CD", Glyph: PerplexityMark },
-  { name: "MCP", color: "#a9caf9", Glyph: McpMark },
+  { name: "OpenAI Codex", color: "#0A0E13", Glyph: OpenAIMark },
+  { name: "Perplexity", color: "#1F9AAE", Glyph: PerplexityMark },
+  { name: "MCP", color: "#2F6FB0", Glyph: McpMark },
   { name: "API", color: "#ff5b24", Glyph: ApiMark },
 ]
 
@@ -26,11 +26,8 @@ export function TechStack() {
   const row = [...STACK, ...STACK]
 
   return (
-    <section className="relative overflow-hidden border-b border-white/8 bg-ink py-14">
-      {/* subtle top glow continuing the hero */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(60%_100%_at_50%_0%,rgba(169,202,249,0.06),transparent)]" />
-
-      <p className="container text-center font-mono text-[12px] uppercase tracking-[0.24em] text-cream-100/45">
+    <section className="relative z-10 overflow-hidden bg-cream-50 py-14 shadow-[0_-30px_60px_-30px_rgba(10,14,19,0.45)]">
+      <p className="container text-center font-mono text-[12px] uppercase tracking-[0.24em] text-ink/40">
         {t.stack.title}
       </p>
 
@@ -40,7 +37,7 @@ export function TechStack() {
           {row.map((item, i) => (
             <div
               key={i}
-              className="group/item flex shrink-0 items-center gap-2.5 text-cream-100/40 transition-colors duration-300 group-hover/item:text-[color:var(--c)]"
+              className="group/item flex shrink-0 items-center gap-2.5 text-ink/35 transition-colors duration-300 group-hover/item:text-[color:var(--c)]"
               style={{ ["--c" as string]: item.color }}
             >
               <item.Glyph className="h-6 w-6 shrink-0" />
