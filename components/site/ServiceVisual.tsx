@@ -1,33 +1,53 @@
 "use client"
 
+import Image, { type StaticImageData } from "next/image"
 import { motion } from "framer-motion"
 import { Mic, Phone } from "lucide-react"
 
+import telegramImg from "@/assets/services/telegram.jpg"
+import websitesImg from "@/assets/services/websites.jpg"
+import n8nImg from "@/assets/services/n8n.png"
+import aiImg from "@/assets/services/ai-integration.jpg"
+
+// real screenshots per service; null → fall back to a coded visual
+const PHOTOS: (StaticImageData | null)[] = [
+  telegramImg, // 0 Telegram Bots
+  websitesImg, // 1 Websites
+  null, // 2 AI Voice Assistants — coded widget mock
+  n8nImg, // 3 n8n Workflows
+  aiImg, // 4 AI Integration
+  null, // 5 Growth Marketing — coded chart
+]
+
 /**
- * A stylized product preview rendered for each service inside the modal —
- * a lightweight "screenshot" so the user instantly sees what they get.
+ * Product preview shown for each service inside the modal.
+ * Uses a real screenshot when available, otherwise a coded mock.
  */
 export function ServiceVisual({ index, color }: { index: number; color: string }) {
-  const visuals = [
-    <TelegramVisual key={0} color={color} />,
-    <WebsiteVisual key={1} color={color} />,
-    <VoiceVisual key={2} color={color} />,
-    <WorkflowVisual key={3} color={color} />,
-    <AIVisual key={4} color={color} />,
-    <GrowthVisual key={5} color={color} />,
-  ]
+  const photo = PHOTOS[index]
+
+  if (photo) {
+    return (
+      <div className="relative h-[240px] w-full overflow-hidden rounded-2xl border border-white/10 bg-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+        <Image
+          src={photo}
+          alt=""
+          fill
+          priority
+          sizes="(max-width: 768px) 90vw, 700px"
+          className="object-contain"
+        />
+      </div>
+    )
+  }
+
+  const coded = [null, null, <VoiceVisual key={2} color={color} />, null, null, <GrowthVisual key={5} color={color} />]
   return (
     <div className="rounded-2xl border border-white/10 bg-ink/60 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-      {visuals[index] ?? visuals[0]}
+      {coded[index]}
     </div>
   )
 }
-
-const stagger = (i: number) => ({
-  initial: { opacity: 0, y: 8 },
-  animate: { opacity: 1, y: 0 },
-  transition: { delay: 0.15 + i * 0.08, duration: 0.4, ease: [0.16, 1, 0.3, 1] as const },
-})
 
 function Bar({ w, color }: { w: string; color?: string }) {
   return (
@@ -35,60 +55,6 @@ function Bar({ w, color }: { w: string; color?: string }) {
       className="block h-2 rounded-full"
       style={{ width: w, backgroundColor: color ?? "rgba(243,239,230,0.16)" }}
     />
-  )
-}
-
-function TelegramVisual({ color }: { color: string }) {
-  return (
-    <div className="space-y-2.5">
-      <motion.div {...stagger(0)} className="flex justify-start">
-        <div className="max-w-[70%] rounded-2xl rounded-tl-sm bg-white/[0.06] px-3.5 py-2 text-[12.5px] text-cream-100/85">
-          Hi! I want to book a demo 👋
-        </div>
-      </motion.div>
-      <motion.div {...stagger(1)} className="flex justify-end">
-        <div
-          className="max-w-[78%] rounded-2xl rounded-br-sm px-3.5 py-2 text-[12.5px] text-ink"
-          style={{ backgroundColor: color }}
-        >
-          Great — I see you&apos;re in the Pro plan. Tuesday 14:00 or Wednesday 11:00?
-        </div>
-      </motion.div>
-      <motion.div {...stagger(2)} className="flex justify-start">
-        <div className="rounded-2xl rounded-tl-sm bg-white/[0.06] px-3.5 py-2 text-[12.5px] text-cream-100/85">
-          Wednesday works ✅
-        </div>
-      </motion.div>
-      <motion.div {...stagger(3)} className="flex items-center gap-2 pt-1 text-[11px] font-mono uppercase tracking-wider text-cream-100/45">
-        <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
-        booked · synced to CRM · payment link sent
-      </motion.div>
-    </div>
-  )
-}
-
-function WebsiteVisual({ color }: { color: string }) {
-  return (
-    <div className="overflow-hidden rounded-xl border border-white/10 bg-ink/70">
-      <div className="flex items-center gap-1.5 border-b border-white/10 px-3 py-2">
-        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-        <span className="ml-2 rounded-md bg-white/[0.06] px-2 py-0.5 text-[10px] font-mono text-cream-100/45">aqly.io</span>
-      </div>
-      <div className="grid grid-cols-[1.4fr_1fr] gap-3 p-4">
-        <div className="space-y-2.5">
-          <motion.div {...stagger(0)}><Bar w="85%" color={color} /></motion.div>
-          <motion.div {...stagger(1)}><Bar w="60%" /></motion.div>
-          <motion.div {...stagger(2)} className="pt-1.5">
-            <span className="inline-block rounded-md px-3 py-1.5 text-[10px] font-medium text-ink" style={{ backgroundColor: color }}>
-              Get started
-            </span>
-          </motion.div>
-        </div>
-        <motion.div {...stagger(2)} className="rounded-lg border border-white/10 bg-white/[0.04]" />
-      </div>
-    </div>
   )
 }
 
@@ -162,60 +128,6 @@ function VoiceVisual({ color }: { color: string }) {
           </div>
         </motion.div>
       </div>
-    </div>
-  )
-}
-
-function WorkflowVisual({ color }: { color: string }) {
-  const nodes = ["Trigger", "Enrich", "AI", "Sync"]
-  return (
-    <div className="flex items-center justify-between gap-1 py-3">
-      {nodes.map((n, i) => (
-        <div key={n} className="flex items-center gap-1">
-          <motion.div
-            {...stagger(i)}
-            className="grid place-items-center rounded-lg border px-2.5 py-2 text-[10.5px] font-mono"
-            style={{ borderColor: `${color}55`, backgroundColor: `${color}14`, color: "#F3EFE6" }}
-          >
-            {n}
-          </motion.div>
-          {i < nodes.length - 1 && (
-            <motion.span
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 0.25 + i * 0.12, duration: 0.3 }}
-              className="block h-px w-4 origin-left sm:w-6"
-              style={{ backgroundColor: color }}
-            />
-          )}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function AIVisual({ color }: { color: string }) {
-  return (
-    <div className="space-y-3">
-      <motion.div {...stagger(0)} className="rounded-xl bg-white/[0.05] px-3.5 py-2.5 text-[12.5px] text-cream-100/70">
-        <span className="font-mono text-[10px] uppercase tracking-wider text-cream-100/40">request</span>
-        <p className="mt-1">Handle the support queue & write our launch post</p>
-      </motion.div>
-      <motion.div
-        {...stagger(1)}
-        className="rounded-xl border px-3.5 py-2.5 text-[12.5px] text-cream-50"
-        style={{ borderColor: `${color}55`, backgroundColor: `${color}12` }}
-      >
-        <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color }}>agent · automated</span>
-        <p className="mt-1">Resolved 38 chats · drafted 5 posts ✦</p>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {["Claude", "GPT-class", "+18% revenue"].map((s) => (
-            <span key={s} className="rounded-md bg-white/[0.06] px-2 py-0.5 text-[9.5px] font-mono text-cream-100/55">
-              {s}
-            </span>
-          ))}
-        </div>
-      </motion.div>
     </div>
   )
 }
