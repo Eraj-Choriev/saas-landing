@@ -58,7 +58,7 @@ export function ServiceModal({
               <motion.div
                 initial={{ opacity: 0, y: 24, scale: 0.97 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 16, scale: 0.98 }}
+                exit={{ opacity: 0, y: 16, scale: 0.98, transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] } }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                 className="grid max-h-[90vh] w-full max-w-3xl grid-rows-[auto_1fr] overflow-hidden rounded-[28px] border border-ink/10 bg-cream-50 shadow-[0_50px_120px_-30px_rgba(10,14,19,0.6)]"
               >

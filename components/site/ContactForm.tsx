@@ -283,7 +283,7 @@ export function ContactForm() {
               disabled={submitted}
               whileTap={{ scale: 0.98 }}
               className={cn(
-                "group relative inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-[15px] font-medium transition-all",
+                "group relative inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-[15px] font-medium transition-colors",
                 submitted
                   ? "bg-brand-blue/70 text-ink cursor-default"
                   : allValid

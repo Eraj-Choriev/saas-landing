@@ -100,6 +100,18 @@ body {
   border-color: rgba(10, 14, 19, 0.08);
 }
 
+/* glassmorphism panel — frosted glass for the dark hero */
+.glass-dark {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.09),
+    rgba(255, 255, 255, 0.025)
+  );
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 /* drifting aurora blobs for hero — slow, calm, organic */
 .aurora-blob {
   position: absolute;
