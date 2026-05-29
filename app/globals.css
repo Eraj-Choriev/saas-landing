@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #F3EFE6;
+  --ink: #0A0E13;
+  --accent: #a9caf9;
+  --amber: #d17a00;
+  --gold: #fce88d;
+  --coral: #ff5b24;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* clears sticky navbar when jumping to anchors */
+  scroll-padding-top: 96px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+html,
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-feature-settings: "ss01", "ss02", "cv11";
+}
+
+::selection {
+  background: var(--coral);
+  color: #fff;
+}
+
+.font-display {
+  font-optical-sizing: auto;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.glow-aqua {
+  box-shadow: 0 0 0 1px rgba(169, 202, 249, 0.22),
+    0 12px 60px -16px rgba(169, 202, 249, 0.45);
+}
+
+.hairline {
+  border-color: rgba(10, 14, 19, 0.08);
+}
+.hairline-dark {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* hero aurora base */
+.aurora {
+  background:
+    radial-gradient(60% 50% at 20% 30%, rgba(169,202,249,0.22), transparent 60%),
+    radial-gradient(50% 40% at 80% 20%, rgba(255,91,36,0.18), transparent 60%),
+    radial-gradient(70% 60% at 50% 100%, rgba(209,122,0,0.22), transparent 60%),
+    linear-gradient(180deg, #0A0E13 0%, #0A0E13 60%, #130e08 100%);
+}
+
+/* glassmorphism navbar — light frosted pill for cream sections */
+.glass-light {
+  background: rgba(251, 248, 242, 0.62);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-color: rgba(10, 14, 19, 0.08);
+}
+
+/* drifting aurora blobs for hero — slow, calm, organic */
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  will-change: transform;
+  pointer-events: none;
+}
+
+@keyframes drift-a {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  33%  { transform: translate3d(8%, 6%, 0) scale(1.12); }
+  66%  { transform: translate3d(-6%, 10%, 0) scale(0.95); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes drift-b {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  40%  { transform: translate3d(-10%, 8%, 0) scale(1.15); }
+  80%  { transform: translate3d(6%, -6%, 0) scale(0.9); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes drift-c {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(10%, -8%, 0) scale(1.1); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+.animate-drift-a { animation: drift-a 22s ease-in-out infinite; }
+.animate-drift-b { animation: drift-b 28s ease-in-out infinite; }
+.animate-drift-c { animation: drift-c 25s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift-a,
+  .animate-drift-b,
+  .animate-drift-c {
+    animation: none;
+  }
+}
+
+/* shake for invalid form fields */
+@keyframes field-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+.animate-shake { animation: field-shake 0.4s ease-in-out; }
+
+/* spotlight that follows cursor on cards */
+.card-spotlight {
+  background: radial-gradient(
+    240px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(169, 202, 249, 0.14),
+    transparent 70%
+  );
+}
