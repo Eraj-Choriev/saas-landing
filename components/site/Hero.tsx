@@ -10,7 +10,7 @@ import {
 import { Sparkles, Terminal } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
-import { HeroBeams } from "@/components/site/HeroBeams"
+import LineWaves from "@/components/site/LineWaves"
 
 const reveal = {
   hidden: { opacity: 0, y: 18 },
@@ -35,8 +35,32 @@ export function Hero() {
         <div className="aurora-blob animate-drift-c left-[28%] bottom-[-14%] h-[36rem] w-[36rem] bg-[radial-gradient(circle,rgba(209,122,0,0.4),transparent_65%)]" />
       </div>
 
-      {/* cursor-illuminated beam field (reactbits-style, adapted) */}
-      <HeroBeams />
+      {/* warped line-wave field (reactbits LineWaves, ogl) — brand-tinted */}
+      <LineWaves
+        speed={0.8}
+        innerLineCount={31}
+        outerLineCount={36}
+        warpIntensity={1}
+        rotation={-51}
+        edgeFadeWidth={0}
+        colorCycleSpeed={1}
+        brightness={0.16}
+        color1="#a9caf9"
+        color2="#ff5b24"
+        color3="#fce88d"
+        enableMouseInteraction
+        mouseInfluence={2}
+      />
+
+      {/* readability scrim — keeps the headline crisp over the waves */}
+      <div
+        className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#0A0E13_0%,rgba(10,14,19,0.72)_28%,rgba(10,14,19,0.15)_58%,transparent_78%)]"
+        aria-hidden
+      />
+      <div
+        className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-[linear-gradient(180deg,transparent,#0A0E13)]"
+        aria-hidden
+      />
 
       {/* fine grid + top glow */}
       <div className="absolute inset-0 -z-10 bg-grid-ink bg-[size:48px_48px] opacity-40 [mask-image:radial-gradient(80%_60%_at_50%_0%,#000,transparent)]" />
