@@ -13,7 +13,6 @@ type FormState = {
   services: string[]
   timeline: string
   challenge: string
-  budget: string
 }
 
 const initial: FormState = {
@@ -23,7 +22,6 @@ const initial: FormState = {
   services: [],
   timeline: "",
   challenge: "",
-  budget: "",
 }
 
 export function ContactForm() {
@@ -41,13 +39,12 @@ export function ContactForm() {
       services: form.services.length > 0,
       timeline: !!form.timeline,
       challenge: form.challenge.trim().length >= 20,
-      budget: !!form.budget,
     }),
     [form]
   )
 
   const filled = Object.values(valid).filter(Boolean).length
-  const total = 6
+  const total = 5
   const pct = (filled / total) * 100
   const allValid = filled === total
 
@@ -264,32 +261,6 @@ export function ContactForm() {
               <p className="mt-1.5 font-mono text-[11px] text-ink/40">
                 {form.challenge.length}/20+
               </p>
-            </FieldGroup>
-
-            {/* budget */}
-            <FieldGroup invalid={err("budget")} errorText={t.form.required}>
-              <Label required invalid={err("budget")}>
-                {t.form.fields.budget.label}
-              </Label>
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {t.form.fields.budget.options.map((s) => (
-                  <button
-                    type="button"
-                    key={s}
-                    onClick={() => setForm((f) => ({ ...f, budget: s }))}
-                    className={cn(
-                      "rounded-2xl border px-3 py-3 text-[13px] transition-colors text-center",
-                      form.budget === s
-                        ? "border-brand-blue bg-brand-blue/10 text-ink"
-                        : err("budget")
-                          ? "border-brand-coral/50 bg-brand-coral/[0.04] text-ink/70 hover:border-brand-coral"
-                          : "border-ink/10 bg-cream-100 text-ink/70 hover:border-ink/25"
-                    )}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
             </FieldGroup>
 
             {/* global error hint */}

@@ -252,11 +252,9 @@ const en = {
     social: [
       { label: "Telegram", href: "https://t.me/aqly" },
       { label: "Telegram Bot", href: "https://t.me/aqly_bot" },
-      { label: "Website", href: "https://aqly.io" },
       { label: "YouTube", href: "https://youtube.com/@aqly" },
       { label: "Instagram", href: "https://instagram.com/aqly" },
       { label: "LinkedIn", href: "https://linkedin.com/company/aqly" },
-      { label: "X / Twitter", href: "https://x.com/aqly" },
     ],
     rights: "© 2026 Aqly.io · All rights reserved",
     nav: ["Privacy Policy", "Terms of Service"],
@@ -489,11 +487,9 @@ const ru: Dict = {
     social: [
       { label: "Telegram", href: "https://t.me/aqly" },
       { label: "Telegram-бот", href: "https://t.me/aqly_bot" },
-      { label: "Сайт", href: "https://aqly.io" },
       { label: "YouTube", href: "https://youtube.com/@aqly" },
       { label: "Instagram", href: "https://instagram.com/aqly" },
       { label: "LinkedIn", href: "https://linkedin.com/company/aqly" },
-      { label: "X / Twitter", href: "https://x.com/aqly" },
     ],
     rights: "© 2026 Aqly.io · Все права защищены",
     nav: ["Политика приватности", "Условия"],

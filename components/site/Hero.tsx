@@ -95,13 +95,9 @@ export function Hero() {
                 href="#services"
                 variant="ghost"
                 size="lg"
-                arrow={false}
-                className="border border-white/15 text-cream-100 hover:border-white/35 hover:bg-white/[0.06] hover:text-cream-50"
+                className="border border-cream-50/25 text-cream-50 hover:border-cream-50/50 hover:bg-white/[0.06] [&_.dot]:bg-cream-50/15 [&_.dot]:text-cream-50 hover:[&_.dot]:bg-cream-50/25"
               >
-                <span className="relative">
-                  {t.hero.secondary}
-                  <span className="pointer-events-none absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-gradient-to-r from-brand-coral to-brand-amber transition-transform duration-300 group-hover:scale-x-100" />
-                </span>
+                {t.hero.secondary}
               </Button>
             </motion.div>
 
