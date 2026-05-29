@@ -149,6 +149,22 @@ body {
 }
 .animate-shake { animation: field-shake 0.4s ease-in-out; }
 
+/* infinite tech-stack marquee — duplicated track scrolls one full set */
+@keyframes tech-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.tech-track {
+  animation: tech-scroll 34s linear infinite;
+  will-change: transform;
+}
+.tech-marquee:hover .tech-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tech-track { animation: none; }
+}
+
 /* animated underline that wipes in from the left on hover */
 .link-underline {
   position: relative;

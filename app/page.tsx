@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/site/Navbar"
 import { Hero } from "@/components/site/Hero"
+import { TechStack } from "@/components/site/TechStack"
 import { WhatWeBuild } from "@/components/site/WhatWeBuild"
 import { Approach } from "@/components/site/Approach"
 import { ContactForm } from "@/components/site/ContactForm"
@@ -10,6 +11,7 @@ export default function Page() {
     <main className="relative">
       <Navbar />
       <Hero />
+      <TechStack />
       <WhatWeBuild />
       <Approach />
       <ContactForm />

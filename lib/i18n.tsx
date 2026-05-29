@@ -55,6 +55,9 @@ const en = {
       success: "Request handled · client happy",
     },
   },
+  stack: {
+    title: "The stack we build with",
+  },
   build: {
     kicker: "WHAT WE BUILD",
     title: "AI Solutions That Deliver Results",
@@ -309,6 +312,9 @@ const ru: Dict = {
       cardTag: "Готов к запуску",
       success: "Заявка оформлена · клиент доволен",
     },
+  },
+  stack: {
+    title: "Стек, на котором мы строим",
   },
   build: {
     kicker: "ЧТО МЫ СТРОИМ",
