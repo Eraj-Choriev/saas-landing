@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import {
   Send,
   Globe,
-  Rocket,
+  Mic,
   Workflow,
   Sparkles,
   TrendingUp,
@@ -19,7 +19,7 @@ import { ServiceModal } from "./ServiceModal"
 const META: { Icon: LucideIcon; color: string }[] = [
   { Icon: Send, color: "#a9caf9" },
   { Icon: Globe, color: "#d17a00" },
-  { Icon: Rocket, color: "#ff5b24" },
+  { Icon: Mic, color: "#ff5b24" },
   { Icon: Workflow, color: "#d17a00" },
   { Icon: Sparkles, color: "#a9caf9" },
   { Icon: TrendingUp, color: "#ff5b24" },

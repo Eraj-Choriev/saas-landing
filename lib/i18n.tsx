@@ -96,19 +96,19 @@ const en = {
         },
       },
       {
-        tag: "Landing Pages",
-        title: "Landing Pages",
-        body: "High-velocity landers for launches and campaigns. A/B-ready, analytics wired, copy that earns attention.",
+        tag: "AI Voice Assistants",
+        title: "AI Voice Assistants",
+        body: "A lifelike voice agent embedded right on your site. It picks up every visitor, answers, qualifies and books in real time — so real, callers can't tell it's AI.",
         details: {
           overview:
-            "High-velocity landing pages purpose-built for launches and paid campaigns. Every section is engineered to convert — A/B-ready, instrumented, with copy that earns attention in the first three seconds.",
+            "A custom AI voice assistant lives as a widget directly on your website. A visitor clicks it and instantly talks to an agent whose voice is so natural it's indistinguishable from a real person. It answers questions, qualifies the lead, handles objections and books the call — 24/7, on every visitor most sites quietly lose.",
           how: [
-            "We sharpen the offer and write the conversion narrative.",
-            "Design a single-focus page with one clear action.",
-            "Wire A/B variants, events and pixels before launch.",
-            "Read the data, kill the losers, double down on winners.",
+            "Visitor clicks the voice widget on your site — no app, no dialing.",
+            "The agent greets them in a warm, human-realistic voice.",
+            "It understands intent, answers and pulls live data from your stack.",
+            "It qualifies, books the meeting or routes to your team — instantly.",
           ],
-          features: ["A/B variants", "Event tracking", "Sub-second load", "Conversion copy"],
+          features: ["Human-realistic voice", "Embedded site widget", "24/7 instant pickup", "Books & routes calls"],
         },
       },
       {
@@ -212,7 +212,7 @@ const en = {
       website: { label: "Website URL (optional)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Services of Interest",
-        options: ["Telegram Bots", "Websites", "Landing Pages", "n8n Workflows", "AI Features", "Growth Marketing"],
+        options: ["Telegram Bots", "Websites", "AI Voice Assistants", "n8n Workflows", "AI Features", "Growth Marketing"],
       },
       timeline: {
         label: "Project Timeline",
@@ -238,7 +238,7 @@ const en = {
       { title: "Services", links: [
         { label: "Telegram Bots", href: "#services" },
         { label: "Websites", href: "#services" },
-        { label: "Landing Pages", href: "#services" },
+        { label: "AI Voice Assistants", href: "#services" },
         { label: "n8n Workflows", href: "#services" },
         { label: "AI Features", href: "#services" },
         { label: "Growth Marketing", href: "#services" },
@@ -351,19 +351,19 @@ const ru: Dict = {
         },
       },
       {
-        tag: "Лендинги",
-        title: "Лендинги",
-        body: "Скоростные лендинги под запуски и кампании. A/B-готовы, аналитика подключена, копирайт работает.",
+        tag: "AI-голосовые помощники",
+        title: "AI-голосовые помощники",
+        body: "Реалистичный голосовой агент прямо на вашем сайте. Встречает каждого посетителя, отвечает, квалифицирует и записывает в реальном времени — голос не отличить от человека.",
         details: {
           overview:
-            "Скоростные лендинги под запуски и платные кампании. Каждый блок спроектирован под конверсию — готов к A/B, с подключённой аналитикой и копирайтом, который цепляет за первые три секунды.",
+            "Кастомный AI-голосовой помощник живёт виджетом прямо на вашем сайте. Посетитель нажимает — и сразу говорит с агентом, чей голос настолько естественный, что его не отличить от живого человека. Он отвечает на вопросы, квалифицирует лида, отрабатывает возражения и записывает на звонок — 24/7, по каждому посетителю, которого большинство сайтов тихо теряет.",
           how: [
-            "Затачиваем оффер и пишем конверсионный нарратив.",
-            "Проектируем страницу с одним фокусом и одним действием.",
-            "Подключаем A/B-варианты, события и пиксели до запуска.",
-            "Читаем данные, убираем слабое, усиливаем сильное.",
+            "Посетитель нажимает голосовой виджет на сайте — без приложений и звонков.",
+            "Агент приветствует тёплым, человечным голосом.",
+            "Понимает запрос, отвечает и подтягивает данные из вашего стека.",
+            "Квалифицирует, записывает встречу или передаёт команде — мгновенно.",
           ],
-          features: ["A/B-варианты", "Трекинг событий", "Загрузка < 1 c", "Конверсионный копирайт"],
+          features: ["Реалистичный голос", "Виджет на сайте", "Ответ 24/7 мгновенно", "Запись и маршрутизация"],
         },
       },
       {
@@ -447,7 +447,7 @@ const ru: Dict = {
       website: { label: "Сайт (необязательно)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Интересующие услуги",
-        options: ["Telegram-боты", "Веб-сайты", "Лендинги", "n8n Workflows", "AI-фичи", "Маркетинг"],
+        options: ["Telegram-боты", "Веб-сайты", "AI-голосовые помощники", "n8n Workflows", "AI-фичи", "Маркетинг"],
       },
       timeline: {
         label: "Сроки проекта",
@@ -473,7 +473,7 @@ const ru: Dict = {
       { title: "Услуги", links: [
         { label: "Telegram-боты", href: "#services" },
         { label: "Веб-сайты", href: "#services" },
-        { label: "Лендинги", href: "#services" },
+        { label: "AI-голосовые помощники", href: "#services" },
         { label: "n8n Workflows", href: "#services" },
         { label: "AI-фичи", href: "#services" },
         { label: "Маркетинг", href: "#services" },

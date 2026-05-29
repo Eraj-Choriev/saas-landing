@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { Mic, Phone } from "lucide-react"
 
 /**
  * A stylized product preview rendered for each service inside the modal —
@@ -10,7 +11,7 @@ export function ServiceVisual({ index, color }: { index: number; color: string }
   const visuals = [
     <TelegramVisual key={0} color={color} />,
     <WebsiteVisual key={1} color={color} />,
-    <LandingVisual key={2} color={color} />,
+    <VoiceVisual key={2} color={color} />,
     <WorkflowVisual key={3} color={color} />,
     <AIVisual key={4} color={color} />,
     <GrowthVisual key={5} color={color} />,
@@ -91,24 +92,76 @@ function WebsiteVisual({ color }: { color: string }) {
   )
 }
 
-function LandingVisual({ color }: { color: string }) {
+function VoiceVisual({ color }: { color: string }) {
+  // animated waveform bars — the agent "speaking"
+  const wave = [0.4, 0.8, 0.55, 1, 0.7, 0.35, 0.9, 0.5, 0.75, 0.45]
   return (
-    <div className="space-y-3 px-2 py-1 text-center">
-      <motion.div {...stagger(0)} className="mx-auto"><Bar w="55%" color={color} /></motion.div>
-      <div className="mx-auto flex flex-col items-center gap-2">
-        <motion.div {...stagger(1)} className="w-full flex justify-center"><Bar w="72%" /></motion.div>
-        <motion.div {...stagger(2)} className="w-full flex justify-center"><Bar w="48%" /></motion.div>
+    <div className="relative overflow-hidden rounded-xl border border-white/10 bg-ink/70">
+      {/* fake site under the widget */}
+      <div className="flex items-center gap-1.5 border-b border-white/10 px-3 py-2">
+        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+        <span className="ml-2 rounded-md bg-white/[0.06] px-2 py-0.5 text-[10px] font-mono text-cream-100/45">yoursite.com</span>
       </div>
-      <motion.div {...stagger(3)}>
-        <span className="inline-block rounded-full px-5 py-2 text-[11px] font-medium text-ink" style={{ backgroundColor: color }}>
-          Claim your spot →
-        </span>
-      </motion.div>
-      <motion.div {...stagger(4)} className="flex justify-center gap-4 pt-1 font-mono text-[10px] uppercase tracking-wider text-cream-100/45">
-        <span>A / B ready</span>
-        <span>·</span>
-        <span>analytics on</span>
-      </motion.div>
+
+      <div className="relative h-[150px] p-4">
+        {/* faint page content */}
+        <div className="space-y-2.5 opacity-50">
+          <Bar w="60%" />
+          <Bar w="40%" />
+          <Bar w="52%" />
+        </div>
+
+        {/* floating voice widget */}
+        <motion.div
+          initial={{ opacity: 0, y: 14, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 280, damping: 22 }}
+          className="absolute bottom-3 right-3 w-[200px] rounded-2xl border border-white/12 bg-ink-800/95 p-3 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.7)] backdrop-blur"
+        >
+          <div className="flex items-center gap-2.5">
+            {/* pulsing avatar */}
+            <div className="relative grid h-9 w-9 shrink-0 place-items-center rounded-full" style={{ backgroundColor: color }}>
+              <Mic className="h-4 w-4 text-ink" strokeWidth={2.2} />
+              <motion.span
+                className="absolute inset-0 rounded-full"
+                style={{ border: `1.5px solid ${color}` }}
+                animate={{ scale: [1, 1.6], opacity: [0.6, 0] }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
+              />
+            </div>
+            <div className="leading-tight">
+              <p className="text-[12px] font-medium text-cream-50">Aqly Voice</p>
+              <p className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider text-emerald-400/85">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                live · human voice
+              </p>
+            </div>
+          </div>
+
+          {/* waveform */}
+          <div className="mt-3 flex h-7 items-center justify-between gap-[3px]">
+            {wave.map((h, i) => (
+              <motion.span
+                key={i}
+                className="w-full rounded-full"
+                style={{ backgroundColor: color }}
+                animate={{ scaleY: [h, h * 0.35, h * 1.1, h * 0.5, h] }}
+                transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut", delay: i * 0.08 }}
+                initial={{ height: `${h * 100}%` }}
+              />
+            ))}
+          </div>
+
+          <div className="mt-2 flex items-center justify-between">
+            <span className="font-mono text-[10px] text-cream-100/50">00:12</span>
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-400 text-ink">
+              <Phone className="h-3 w-3" strokeWidth={2.4} />
+            </span>
+          </div>
+        </motion.div>
+      </div>
     </div>
   )
 }
