@@ -198,18 +198,18 @@ function AIVisual({ color }: { color: string }) {
   return (
     <div className="space-y-3">
       <motion.div {...stagger(0)} className="rounded-xl bg-white/[0.05] px-3.5 py-2.5 text-[12.5px] text-cream-100/70">
-        <span className="font-mono text-[10px] uppercase tracking-wider text-cream-100/40">prompt</span>
-        <p className="mt-1">What was our Q3 churn and why?</p>
+        <span className="font-mono text-[10px] uppercase tracking-wider text-cream-100/40">request</span>
+        <p className="mt-1">Handle the support queue & write our launch post</p>
       </motion.div>
       <motion.div
         {...stagger(1)}
         className="rounded-xl border px-3.5 py-2.5 text-[12.5px] text-cream-50"
         style={{ borderColor: `${color}55`, backgroundColor: `${color}12` }}
       >
-        <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color }}>answer · grounded</span>
-        <p className="mt-1">Q3 churn was 4.2%, driven by onboarding drop-off.</p>
-        <div className="mt-2 flex gap-1.5">
-          {["report.pdf", "crm", "tickets"].map((s) => (
+        <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color }}>agent · automated</span>
+        <p className="mt-1">Resolved 38 chats · drafted 5 posts ✦</p>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {["Claude", "GPT-class", "+18% revenue"].map((s) => (
             <span key={s} className="rounded-md bg-white/[0.06] px-2 py-0.5 text-[9.5px] font-mono text-cream-100/55">
               {s}
             </span>

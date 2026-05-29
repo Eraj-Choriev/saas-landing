@@ -131,19 +131,19 @@ const en = {
         },
       },
       {
-        tag: "AI Features",
-        title: "AI Features",
-        body: "RAG systems, copilots, classifiers, voice. AI that actually knows your business data and integrates with your stack.",
+        tag: "AI Integration",
+        title: "AI Integration",
+        body: "Embed advanced AI across your business and product — automated chat support, content generation and copilots on Claude & GPT-class models that lift revenue and reach more customers.",
         details: {
           overview:
-            "RAG systems, copilots, classifiers and voice agents that actually know your business data. We embed AI directly into your product and stack — grounded in your knowledge, not generic answers.",
+            "We integrate state-of-the-art AI directly into your business and product — not a generic chatbot, but automated chat support, content generation, copilots and decision tools running on the most advanced cloud models (Claude, GPT-class). The result: lower costs, higher conversion and customers reached 24/7.",
           how: [
-            "We index your docs, data and knowledge into a vector store.",
-            "Build retrieval so answers are grounded and cite sources.",
-            "Wrap it in a copilot, classifier or voice interface.",
-            "Guardrail, evaluate and ship behind your own auth.",
+            "Automated chat support that answers and resolves around the clock.",
+            "Content generation — posts, emails and product copy on demand.",
+            "Copilots and assistants wired straight into your existing product.",
+            "Runs on advanced cloud models (Claude, GPT-class) — secure & scalable.",
           ],
-          features: ["RAG + citations", "Your own data", "Eval harness", "Any LLM provider"],
+          features: ["Chat support automation", "Content generation", "Claude & GPT-class models", "Revenue & reach uplift"],
         },
       },
       {
@@ -215,7 +215,7 @@ const en = {
       website: { label: "Website URL (optional)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Services of Interest",
-        options: ["Telegram Bots", "Websites", "AI Voice Assistants", "n8n Workflows", "AI Features", "Growth Marketing"],
+        options: ["Telegram Bots", "Websites", "AI Voice Assistants", "n8n Workflows", "AI Integration", "Growth Marketing"],
       },
       timeline: {
         label: "Project Timeline",
@@ -243,7 +243,7 @@ const en = {
         { label: "Websites", href: "#services" },
         { label: "AI Voice Assistants", href: "#services" },
         { label: "n8n Workflows", href: "#services" },
-        { label: "AI Features", href: "#services" },
+        { label: "AI Integration", href: "#services" },
         { label: "Growth Marketing", href: "#services" },
       ] },
       { title: "Company", links: [
@@ -389,19 +389,19 @@ const ru: Dict = {
         },
       },
       {
-        tag: "AI-фичи",
-        title: "AI-фичи",
-        body: "RAG-системы, копайлоты, классификаторы, голос. AI, который знает ваши данные и интегрируется в стек.",
+        tag: "Интеграция AI",
+        title: "Интеграция AI",
+        body: "Встраиваем продвинутый AI в ваш бизнес и продукт — автоматическая чат-поддержка, генерация контента и копайлоты на моделях Claude и уровня GPT, которые повышают доход и охватывают больше клиентов.",
         details: {
           overview:
-            "RAG-системы, копайлоты, классификаторы и голосовые агенты, которые реально знают данные вашего бизнеса. Встраиваем AI прямо в продукт и стек — на основе ваших знаний, а не общих ответов.",
+            "Интегрируем передовой AI прямо в ваш бизнес и продукт — не дежурный чат-бот, а автоматическая чат-поддержка, генерация контента, копайлоты и инструменты принятия решений на самых продвинутых клауд-моделях (Claude, уровень GPT). Итог: ниже издержки, выше конверсия, клиенты охвачены 24/7.",
           how: [
-            "Индексируем ваши документы и данные в векторное хранилище.",
-            "Строим retrieval — ответы обоснованы и ссылаются на источники.",
-            "Заворачиваем в копайлот, классификатор или голосовой интерфейс.",
-            "Ставим guardrails, прогоняем eval и запускаем за вашей авторизацией.",
+            "Автоматическая чат-поддержка — отвечает и закрывает обращения круглосуточно.",
+            "Генерация контента — посты, письма и продуктовые тексты по запросу.",
+            "Копайлоты и ассистенты, встроенные прямо в ваш продукт.",
+            "Работает на продвинутых клауд-моделях (Claude, уровень GPT) — надёжно и масштабируемо.",
           ],
-          features: ["RAG + цитаты", "Ваши данные", "Eval-харнесс", "Любой LLM-провайдер"],
+          features: ["Автоматизация чат-поддержки", "Генерация контента", "Модели Claude и уровня GPT", "Рост дохода и охвата"],
         },
       },
       {
@@ -453,7 +453,7 @@ const ru: Dict = {
       website: { label: "Сайт (необязательно)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Интересующие услуги",
-        options: ["Telegram-боты", "Веб-сайты", "AI-голосовые помощники", "n8n Workflows", "AI-фичи", "Маркетинг"],
+        options: ["Telegram-боты", "Веб-сайты", "AI-голосовые помощники", "n8n Workflows", "Интеграция AI", "Маркетинг"],
       },
       timeline: {
         label: "Сроки проекта",
@@ -481,7 +481,7 @@ const ru: Dict = {
         { label: "Веб-сайты", href: "#services" },
         { label: "AI-голосовые помощники", href: "#services" },
         { label: "n8n Workflows", href: "#services" },
-        { label: "AI-фичи", href: "#services" },
+        { label: "Интеграция AI", href: "#services" },
         { label: "Маркетинг", href: "#services" },
       ] },
       { title: "Компания", links: [
