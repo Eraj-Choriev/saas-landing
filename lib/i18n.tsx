@@ -37,40 +37,127 @@ const en = {
     mockReq: "Process 2,400 refund requests by EOD",
     mockMeta: "947 resolved · 1,453 in queue",
     mockBadge: "98% auto-resolved",
+    mockProcessing: "Agent working",
+    chat: {
+      title: "Aqly Agent",
+      status: "online",
+      typing: "typing",
+      placeholder: "Message",
+      turns: [
+        { role: "user", text: "What services do you offer? 🤔", card: false },
+        { role: "agent", text: "AI agents, Telegram bots, websites & n8n automation — built end to end ⚡", card: false },
+        { role: "user", text: "Generate a service card for me 🎨", card: false },
+        { role: "agent", text: "Done — here's your card:", card: true },
+      ],
+      cardTitle: "Telegram Bot",
+      cardBody: "24/7 sales & support agent, wired to your CRM",
+      cardTag: "Ready to deploy",
+      success: "Request handled · client happy",
+    },
   },
   build: {
     kicker: "WHAT WE BUILD",
     title: "AI Solutions That Deliver Results",
+    learnMore: "Learn more",
+    modalCta: "Book a consultation",
+    modalHow: "How it works",
+    modalIncludes: "What's included",
     items: [
       {
         tag: "Telegram Bots",
         title: "Telegram Bots",
         body: "Conversational agents that qualify leads, sell, onboard and support — natively inside Telegram. Plugged into your CRM and payments.",
+        details: {
+          overview:
+            "A Telegram bot is an always-on conversational agent that lives inside the app your customers already use every day. It understands natural language, remembers context, and can sell, onboard, support and collect payments — without a human in the loop.",
+          how: [
+            "A user messages your bot — it reads intent in plain language.",
+            "It pulls live context from your CRM, docs and payment provider.",
+            "It answers, books, sells or escalates to a human when needed.",
+            "Every conversation is logged and scored in one dashboard.",
+          ],
+          features: ["CRM + payments wired in", "Multi-language", "Human handoff", "Live analytics"],
+        },
       },
       {
         tag: "Websites",
         title: "Websites",
         body: "Production-grade marketing sites and dashboards. Performance, SEO and design polished to enterprise standard.",
+        details: {
+          overview:
+            "We design and ship production-grade marketing sites and product dashboards — fast, accessible, search-optimised and pixel-polished to an enterprise standard your brand deserves.",
+          how: [
+            "We map your positioning, audience and conversion goals.",
+            "Design a distinctive system — type, colour, motion, layout.",
+            "Build on a modern stack (Next.js) with 90+ Lighthouse scores.",
+            "Ship, measure and iterate with analytics wired from day one.",
+          ],
+          features: ["Next.js + edge hosting", "SEO + Core Web Vitals", "CMS-ready", "Analytics built in"],
+        },
       },
       {
         tag: "Landing Pages",
         title: "Landing Pages",
         body: "High-velocity landers for launches and campaigns. A/B-ready, analytics wired, copy that earns attention.",
+        details: {
+          overview:
+            "High-velocity landing pages purpose-built for launches and paid campaigns. Every section is engineered to convert — A/B-ready, instrumented, with copy that earns attention in the first three seconds.",
+          how: [
+            "We sharpen the offer and write the conversion narrative.",
+            "Design a single-focus page with one clear action.",
+            "Wire A/B variants, events and pixels before launch.",
+            "Read the data, kill the losers, double down on winners.",
+          ],
+          features: ["A/B variants", "Event tracking", "Sub-second load", "Conversion copy"],
+        },
       },
       {
         tag: "n8n Workflows",
         title: "n8n Workflows",
         body: "Automated workflows connecting 400+ apps that save 10+ hours per week. No more manual data entry or copy-pasting.",
+        details: {
+          overview:
+            "Automated workflows that connect 400+ apps and quietly run your operations in the background. We replace the manual data entry, copy-pasting and tab-switching that eats 10+ hours of your team's week.",
+          how: [
+            "We audit the repetitive work draining your team's hours.",
+            "Map each task into a visual, reliable n8n workflow.",
+            "Connect your apps — CRM, email, sheets, Slack, AI models.",
+            "Add monitoring and alerts so it never silently breaks.",
+          ],
+          features: ["400+ integrations", "AI steps inside flows", "Error alerting", "Self-hosted option"],
+        },
       },
       {
         tag: "AI Features",
         title: "AI Features",
         body: "RAG systems, copilots, classifiers, voice. AI that actually knows your business data and integrates with your stack.",
+        details: {
+          overview:
+            "RAG systems, copilots, classifiers and voice agents that actually know your business data. We embed AI directly into your product and stack — grounded in your knowledge, not generic answers.",
+          how: [
+            "We index your docs, data and knowledge into a vector store.",
+            "Build retrieval so answers are grounded and cite sources.",
+            "Wrap it in a copilot, classifier or voice interface.",
+            "Guardrail, evaluate and ship behind your own auth.",
+          ],
+          features: ["RAG + citations", "Your own data", "Eval harness", "Any LLM provider"],
+        },
       },
       {
         tag: "Growth Marketing",
         title: "Growth Marketing",
         body: "Positioning, funnels, content systems and paid loops — instrumented from day one so growth compounds.",
+        details: {
+          overview:
+            "Positioning, funnels, content systems and paid acquisition loops — instrumented from day one so growth compounds instead of leaking. We treat marketing like an engineering system, not a guessing game.",
+          how: [
+            "We nail positioning and the ideal-customer profile.",
+            "Design the funnel and the content engine that feeds it.",
+            "Launch paid loops with clean attribution end to end.",
+            "Optimise on real numbers, reinvest into what compounds.",
+          ],
+          features: ["Positioning sprint", "Content engine", "Paid loops", "Full-funnel analytics"],
+        },
       },
     ],
   },
@@ -148,9 +235,28 @@ const en = {
     tagline: "Custom AI solutions that save your business 10+ hours per week.",
     email: "hello@aqly.io",
     cols: [
-      { title: "Services", links: ["Telegram Bots", "Websites", "Landing Pages", "n8n Workflows", "AI Features", "Growth Marketing"] },
-      { title: "Company", links: ["Our Approach", "Blog", "Community", "Contact"] },
-      { title: "Connect", links: ["Aqly+", "Free Community", "YouTube", "Instagram", "TikTok", "LinkedIn", "X / Twitter"] },
+      { title: "Services", links: [
+        { label: "Telegram Bots", href: "#services" },
+        { label: "Websites", href: "#services" },
+        { label: "Landing Pages", href: "#services" },
+        { label: "n8n Workflows", href: "#services" },
+        { label: "AI Features", href: "#services" },
+        { label: "Growth Marketing", href: "#services" },
+      ] },
+      { title: "Company", links: [
+        { label: "Our Approach", href: "#approach" },
+        { label: "Contact", href: "#contact" },
+      ] },
+    ],
+    socialTitle: "Connect",
+    social: [
+      { label: "Telegram", href: "https://t.me/aqly" },
+      { label: "Telegram Bot", href: "https://t.me/aqly_bot" },
+      { label: "Website", href: "https://aqly.io" },
+      { label: "YouTube", href: "https://youtube.com/@aqly" },
+      { label: "Instagram", href: "https://instagram.com/aqly" },
+      { label: "LinkedIn", href: "https://linkedin.com/company/aqly" },
+      { label: "X / Twitter", href: "https://x.com/aqly" },
     ],
     rights: "© 2026 Aqly.io · All rights reserved",
     nav: ["Privacy Policy", "Terms of Service"],
@@ -188,17 +294,128 @@ const ru: Dict = {
     mockReq: "Обработать 2 400 возвратов к концу дня",
     mockMeta: "947 закрыто · 1 453 в очереди",
     mockBadge: "98% авто-резолв",
+    mockProcessing: "Агент работает",
+    chat: {
+      title: "Aqly Агент",
+      status: "онлайн",
+      typing: "печатает",
+      placeholder: "Сообщение",
+      turns: [
+        { role: "user", text: "Какие у вас услуги? 🤔", card: false },
+        { role: "agent", text: "AI-агенты, Telegram-боты, сайты и автоматизация n8n — под ключ ⚡", card: false },
+        { role: "user", text: "Сгенерируй мне карточку услуги 🎨", card: false },
+        { role: "agent", text: "Готово — вот ваша карточка:", card: true },
+      ],
+      cardTitle: "Telegram-бот",
+      cardBody: "Агент продаж и поддержки 24/7, подключён к CRM",
+      cardTag: "Готов к запуску",
+      success: "Заявка оформлена · клиент доволен",
+    },
   },
   build: {
     kicker: "ЧТО МЫ СТРОИМ",
     title: "AI-решения, которые дают результат",
+    learnMore: "Подробнее",
+    modalCta: "Записаться на созвон",
+    modalHow: "Как это работает",
+    modalIncludes: "Что входит",
     items: [
-      { tag: "Telegram-боты", title: "Telegram-боты", body: "Диалоговые агенты квалифицируют, продают, онбордят и поддерживают — нативно в Telegram. Подключены к CRM и платежам." },
-      { tag: "Веб-сайты", title: "Веб-сайты", body: "Production-grade сайты и дашборды. Производительность, SEO и дизайн уровня enterprise." },
-      { tag: "Лендинги", title: "Лендинги", body: "Скоростные лендинги под запуски и кампании. A/B-готовы, аналитика подключена, копирайт работает." },
-      { tag: "n8n Workflows", title: "n8n Workflows", body: "Автоматизация на 400+ приложениях. Экономия 10+ часов в неделю. Ручной ввод и копи-паст — в прошлом." },
-      { tag: "AI-фичи", title: "AI-фичи", body: "RAG-системы, копайлоты, классификаторы, голос. AI, который знает ваши данные и интегрируется в стек." },
-      { tag: "Маркетинг", title: "Маркетинг", body: "Позиционирование, воронки, контент-системы и платные циклы — измеряем с первого дня, рост компаундируется." },
+      {
+        tag: "Telegram-боты",
+        title: "Telegram-боты",
+        body: "Диалоговые агенты квалифицируют, продают, онбордят и поддерживают — нативно в Telegram. Подключены к CRM и платежам.",
+        details: {
+          overview:
+            "Telegram-бот — это всегда онлайн диалоговый агент внутри приложения, которым ваши клиенты пользуются каждый день. Он понимает естественный язык, помнит контекст, продаёт, онбордит, поддерживает и принимает платежи — без участия человека.",
+          how: [
+            "Пользователь пишет боту — он понимает запрос на обычном языке.",
+            "Бот подтягивает контекст из CRM, документов и платёжной системы.",
+            "Отвечает, бронирует, продаёт или передаёт человеку при необходимости.",
+            "Каждый диалог логируется и оценивается в одном дашборде.",
+          ],
+          features: ["CRM + платежи", "Мультиязычность", "Передача человеку", "Аналитика онлайн"],
+        },
+      },
+      {
+        tag: "Веб-сайты",
+        title: "Веб-сайты",
+        body: "Production-grade сайты и дашборды. Производительность, SEO и дизайн уровня enterprise.",
+        details: {
+          overview:
+            "Проектируем и запускаем production-grade сайты и продуктовые дашборды — быстрые, доступные, SEO-оптимизированные и отполированные до пикселя на уровне enterprise.",
+          how: [
+            "Разбираем позиционирование, аудиторию и цели по конверсии.",
+            "Создаём фирменную систему — шрифты, цвет, анимация, сетка.",
+            "Собираем на современном стеке (Next.js), Lighthouse 90+.",
+            "Запускаем и итерируем с аналитикой с первого дня.",
+          ],
+          features: ["Next.js + edge", "SEO + Core Web Vitals", "Готов к CMS", "Аналитика внутри"],
+        },
+      },
+      {
+        tag: "Лендинги",
+        title: "Лендинги",
+        body: "Скоростные лендинги под запуски и кампании. A/B-готовы, аналитика подключена, копирайт работает.",
+        details: {
+          overview:
+            "Скоростные лендинги под запуски и платные кампании. Каждый блок спроектирован под конверсию — готов к A/B, с подключённой аналитикой и копирайтом, который цепляет за первые три секунды.",
+          how: [
+            "Затачиваем оффер и пишем конверсионный нарратив.",
+            "Проектируем страницу с одним фокусом и одним действием.",
+            "Подключаем A/B-варианты, события и пиксели до запуска.",
+            "Читаем данные, убираем слабое, усиливаем сильное.",
+          ],
+          features: ["A/B-варианты", "Трекинг событий", "Загрузка < 1 c", "Конверсионный копирайт"],
+        },
+      },
+      {
+        tag: "n8n Workflows",
+        title: "n8n Workflows",
+        body: "Автоматизация на 400+ приложениях. Экономия 10+ часов в неделю. Ручной ввод и копи-паст — в прошлом.",
+        details: {
+          overview:
+            "Автоматизированные воркфлоу, которые связывают 400+ приложений и тихо ведут вашу операционку в фоне. Убираем ручной ввод, копи-паст и переключение вкладок, которые съедают 10+ часов команды в неделю.",
+          how: [
+            "Аудитим рутину, которая забирает часы у команды.",
+            "Переносим каждую задачу в визуальный надёжный n8n-воркфлоу.",
+            "Подключаем приложения — CRM, почту, таблицы, Slack, AI-модели.",
+            "Добавляем мониторинг и алерты — ничего не ломается молча.",
+          ],
+          features: ["400+ интеграций", "AI-шаги внутри", "Алерты об ошибках", "Self-hosted опция"],
+        },
+      },
+      {
+        tag: "AI-фичи",
+        title: "AI-фичи",
+        body: "RAG-системы, копайлоты, классификаторы, голос. AI, который знает ваши данные и интегрируется в стек.",
+        details: {
+          overview:
+            "RAG-системы, копайлоты, классификаторы и голосовые агенты, которые реально знают данные вашего бизнеса. Встраиваем AI прямо в продукт и стек — на основе ваших знаний, а не общих ответов.",
+          how: [
+            "Индексируем ваши документы и данные в векторное хранилище.",
+            "Строим retrieval — ответы обоснованы и ссылаются на источники.",
+            "Заворачиваем в копайлот, классификатор или голосовой интерфейс.",
+            "Ставим guardrails, прогоняем eval и запускаем за вашей авторизацией.",
+          ],
+          features: ["RAG + цитаты", "Ваши данные", "Eval-харнесс", "Любой LLM-провайдер"],
+        },
+      },
+      {
+        tag: "Маркетинг",
+        title: "Маркетинг",
+        body: "Позиционирование, воронки, контент-системы и платные циклы — измеряем с первого дня, рост компаундируется.",
+        details: {
+          overview:
+            "Позиционирование, воронки, контент-системы и платные циклы привлечения — измеряем с первого дня, чтобы рост компаундировался, а не утекал. Относимся к маркетингу как к инженерной системе, а не к угадайке.",
+          how: [
+            "Фиксируем позиционирование и профиль идеального клиента.",
+            "Проектируем воронку и контент-движок, который её кормит.",
+            "Запускаем платные циклы с чистой сквозной атрибуцией.",
+            "Оптимизируем по реальным цифрам, реинвестируем в рост.",
+          ],
+          features: ["Спринт позиционирования", "Контент-движок", "Платные циклы", "Сквозная аналитика"],
+        },
+      },
     ],
   },
   approach: {
@@ -255,9 +472,28 @@ const ru: Dict = {
     tagline: "Кастомные AI-системы, экономящие команде 10+ часов в неделю.",
     email: "hello@aqly.io",
     cols: [
-      { title: "Услуги", links: ["Telegram-боты", "Веб-сайты", "Лендинги", "n8n Workflows", "AI-фичи", "Маркетинг"] },
-      { title: "Компания", links: ["Подход", "Блог", "Сообщество", "Контакты"] },
-      { title: "Соцсети", links: ["Aqly+", "Сообщество", "YouTube", "Instagram", "TikTok", "LinkedIn", "X / Twitter"] },
+      { title: "Услуги", links: [
+        { label: "Telegram-боты", href: "#services" },
+        { label: "Веб-сайты", href: "#services" },
+        { label: "Лендинги", href: "#services" },
+        { label: "n8n Workflows", href: "#services" },
+        { label: "AI-фичи", href: "#services" },
+        { label: "Маркетинг", href: "#services" },
+      ] },
+      { title: "Компания", links: [
+        { label: "Подход", href: "#approach" },
+        { label: "Контакты", href: "#contact" },
+      ] },
+    ],
+    socialTitle: "Соцсети",
+    social: [
+      { label: "Telegram", href: "https://t.me/aqly" },
+      { label: "Telegram-бот", href: "https://t.me/aqly_bot" },
+      { label: "Сайт", href: "https://aqly.io" },
+      { label: "YouTube", href: "https://youtube.com/@aqly" },
+      { label: "Instagram", href: "https://instagram.com/aqly" },
+      { label: "LinkedIn", href: "https://linkedin.com/company/aqly" },
+      { label: "X / Twitter", href: "https://x.com/aqly" },
     ],
     rights: "© 2026 Aqly.io · Все права защищены",
     nav: ["Политика приватности", "Условия"],

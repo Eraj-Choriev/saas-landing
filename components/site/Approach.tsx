@@ -2,7 +2,15 @@
 
 import { useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
+import { Compass, Target, Hammer, LifeBuoy, type LucideIcon } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
+
+const STEP_META: { Icon: LucideIcon; color: string }[] = [
+  { Icon: Compass, color: "#a9caf9" },
+  { Icon: Target, color: "#d17a00" },
+  { Icon: Hammer, color: "#ff5b24" },
+  { Icon: LifeBuoy, color: "#d17a00" },
+]
 
 export function Approach() {
   const { t } = useI18n()
@@ -15,8 +23,15 @@ export function Approach() {
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"])
 
   return (
-    <section id="approach" className="relative bg-cream-50">
-      <div className="container py-20 sm:py-28">
+    <section id="approach" className="relative overflow-hidden bg-cream-50">
+      {/* faint warm glow so the section breathes */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/3 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full opacity-[0.07] blur-3xl"
+        style={{ background: "radial-gradient(circle, #d17a00, transparent 70%)" }}
+        aria-hidden
+      />
+
+      <div className="container relative py-20 sm:py-28">
         <div className="text-center max-w-2xl mx-auto">
           <motion.p
             initial={{ opacity: 0, y: 8 }}
@@ -43,7 +58,7 @@ export function Approach() {
           <div className="pointer-events-none absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-ink/10 lg:block" />
           <motion.div
             style={{ height: lineHeight }}
-            className="pointer-events-none absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-brand-blue via-brand-amber to-brand-coral lg:block"
+            className="pointer-events-none absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-brand-blue via-brand-amber to-brand-coral shadow-[0_0_12px_rgba(209,122,0,0.5)] lg:block"
           />
 
           {/* mobile rail */}
@@ -53,39 +68,63 @@ export function Approach() {
             className="pointer-events-none absolute left-5 top-0 w-px bg-gradient-to-b from-brand-blue via-brand-amber to-brand-coral lg:hidden"
           />
 
-          <ul className="space-y-12 lg:space-y-20">
+          <ul className="space-y-12 lg:space-y-24">
             {t.approach.steps.map((step, i) => {
               const isRight = i % 2 === 1
+              const { Icon, color } = STEP_META[i]
               return (
                 <li key={i} className="relative">
-                  <NodeDot progress={scrollYProgress} index={i} total={t.approach.steps.length} />
+                  <NodeDot progress={scrollYProgress} index={i} total={t.approach.steps.length} color={color} />
 
                   <div
                     className={`grid grid-cols-1 lg:grid-cols-2 lg:gap-12 ${isRight ? "lg:[&>div]:col-start-2" : ""}`}
                   >
                     <motion.div
-                      initial={{ opacity: 0, y: 30, x: isRight ? 20 : -20 }}
+                      initial={{ opacity: 0, y: 36, x: isRight ? 28 : -28 }}
                       whileInView={{ opacity: 1, y: 0, x: 0 }}
                       viewport={{ once: true, margin: "-120px" }}
-                      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ type: "spring", stiffness: 90, damping: 18, mass: 0.7 }}
+                      whileHover={{ y: -5 }}
                       className="relative pl-14 lg:pl-0"
                     >
-                      <div className="relative rounded-3xl border border-ink/8 bg-cream-100 p-7 sm:p-8 shadow-[0_24px_60px_-40px_rgba(10,14,19,0.25)]">
-                        <div className="flex items-baseline justify-between gap-3">
-                          <span className="font-display text-[15px] font-medium tracking-tightest text-brand-coral">
-                            {step.n}
-                          </span>
+                      <div
+                        className="group relative overflow-hidden rounded-3xl border border-ink/8 bg-cream-100 p-7 shadow-[0_24px_60px_-40px_rgba(10,14,19,0.25)] transition-shadow duration-300 sm:p-8"
+                        style={{ ["--accent" as string]: color }}
+                      >
+                        {/* accent corner glow on hover */}
+                        <div
+                          className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                          style={{ background: color }}
+                        />
+                        <div className="relative flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="grid h-11 w-11 place-items-center rounded-2xl transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110"
+                              style={{ backgroundColor: `${color}22`, color: "#0A0E13" }}
+                            >
+                              <Icon className="h-5 w-5" style={{ color }} strokeWidth={1.9} />
+                            </div>
+                            <span
+                              className="font-display text-[28px] font-medium leading-none tracking-tightest"
+                              style={{ color }}
+                            >
+                              {step.n}
+                            </span>
+                          </div>
                           <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink/40">
                             STEP {i + 1} / {t.approach.steps.length}
                           </span>
                         </div>
-                        <h3 className="mt-3 font-display text-[26px] leading-tight tracking-tight text-ink sm:text-[30px]">
+                        <h3 className="relative mt-5 font-display text-[26px] leading-tight tracking-tight text-ink sm:text-[30px]">
                           {step.title}
                         </h3>
-                        <p className="mt-3 text-[14.5px] leading-[1.55] text-ink/65 text-pretty">
+                        <p className="relative mt-3 text-[14.5px] leading-[1.55] text-ink/65 text-pretty">
                           {step.body}
                         </p>
-                        <span className="mt-5 inline-block rounded-full bg-brand-gold/30 px-3 py-1 font-mono text-[10.5px] uppercase tracking-[0.16em] text-brand-amber">
+                        <span
+                          className="relative mt-5 inline-block rounded-full px-3 py-1 font-mono text-[10.5px] uppercase tracking-[0.16em]"
+                          style={{ backgroundColor: `${color}22`, color: "#0A0E13" }}
+                        >
                           {step.tag}
                         </span>
                       </div>
@@ -105,24 +144,37 @@ function NodeDot({
   progress,
   index,
   total,
+  color,
 }: {
   progress: ReturnType<typeof useScroll>["scrollYProgress"]
   index: number
   total: number
+  color: string
 }) {
   const t = (index + 0.5) / total
-  const scale = useTransform(progress, [t - 0.05, t], [0.6, 1])
-  const opacity = useTransform(progress, [t - 0.08, t], [0.3, 1])
+  const scale = useTransform(progress, [t - 0.06, t], [0.4, 1])
+  const opacity = useTransform(progress, [t - 0.09, t], [0.2, 1])
   return (
     <>
+      {/* desktop node */}
       <motion.div
         style={{ scale, opacity }}
-        className="absolute left-1/2 top-1/2 hidden h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-blue ring-4 ring-cream-50 lg:block"
-      />
+        className="absolute left-1/2 top-1/2 hidden h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full ring-4 ring-cream-50 lg:block"
+      >
+        <span className="absolute inset-0 rounded-full" style={{ backgroundColor: color }} />
+        <span
+          className="absolute inset-0 animate-ping rounded-full opacity-40"
+          style={{ backgroundColor: color }}
+        />
+      </motion.div>
+      {/* mobile node */}
       <motion.div
         style={{ scale, opacity }}
-        className="absolute left-5 top-7 h-3 w-3 -translate-x-1/2 rounded-full bg-brand-blue ring-4 ring-cream-50 lg:hidden"
-      />
+        className="absolute left-5 top-8 h-3.5 w-3.5 -translate-x-1/2 rounded-full ring-4 ring-cream-50 lg:hidden"
+        aria-hidden
+      >
+        <span className="absolute inset-0 rounded-full" style={{ backgroundColor: color }} />
+      </motion.div>
     </>
   )
 }

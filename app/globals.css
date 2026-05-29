@@ -149,6 +149,28 @@ body {
 }
 .animate-shake { animation: field-shake 0.4s ease-in-out; }
 
+/* animated underline that wipes in from the left on hover */
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--coral), var(--amber));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link-underline:hover::after {
+  transform: scaleX(1);
+}
+
 /* spotlight that follows cursor on cards */
 .card-spotlight {
   background: radial-gradient(

@@ -29,12 +29,10 @@ export function LangToggle({ tone = "ink" }: { tone?: "ink" | "cream" }) {
             className={cn(
               "relative z-10 rounded-full px-3 py-1.5 transition-colors duration-200",
               isActive
-                ? tone === "ink"
-                  ? "text-ink"
-                  : "text-cream-50"
+                ? "text-ink font-semibold"
                 : tone === "ink"
                   ? "text-ink/50 hover:text-ink/75"
-                  : "text-cream-100/50 hover:text-cream-100/80"
+                  : "text-cream-100/60 hover:text-cream-100/90"
             )}
           >
             {isActive && (
