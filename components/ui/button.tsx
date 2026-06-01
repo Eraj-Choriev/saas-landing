@@ -11,7 +11,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-brand-blue text-ink hover:bg-brand-blue/90 pl-5 pr-1.5 py-1.5 [&_.dot]:bg-brand-coral [&_.dot]:text-white",
+          "bg-brand-coral text-white hover:bg-brand-coral/90 pl-5 pr-1.5 py-1.5 [&_.dot]:bg-white [&_.dot]:text-brand-coral",
         light:
           "bg-cream-50 text-ink hover:bg-white pl-5 pr-1.5 py-1.5 [&_.dot]:bg-ink [&_.dot]:text-cream-50",
         ghost: "bg-transparent text-ink hover:bg-ink/5 px-4 py-2",

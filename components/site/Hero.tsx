@@ -1,16 +1,10 @@
 "use client"
 
-import {
-  motion,
-  useReducedMotion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion"
-import { Sparkles, Terminal } from "lucide-react"
+import * as React from "react"
+import { motion, useReducedMotion, useInView, animate } from "framer-motion"
+import { Sparkles, Send, Check } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
-import LineWaves from "@/components/site/LineWaves"
 
 const reveal = {
   hidden: { opacity: 0, y: 18 },
@@ -30,29 +24,15 @@ export function Hero() {
 
       {/* drifting aurora blobs — slow, calm, organic */}
       <div className="absolute inset-0 -z-10 overflow-hidden" aria-hidden>
-        <div className="aurora-blob animate-drift-a left-[-8%] top-[6%] h-[34rem] w-[34rem] bg-[radial-gradient(circle,rgba(169,202,249,0.5),transparent_65%)]" />
-        <div className="aurora-blob animate-drift-b right-[-10%] top-[-6%] h-[30rem] w-[30rem] bg-[radial-gradient(circle,rgba(255,91,36,0.34),transparent_65%)]" />
-        <div className="aurora-blob animate-drift-c left-[28%] bottom-[-14%] h-[36rem] w-[36rem] bg-[radial-gradient(circle,rgba(209,122,0,0.4),transparent_65%)]" />
+        <div className="aurora-blob animate-drift-a left-[-8%] top-[6%] h-[34rem] w-[34rem] bg-[radial-gradient(circle,rgba(169,202,249,0.42),transparent_65%)]" />
+        <div className="aurora-blob animate-drift-b right-[-10%] top-[-6%] h-[30rem] w-[30rem] bg-[radial-gradient(circle,rgba(255,91,36,0.3),transparent_65%)]" />
+        <div className="aurora-blob animate-drift-c left-[28%] bottom-[-14%] h-[36rem] w-[36rem] bg-[radial-gradient(circle,rgba(209,122,0,0.34),transparent_65%)]" />
       </div>
 
-      {/* warped line-wave field (reactbits LineWaves, ogl) — brand-tinted */}
-      <LineWaves
-        speed={0.8}
-        innerLineCount={31}
-        outerLineCount={36}
-        warpIntensity={1}
-        rotation={-51}
-        edgeFadeWidth={0}
-        colorCycleSpeed={1}
-        brightness={0.16}
-        color1="#a9caf9"
-        color2="#ff5b24"
-        color3="#fce88d"
-        enableMouseInteraction
-        mouseInfluence={2}
-      />
+      {/* engineered diagonal hairlines — static, cheap, brand-tinted */}
+      <div className="hero-lines absolute inset-0 -z-10" aria-hidden />
 
-      {/* readability scrim — keeps the headline crisp over the waves */}
+      {/* readability scrim — keeps the headline crisp */}
       <div
         className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#0A0E13_0%,rgba(10,14,19,0.72)_28%,rgba(10,14,19,0.15)_58%,transparent_78%)]"
         aria-hidden
@@ -70,7 +50,7 @@ export function Hero() {
       />
 
       <div className="container relative grain w-full pt-32 pb-20 sm:pt-36 sm:pb-24 lg:pt-40 lg:pb-28">
-        <div className="grid lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-16 items-center">
           <div>
             <motion.div
               variants={reveal}
@@ -121,7 +101,7 @@ export function Hero() {
               animate="show"
               className="mt-8 flex flex-wrap items-center gap-3"
             >
-              <Button href="#contact" variant="light" size="lg">
+              <Button href="#contact" variant="primary" size="lg">
                 {t.hero.primary}
               </Button>
               <Button
@@ -134,198 +114,340 @@ export function Hero() {
               </Button>
             </motion.div>
 
-            <motion.div
+            {/* trust line — instant credibility */}
+            <motion.p
               variants={reveal}
               custom={7}
               initial="hidden"
               animate="show"
-              className="mt-10 inline-flex items-center gap-2 text-[12.5px] font-mono uppercase tracking-[0.16em] text-cream-100/55"
+              className="mt-6 text-[13px] tracking-tight text-cream-100/50"
             >
-              <span className="inline-block h-px w-8 bg-cream-100/30" />
-              {t.hero.pill}
+              {t.hero.trust}
+            </motion.p>
+
+            {/* clickable topic tags → jump to services */}
+            <motion.div
+              variants={reveal}
+              custom={8}
+              initial="hidden"
+              animate="show"
+              className="mt-7 flex flex-wrap items-center gap-2"
+            >
+              {t.hero.tags.map((tag) => (
+                <a
+                  key={tag.label}
+                  href={tag.href}
+                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-1 font-mono text-[11.5px] uppercase tracking-[0.14em] text-cream-100/55 transition-colors duration-200 hover:border-brand-blue/40 hover:bg-brand-blue/10 hover:text-cream-50"
+                >
+                  {tag.label}
+                </a>
+              ))}
             </motion.div>
           </div>
 
-          <HeroCodeCard />
+          <HeroChat />
         </div>
       </div>
     </section>
   )
 }
 
-/* ── glassmorphism code panel with pointer-driven 3D tilt + glare ── */
-function HeroCodeCard() {
-  const prefersReduced = useReducedMotion()
+/* ════════════════ Interactive Telegram demo ════════════════ */
 
-  const px = useMotionValue(0) // -0.5 … 0.5
-  const py = useMotionValue(0)
-  const rotX = useSpring(useTransform(py, [-0.5, 0.5], [8, -8]), { stiffness: 120, damping: 18 })
-  const rotY = useSpring(useTransform(px, [-0.5, 0.5], [-10, 10]), { stiffness: 120, damping: 18 })
-  const glareX = useTransform(px, [-0.5, 0.5], ["18%", "82%"])
-  const glareY = useTransform(py, [-0.5, 0.5], ["8%", "72%"])
-  const glare = useTransform(
-    [glareX, glareY],
-    ([x, y]: string[]) =>
-      `radial-gradient(420px circle at ${x} ${y}, rgba(255,255,255,0.45), transparent 58%)`
-  )
+type Turn = { role: string; text: string; card: boolean }
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-  function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (prefersReduced) return
-    const r = e.currentTarget.getBoundingClientRect()
-    px.set((e.clientX - r.left) / r.width - 0.5)
-    py.set((e.clientY - r.top) / r.height - 0.5)
+function HeroChat() {
+  const { t } = useI18n()
+  const chat = t.hero.chat
+  const reduce = useReducedMotion()
+
+  const [msgs, setMsgs] = React.useState<Turn[]>([])
+  const [typing, setTyping] = React.useState(false)
+  const [ready, setReady] = React.useState(false)
+  const [usedQuick, setUsedQuick] = React.useState<number[]>([])
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const busyRef = React.useRef(false)
+
+  // auto-play the scripted conversation (re-runs on language change)
+  React.useEffect(() => {
+    if (reduce) {
+      setMsgs(chat.turns as Turn[])
+      setReady(true)
+      return
+    }
+    let cancelled = false
+    setMsgs([])
+    setReady(false)
+    setUsedQuick([])
+    ;(async () => {
+      await wait(650)
+      for (const turn of chat.turns as Turn[]) {
+        if (cancelled) return
+        if (turn.role === "agent") {
+          setTyping(true)
+          await wait(950)
+          if (cancelled) return
+          setTyping(false)
+        } else {
+          await wait(550)
+        }
+        if (cancelled) return
+        setMsgs((m) => [...m, turn])
+        await wait(350)
+      }
+      if (!cancelled) setReady(true)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [chat, reduce])
+
+  // keep the thread pinned to the latest message
+  React.useEffect(() => {
+    const el = scrollRef.current
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: reduce ? "auto" : "smooth" })
+  }, [msgs, typing, reduce])
+
+  const replyKeys = ["price", "services", "booking"] as const
+
+  async function send(text: string, key: (typeof replyKeys)[number], quickIdx?: number) {
+    if (busyRef.current) return
+    busyRef.current = true
+    if (quickIdx !== undefined) setUsedQuick((u) => [...u, quickIdx])
+    setMsgs((m) => [...m, { role: "user", text, card: false }])
+    if (!reduce) {
+      await wait(450)
+      setTyping(true)
+      await wait(950)
+      setTyping(false)
+    }
+    setMsgs((m) => [...m, { role: "agent", text: chat.replies[key], card: false }])
+    busyRef.current = false
   }
-  function onPointerLeave() {
-    px.set(0)
-    py.set(0)
+
+  function matchKey(input: string): (typeof replyKeys)[number] {
+    const s = input.toLowerCase()
+    if (/(стоит|цен|сколько|cost|price|\$)/.test(s)) return "price"
+    if (/(созвон|запиш|call|book|встреч|consult)/.test(s)) return "booking"
+    if (/(делае|услуг|do you|what|services|строит|build)/.test(s)) return "services"
+    return "services"
+  }
+
+  const [draft, setDraft] = React.useState("")
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const v = draft.trim()
+    if (!v) return
+    setDraft("")
+    // freeform → fallback unless it matches a known intent
+    const s = v.toLowerCase()
+    const known = /(стоит|цен|сколько|cost|price|\$|созвон|запиш|call|book|делае|услуг|do you|what|services|строит|build)/.test(s)
+    if (known) {
+      send(v, matchKey(v))
+    } else {
+      sendFallback(v)
+    }
+  }
+
+  async function sendFallback(text: string) {
+    if (busyRef.current) return
+    busyRef.current = true
+    setMsgs((m) => [...m, { role: "user", text, card: false }])
+    if (!reduce) {
+      await wait(450)
+      setTyping(true)
+      await wait(950)
+      setTyping(false)
+    }
+    setMsgs((m) => [...m, { role: "agent", text: chat.replies.fallback, card: false }])
+    busyRef.current = false
   }
 
   return (
-    <div className="[perspective:1600px]">
-      <motion.div
-        initial={{ opacity: 0, y: 40, rotateX: 10, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
-        transition={{ duration: 1.1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-        onPointerMove={onPointerMove}
-        onPointerLeave={onPointerLeave}
-        style={{ rotateX: rotX, rotateY: rotY, transformStyle: "preserve-3d" }}
-        className="relative mx-auto w-full max-w-[520px] will-change-transform"
-      >
-        {/* gentle perpetual float */}
-        <motion.div
-          animate={prefersReduced ? undefined : { y: [0, -10, 0] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          style={{ transformStyle: "preserve-3d" }}
-        >
-          <div className="absolute -inset-12 -z-10 rounded-full bg-brand-blue/12 blur-3xl" />
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 40, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+      className="relative mx-auto w-full max-w-[440px]"
+    >
+      {/* ambient glow behind the device */}
+      <div className="absolute -inset-10 -z-10 rounded-[40px] bg-brand-blue/12 blur-3xl" aria-hidden />
 
-          <div
-            className="glass-dark relative overflow-hidden rounded-[24px] p-1.5 shadow-[0_50px_120px_-40px_rgba(0,0,0,0.75)]"
-            style={{ transform: "translateZ(40px)" }}
-          >
-            {/* glare that tracks the tilt */}
-            <motion.div
-              className="pointer-events-none absolute inset-0 z-20 opacity-60 mix-blend-soft-light"
-              style={{ background: glare }}
-            />
-
-            <div className="overflow-hidden rounded-[18px] bg-ink-800/70">
-              {/* editor chrome */}
-              <div className="flex items-center justify-between border-b border-white/8 px-4 py-3">
-                <div className="flex items-center gap-2.5">
-                  <span className="flex gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-brand-coral/80" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-brand-amber/80" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-brand-gold/80" />
-                  </span>
-                  <span className="ml-1 flex items-center gap-1.5 font-mono text-[11.5px] text-cream-100/55">
-                    <Terminal className="h-3.5 w-3.5" strokeWidth={2} />
-                    agent.ts
-                  </span>
-                </div>
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream-100/35">
-                  Aqly · AI
-                </span>
-              </div>
-
-              {/* code body */}
-              <div
-                className="relative px-4 py-5 font-mono text-[13px] leading-[1.85]"
-                style={{
-                  backgroundImage:
-                    "radial-gradient(rgba(169,202,249,0.05) 1px, transparent 1px)",
-                  backgroundSize: "22px 22px",
-                }}
-              >
-                <CodeLines />
-              </div>
-
-              {/* runtime status footer */}
-              <div className="flex items-center justify-between border-t border-white/8 px-4 py-2.5">
-                <span className="flex items-center gap-2 text-[12px] text-emerald-300/90">
-                  <span className="relative grid place-items-center">
-                    <span className="absolute h-2.5 w-2.5 animate-ping rounded-full bg-emerald-400/50" />
-                    <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                  </span>
-                  deployed
-                </span>
-                <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-cream-100/40">
-                  opus-4 · n8n · telegram
-                </span>
-              </div>
+      <div className="glass-dark overflow-hidden rounded-[28px] p-1.5 shadow-[0_50px_120px_-40px_rgba(0,0,0,0.8)]">
+        <div className="overflow-hidden rounded-[22px] bg-ink-800/80">
+          {/* Telegram header */}
+          <div className="flex items-center gap-3 bg-[linear-gradient(180deg,#2AABEE,#229ED9)] px-4 py-3">
+            <div className="grid h-9 w-9 place-items-center rounded-full bg-white/20 font-display text-[15px] text-white">
+              a
             </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[14px] font-semibold text-white">{chat.title}</p>
+              <p className="flex items-center gap-1.5 text-[11.5px] text-white/80">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                {typing ? chat.typing + "…" : chat.status}
+              </p>
+            </div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/55">
+              Aqly
+            </span>
           </div>
-        </motion.div>
-      </motion.div>
+
+          {/* message thread */}
+          <div
+            ref={scrollRef}
+            className="flex h-[300px] flex-col gap-2 overflow-y-auto scrollbar-hide px-3.5 py-4 sm:h-[330px]"
+            style={{
+              backgroundImage:
+                "radial-gradient(rgba(169,202,249,0.05) 1px, transparent 1px)",
+              backgroundSize: "22px 22px",
+            }}
+          >
+            {msgs.map((m, i) =>
+              m.card ? (
+                <Bubble key={i} side="agent">
+                  <span className="mb-1 block">{m.text}</span>
+                  <ServiceCard
+                    title={chat.cardTitle}
+                    body={chat.cardBody}
+                    tag={chat.cardTag}
+                  />
+                </Bubble>
+              ) : (
+                <Bubble key={i} side={m.role === "user" ? "user" : "agent"}>
+                  {m.text}
+                </Bubble>
+              )
+            )}
+            {typing && <TypingBubble />}
+          </div>
+
+          {/* quick replies + input */}
+          <div className="border-t border-white/8 bg-ink-800/60 px-3 pb-3 pt-2.5">
+            <div className="mb-2 flex flex-wrap gap-1.5">
+              {chat.quickReplies.map((q, i) =>
+                usedQuick.includes(i) ? null : (
+                  <button
+                    key={q}
+                    type="button"
+                    disabled={!ready}
+                    onClick={() => send(q, replyKeys[i], i)}
+                    className="rounded-full border border-brand-blue/30 bg-brand-blue/10 px-2.5 py-1 text-[12px] text-brand-blue transition-colors duration-200 enabled:hover:bg-brand-blue/20 disabled:opacity-40"
+                  >
+                    {q}
+                  </button>
+                )
+              )}
+            </div>
+            <form onSubmit={onSubmit} className="flex items-center gap-2">
+              <input
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder={chat.placeholder}
+                aria-label={chat.placeholder}
+                className="min-w-0 flex-1 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-[13.5px] text-cream-50 placeholder:text-cream-100/30 focus:border-brand-blue/50 focus:outline-none"
+              />
+              <button
+                type="submit"
+                aria-label="Send"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#229ED9] text-white transition-transform duration-200 hover:scale-105 active:scale-95"
+              >
+                <Send className="h-4 w-4" strokeWidth={2} />
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <LiveCounter template={chat.counter} target={1247} reduce={!!reduce} />
+    </motion.div>
+  )
+}
+
+function Bubble({ side, children }: { side: "user" | "agent"; children: React.ReactNode }) {
+  const isUser = side === "user"
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className={`flex ${isUser ? "justify-end" : "justify-start"}`}
+    >
+      <div
+        className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-[13.5px] leading-[1.45] ${
+          isUser
+            ? "rounded-br-md bg-[#229ED9] text-white"
+            : "rounded-bl-md border border-white/10 bg-white/[0.07] text-cream-50"
+        }`}
+      >
+        {children}
+      </div>
+    </motion.div>
+  )
+}
+
+function TypingBubble() {
+  return (
+    <div className="flex justify-start">
+      <div className="flex items-center gap-1 rounded-2xl rounded-bl-md border border-white/10 bg-white/[0.07] px-4 py-3">
+        {[0, 1, 2].map((d) => (
+          <motion.span
+            key={d}
+            className="h-1.5 w-1.5 rounded-full bg-brand-blue"
+            animate={{ opacity: [0.25, 1, 0.25], y: [0, -3, 0] }}
+            transition={{ duration: 1, repeat: Infinity, delay: d * 0.16, ease: "easeInOut" }}
+          />
+        ))}
+      </div>
     </div>
   )
 }
 
-/* syntax-coloured snippet — brand palette, staggered reveal */
-function CodeLines() {
-  const kw = "text-brand-coral"
-  const fn = "text-brand-blue"
-  const str = "text-brand-gold"
-  const pn = "text-cream-100/40"
-  const tx = "text-cream-100/85"
-
-  const lines: React.ReactNode[] = [
-    <>
-      <span className={kw}>const</span> <span className={fn}>agent</span>{" "}
-      <span className={pn}>=</span> <span className={kw}>new</span>{" "}
-      <span className={fn}>AqlyAgent</span>
-      <span className={pn}>{"({"}</span>
-    </>,
-    <>
-      {"  "}
-      <span className={tx}>model</span>
-      <span className={pn}>:</span> <span className={str}>{'"claude-opus-4"'}</span>
-      <span className={pn}>,</span>
-    </>,
-    <>
-      {"  "}
-      <span className={tx}>tools</span>
-      <span className={pn}>:</span> <span className={pn}>[</span>
-      <span className={fn}>telegram</span>
-      <span className={pn}>,</span> <span className={fn}>n8n</span>
-      <span className={pn}>,</span> <span className={fn}>crm</span>
-      <span className={pn}>],</span>
-    </>,
-    <>
-      {"  "}
-      <span className={tx}>voice</span>
-      <span className={pn}>:</span> <span className={kw}>true</span>
-      <span className={pn}>,</span>
-    </>,
-    <>
-      <span className={pn}>{"})"}</span>
-    </>,
-    <>{" "}</>,
-    <>
-      <span className={kw}>await</span> <span className={fn}>agent</span>
-      <span className={pn}>.</span>
-      <span className={fn}>deploy</span>
-      <span className={pn}>()</span>
-    </>,
-    <>
-      <span className="text-emerald-400/70">{"// ✓ live · 1.2k chats/day"}</span>
-    </>,
-  ]
-
+function ServiceCard({ title, body, tag }: { title: string; body: string; tag: string }) {
   return (
-    <div>
-      {lines.map((ln, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: -6 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.5 + i * 0.07, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="grid grid-cols-[1.4rem_1fr] gap-x-3"
-        >
-          <span className="select-none text-right text-cream-100/20">{i + 1}</span>
-          <span className="whitespace-pre">{ln}</span>
-        </motion.div>
-      ))}
+    <div className="mt-1 w-full rounded-xl border border-brand-blue/25 bg-[linear-gradient(160deg,rgba(169,202,249,0.12),rgba(169,202,249,0.03))] p-3">
+      <div className="flex items-center justify-between">
+        <span className="text-[13px] font-semibold text-cream-50">{title}</span>
+        <span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
+          {tag}
+        </span>
+      </div>
+      <p className="mt-1 text-[12px] leading-snug text-cream-100/70">{body}</p>
     </div>
+  )
+}
+
+function LiveCounter({ template, target, reduce }: { template: string; target: number; reduce: boolean }) {
+  const ref = React.useRef<HTMLParagraphElement>(null)
+  const inView = useInView(ref, { once: true, margin: "-60px" })
+  const [n, setN] = React.useState(0)
+
+  React.useEffect(() => {
+    if (!inView) return
+    if (reduce) {
+      setN(target)
+      return
+    }
+    const controls = animate(0, target, {
+      duration: 1.6,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setN(Math.round(v)),
+    })
+    return () => controls.stop()
+  }, [inView, target, reduce])
+
+  const [before, after] = template.split("%n")
+  return (
+    <p
+      ref={ref}
+      className="mt-4 flex items-center justify-center gap-1.5 text-center text-[12.5px] text-cream-100/55"
+    >
+      <Check className="h-3.5 w-3.5 text-emerald-400" strokeWidth={2.5} />
+      <span>
+        {before}
+        <span className="font-mono font-medium text-cream-50">{n.toLocaleString("en-US")}</span>
+        {after}
+      </span>
+    </p>
   )
 }

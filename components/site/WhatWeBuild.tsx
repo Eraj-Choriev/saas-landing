@@ -8,7 +8,7 @@ import {
   Mic,
   Workflow,
   Sparkles,
-  TrendingUp,
+  PenTool,
   ArrowUpRight,
   type LucideIcon,
 } from "lucide-react"
@@ -22,7 +22,7 @@ const META: { Icon: LucideIcon; color: string }[] = [
   { Icon: Mic, color: "#ff5b24" },
   { Icon: Workflow, color: "#d17a00" },
   { Icon: Sparkles, color: "#a9caf9" },
-  { Icon: TrendingUp, color: "#ff5b24" },
+  { Icon: PenTool, color: "#ff5b24" },
 ]
 
 export function WhatWeBuild() {

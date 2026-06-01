@@ -112,7 +112,7 @@ export function Approach() {
                             </span>
                           </div>
                           <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink/40">
-                            STEP {i + 1} / {t.approach.steps.length}
+                            {t.approach.stepLabel} {i + 1} / {t.approach.steps.length}
                           </span>
                         </div>
                         <h3 className="relative mt-5 font-display text-[26px] leading-tight tracking-tight text-ink sm:text-[30px]">

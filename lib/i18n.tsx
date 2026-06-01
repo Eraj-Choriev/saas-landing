@@ -1,8 +1,8 @@
 "use client"
 
-import { createContext, useContext, useState, ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from "react"
 
-export type Lang = "ru" | "en"
+export type Lang = "ru" | "en" | "tj"
 
 type Dict = typeof en
 
@@ -13,6 +13,7 @@ const en = {
     cta: "Read the guide",
   },
   nav: {
+    about: "About",
     services: "Services",
     approach: "Approach",
     blog: "Blog",
@@ -23,10 +24,18 @@ const en = {
     eyebrow: "AI AGENCY · ENGINEERING-FIRST",
     title: ["Turn AI Into", "Your Unfair", "Advantage."],
     subtitle:
-      "Aqly builds custom AI agents, Telegram bots, websites, n8n workflows and growth systems that save your team 10+ hours per week. From concept to deployment, we handle everything.",
+      "Aqly builds custom AI agents, Telegram bots, websites, connected tools and growth systems that save your team 10+ hours per week. From concept to deployment, we handle everything.",
     primary: "Book a consultation",
     secondary: "See our services",
-    pill: "Telegram · Web · n8n · RAG · Growth",
+    pill: "Telegram · Web · Automation · RAG · Growth",
+    trust: "47 projects · 12 countries · 10+ hours saved weekly",
+    tags: [
+      { label: "Telegram", href: "#services" },
+      { label: "Web", href: "#services" },
+      { label: "Automation", href: "#services" },
+      { label: "RAG", href: "#services" },
+      { label: "Growth", href: "#services" },
+    ],
     mockTitle: "Aqly Agent",
     mockStatus: "live",
     mockLog: [
@@ -45,24 +54,95 @@ const en = {
       placeholder: "Message",
       turns: [
         { role: "user", text: "What services do you offer? 🤔", card: false },
-        { role: "agent", text: "AI agents, Telegram bots, websites & n8n automation — built end to end ⚡", card: false },
-        { role: "user", text: "Generate a service card for me 🎨", card: false },
-        { role: "agent", text: "Done — here's your card:", card: true },
+        { role: "agent", text: "Hey — great to meet you 👋", card: false },
+        { role: "agent", text: "We build AI agents, Telegram bots, websites & connected tools — fully end to end ⚡", card: false },
+        { role: "user", text: "Could you build me a Telegram sales bot? 🤖", card: false },
+        { role: "agent", text: "Absolutely. Let me put together a quick spec…", card: false },
+        { role: "agent", text: "Done — here's your service card:", card: true },
+        { role: "user", text: "Looks perfect — let's start 🚀", card: false },
+        { role: "agent", text: "On it — booking your kickoff call now ✅", card: false },
       ],
       cardTitle: "Telegram Bot",
       cardBody: "24/7 sales & support agent, wired to your CRM",
       cardTag: "Ready to deploy",
       success: "Request handled · client happy",
+      counter: "Today the bot answered %n messages",
+      quickReplies: ["How much does it cost?", "What do you do?", "Book a call"],
+      replies: {
+        price: "From $5k — it depends on scope. Most projects land between $5k and $15k ⚡",
+        services: "We build AI agents, Telegram bots, websites and connected tools — fully end to end 🚀",
+        booking: "Of course! Grab a slot here 👉 aqly.io/call",
+        fallback: "Great question — easiest to cover it on a quick call. Tap “Book a call” 👇",
+      },
     },
   },
+  cases: {
+    kicker: "CASE STUDIES",
+    title: "Results, not promises.",
+    lead: "A few systems we've shipped — and the numbers they moved.",
+    readCase: "Read case",
+    problemLabel: "Problem",
+    solutionLabel: "Solution",
+    resultLabel: "Result",
+    items: [
+      {
+        client: "Northwind",
+        category: "Telegram bot",
+        name: "Lead-qualification bot",
+        problem: "Losing 40% of inbound leads at the qualification stage.",
+        solution: "A Telegram bot wired into the CRM that qualifies and books calls 24/7.",
+        results: [
+          { value: "3.2×", label: "conversion" },
+          { value: "6 wks", label: "to launch" },
+          { value: "$120k", label: "ROI / yr" },
+        ],
+        stack: ["Next.js", "Claude", "Notion", "Stripe"],
+      },
+      {
+        client: "Lumen",
+        category: "AI integration",
+        name: "Support copilot",
+        problem: "Support team buried under repetitive tickets.",
+        solution: "A Claude-powered copilot that drafts and resolves tickets inline.",
+        results: [
+          { value: "71%", label: "auto-resolved" },
+          { value: "8 days", label: "to live" },
+          { value: "−44%", label: "response time" },
+        ],
+        stack: ["Python", "Claude", "Zendesk", "Postgres"],
+      },
+      {
+        client: "Voltage",
+        category: "Website + growth",
+        name: "Marketing site rebuild",
+        problem: "A slow, generic site converting under 1%.",
+        solution: "A rebuilt Next.js site with funnels instrumented from day one.",
+        results: [
+          { value: "98", label: "Lighthouse" },
+          { value: "2.6×", label: "sign-ups" },
+          { value: "5 wks", label: "to launch" },
+        ],
+        stack: ["Next.js", "Vercel", "GA4", "Figma"],
+      },
+    ],
+  },
+  finalCta: {
+    kicker: "READY?",
+    title: ["Ready to turn AI into", "your advantage?"],
+    sub: "Free 30-minute consultation. No obligation.",
+    button: "Book a call",
+    orPrefix: "or email us:",
+  },
   stack: {
-    title: "The stack we build with",
+    title: "Technologies & platforms",
   },
   build: {
     kicker: "WHAT WE BUILD",
     title: "AI Solutions That Deliver Results",
     learnMore: "Learn more",
     modalCta: "Book a consultation",
+    modalCtaTitle: "Ready to build this?",
+    modalCtaSub: "Free 30-min consultation — no obligation.",
     modalHow: "How it works",
     modalIncludes: "What's included",
     items: [
@@ -115,19 +195,19 @@ const en = {
         },
       },
       {
-        tag: "n8n Workflows",
-        title: "n8n Workflows",
-        body: "Automated workflows connecting 400+ apps that save 10+ hours per week. No more manual data entry or copy-pasting.",
+        tag: "Connected Tools",
+        title: "Connected Tools",
+        body: "We link your apps into one chain — a lead comes in, it's logged to a sheet, the client gets a message and your team gets a ping. Nobody does it by hand.",
         details: {
           overview:
-            "Automated workflows that connect 400+ apps and quietly run your operations in the background. We replace the manual data entry, copy-pasting and tab-switching that eats 10+ hours of your team's week.",
+            "Picture one event kicking off a chain across your apps: an order arrives → it's saved to a sheet → the client gets a message → your manager gets notified. We build these chains, host them and keep them running without a hitch.",
           how: [
-            "We audit the repetitive work draining your team's hours.",
-            "Map each task into a visual, reliable n8n workflow.",
-            "Connect your apps — CRM, email, sheets, Slack, AI models.",
-            "Add monitoring and alerts so it never silently breaks.",
+            "We look at what you do by hand every day.",
+            "We build the chain — one event, your apps do the rest.",
+            "We add checks so nothing slips through.",
+            "We launch it, watch it and keep improving.",
           ],
-          features: ["400+ integrations", "AI steps inside flows", "Error alerting", "Self-hosted option"],
+          features: ["Multi-step chains", "Connects any apps", "Error protection", "Hosting + monitoring"],
         },
       },
       {
@@ -147,19 +227,19 @@ const en = {
         },
       },
       {
-        tag: "Growth Marketing",
-        title: "Growth Marketing",
-        body: "Positioning, funnels, content systems and paid loops — instrumented from day one so growth compounds.",
+        tag: "Design",
+        title: "Design",
+        body: "Logos, brand identity, website and social-media visuals — a clean, recognisable look that makes your business feel trustworthy.",
         details: {
           overview:
-            "Positioning, funnels, content systems and paid acquisition loops — instrumented from day one so growth compounds instead of leaking. We treat marketing like an engineering system, not a guessing game.",
+            "Everything visual for your business — logo, brand identity, website and app design, social-media graphics and presentations. We make it look professional and consistent so customers trust you at first glance.",
           how: [
-            "We nail positioning and the ideal-customer profile.",
-            "Design the funnel and the content engine that feeds it.",
-            "Launch paid loops with clean attribution end to end.",
-            "Optimise on real numbers, reinvest into what compounds.",
+            "We study your business and who your customers are.",
+            "Design a logo and a clear brand style — colours and fonts.",
+            "Apply it everywhere — site, social media, presentations.",
+            "Hand over ready-to-use files and simple guidelines.",
           ],
-          features: ["Positioning sprint", "Content engine", "Paid loops", "Full-funnel analytics"],
+          features: ["Logo & identity", "Website / UI design", "Social-media visuals", "Brand guidelines"],
         },
       },
     ],
@@ -167,6 +247,7 @@ const en = {
   approach: {
     kicker: "OUR APPROACH",
     title: "From Idea to Impact in 4 Steps",
+    stepLabel: "STEP",
     steps: [
       {
         n: "01",
@@ -194,6 +275,29 @@ const en = {
       },
     ],
   },
+  about: {
+    kicker: "WHO WE ARE",
+    title: ["We design,", "build & integrate", "into your business."],
+    lead: "Aqly is an agency that designs, builds and integrates products into your business. Integration is the core of what we do: we wire AI, bots and automations into your existing systems — CRM, payments, data — so everything works as one. You talk straight to the team that owns the project from first call to live deployment.",
+    values: [
+      {
+        title: "Speed",
+        body: "We ship production AI in ~30 days, not 9 months. Tight loops, weekly demos, no bureaucracy.",
+      },
+      {
+        title: "Engineering-first",
+        body: "Real systems wired into your stack — CRM, payments, data. Not a wrapped chatbot demo.",
+      },
+      {
+        title: "Transparency",
+        body: "Clear roadmap, clear pricing, clear ROI model. You always know what you're paying for.",
+      },
+      {
+        title: "Partnership",
+        body: "We build for the long run — monitoring, optimizing and scaling as you grow, not one-and-done.",
+      },
+    ],
+  },
   form: {
     kicker: "GET STARTED",
     title: "Let's Talk About Your Project",
@@ -215,7 +319,7 @@ const en = {
       website: { label: "Website URL (optional)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Services of Interest",
-        options: ["Telegram Bots", "Websites", "AI Voice Assistants", "n8n Workflows", "AI Integration", "Growth Marketing"],
+        options: ["Telegram Bots", "Websites", "AI Voice Assistants", "Connected Tools", "AI Integration", "Design"],
       },
       timeline: {
         label: "Project Timeline",
@@ -231,6 +335,12 @@ const en = {
       },
     },
     submit: "Book Your Free Consultation",
+    sending: "Sending…",
+    sent: "Sent — we'll reply within 24h",
+    sendError: "Couldn't send — please try again or email us.",
+    successTitle: "Your request has been sent",
+    successBody: "Thank you! We've received your message and will get back to you within the hour.",
+    successTag: "We'll be in touch shortly",
     errorHint: "Please fill in the highlighted fields first.",
     required: "This field is required",
   },
@@ -242,22 +352,22 @@ const en = {
         { label: "Telegram Bots", href: "#services" },
         { label: "Websites", href: "#services" },
         { label: "AI Voice Assistants", href: "#services" },
-        { label: "n8n Workflows", href: "#services" },
+        { label: "Connected Tools", href: "#services" },
         { label: "AI Integration", href: "#services" },
-        { label: "Growth Marketing", href: "#services" },
+        { label: "Design", href: "#services" },
       ] },
       { title: "Company", links: [
+        { label: "About", href: "#about" },
         { label: "Our Approach", href: "#approach" },
         { label: "Contact", href: "#contact" },
       ] },
     ],
     socialTitle: "Connect",
     social: [
-      { label: "Telegram", href: "https://t.me/aqly" },
-      { label: "Telegram Bot", href: "https://t.me/aqly_bot" },
-      { label: "YouTube", href: "https://youtube.com/@aqly" },
-      { label: "Instagram", href: "https://instagram.com/aqly" },
-      { label: "LinkedIn", href: "https://linkedin.com/company/aqly" },
+      { label: "Telegram", href: "https://t.me/aqly", icon: "telegram" },
+      { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
+      { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
+      { label: "Facebook", href: "https://facebook.com/aqly", icon: "facebook" },
     ],
     rights: "© 2026 Aqly.io · All rights reserved",
     nav: ["Privacy Policy", "Terms of Service"],
@@ -271,6 +381,7 @@ const ru: Dict = {
     cta: "Открыть гайд",
   },
   nav: {
+    about: "О нас",
     services: "Услуги",
     approach: "Подход",
     blog: "Блог",
@@ -281,10 +392,18 @@ const ru: Dict = {
     eyebrow: "AI-АГЕНТСТВО · ИНЖЕНЕРНЫЙ ПОДХОД",
     title: ["Превратите AI", "в своё нечестное", "преимущество."],
     subtitle:
-      "Aqly строит AI-агентов, Telegram-ботов, сайты, n8n-воркфлоу и системы роста — экономим вашей команде 10+ часов в неделю. От концепта до деплоя — закрываем всё.",
+      "Aqly строит AI-агентов, Telegram-ботов, сайты, связки программ и системы роста — экономим вашей команде 10+ часов в неделю. От концепта до деплоя — закрываем всё.",
     primary: "Записаться на созвон",
     secondary: "Наши услуги",
-    pill: "Telegram · Веб · n8n · RAG · Маркетинг",
+    pill: "Telegram · Веб · Связки · RAG · Дизайн",
+    trust: "47 проектов · 12 стран · 10+ часов экономии в неделю",
+    tags: [
+      { label: "Telegram", href: "#services" },
+      { label: "Веб", href: "#services" },
+      { label: "Связки", href: "#services" },
+      { label: "RAG", href: "#services" },
+      { label: "Маркетинг", href: "#services" },
+    ],
     mockTitle: "Aqly Агент",
     mockStatus: "онлайн",
     mockLog: [
@@ -303,24 +422,95 @@ const ru: Dict = {
       placeholder: "Сообщение",
       turns: [
         { role: "user", text: "Какие у вас услуги? 🤔", card: false },
-        { role: "agent", text: "AI-агенты, Telegram-боты, сайты и автоматизация n8n — под ключ ⚡", card: false },
-        { role: "user", text: "Сгенерируй мне карточку услуги 🎨", card: false },
-        { role: "agent", text: "Готово — вот ваша карточка:", card: true },
+        { role: "agent", text: "Привет — рад знакомству 👋", card: false },
+        { role: "agent", text: "Мы строим AI-агентов, Telegram-ботов, сайты и связки программ — полностью под ключ ⚡", card: false },
+        { role: "user", text: "Сможете собрать Telegram-бота для продаж? 🤖", card: false },
+        { role: "agent", text: "Конечно. Сейчас набросаю краткую спеку…", card: false },
+        { role: "agent", text: "Готово — вот карточка услуги:", card: true },
+        { role: "user", text: "Отлично — давайте начнём 🚀", card: false },
+        { role: "agent", text: "Принято — записываю вас на стартовый созвон ✅", card: false },
       ],
       cardTitle: "Telegram-бот",
       cardBody: "Агент продаж и поддержки 24/7, подключён к CRM",
       cardTag: "Готов к запуску",
       success: "Заявка оформлена · клиент доволен",
+      counter: "Сегодня бот ответил на %n сообщений",
+      quickReplies: ["Сколько стоит?", "Что вы делаете?", "Запишите на созвон"],
+      replies: {
+        price: "От $5k — зависит от объёма. Большинство проектов укладываются в $5k–$15k ⚡",
+        services: "Строим AI-агентов, Telegram-ботов, сайты и связки программ — полностью под ключ 🚀",
+        booking: "Конечно! Выберите слот здесь 👉 aqly.io/call",
+        fallback: "Хороший вопрос — проще обсудить на коротком созвоне. Нажмите «Запишите на созвон» 👇",
+      },
     },
   },
+  cases: {
+    kicker: "КЕЙСЫ",
+    title: "Результаты, а не обещания.",
+    lead: "Несколько систем, которые мы запустили — и цифры, которые они сдвинули.",
+    readCase: "Читать кейс",
+    problemLabel: "Проблема",
+    solutionLabel: "Решение",
+    resultLabel: "Результат",
+    items: [
+      {
+        client: "Northwind",
+        category: "Telegram-бот",
+        name: "Бот квалификации лидов",
+        problem: "Теряли 40% входящих лидов на этапе квалификации.",
+        solution: "Telegram-бот с интеграцией в CRM — квалифицирует и записывает 24/7.",
+        results: [
+          { value: "3.2×", label: "конверсия" },
+          { value: "6 нед", label: "до запуска" },
+          { value: "$120k", label: "ROI / год" },
+        ],
+        stack: ["Next.js", "Claude", "Notion", "Stripe"],
+      },
+      {
+        client: "Lumen",
+        category: "Интеграция AI",
+        name: "Копайлот поддержки",
+        problem: "Команда поддержки тонула в однотипных тикетах.",
+        solution: "Копайлот на Claude, который пишет и закрывает тикеты прямо в интерфейсе.",
+        results: [
+          { value: "71%", label: "авто-резолв" },
+          { value: "8 дней", label: "до запуска" },
+          { value: "−44%", label: "время ответа" },
+        ],
+        stack: ["Python", "Claude", "Zendesk", "Postgres"],
+      },
+      {
+        client: "Voltage",
+        category: "Сайт + рост",
+        name: "Переделка маркетинг-сайта",
+        problem: "Медленный шаблонный сайт с конверсией ниже 1%.",
+        solution: "Сайт заново на Next.js с воронками, измеряемыми с первого дня.",
+        results: [
+          { value: "98", label: "Lighthouse" },
+          { value: "2.6×", label: "регистрации" },
+          { value: "5 нед", label: "до запуска" },
+        ],
+        stack: ["Next.js", "Vercel", "GA4", "Figma"],
+      },
+    ],
+  },
+  finalCta: {
+    kicker: "ГОТОВЫ?",
+    title: ["Готовы превратить AI", "в преимущество?"],
+    sub: "Бесплатная 30-минутная консультация, без обязательств.",
+    button: "Записаться на созвон",
+    orPrefix: "или напишите:",
+  },
   stack: {
-    title: "Стек, на котором мы строим",
+    title: "Технологии и платформы",
   },
   build: {
     kicker: "ЧТО МЫ СТРОИМ",
     title: "AI-решения, которые дают результат",
     learnMore: "Подробнее",
     modalCta: "Записаться на созвон",
+    modalCtaTitle: "Готовы запустить?",
+    modalCtaSub: "Бесплатная консультация 30 минут, без обязательств.",
     modalHow: "Как это работает",
     modalIncludes: "Что входит",
     items: [
@@ -373,19 +563,19 @@ const ru: Dict = {
         },
       },
       {
-        tag: "n8n Workflows",
-        title: "n8n Workflows",
-        body: "Автоматизация на 400+ приложениях. Экономия 10+ часов в неделю. Ручной ввод и копи-паст — в прошлом.",
+        tag: "Связка программ",
+        title: "Связка программ",
+        body: "Соединяем ваши программы в одну цепочку: пришла заявка — она сама попадает в таблицу, клиенту уходит сообщение, а вам — уведомление. Руками никто ничего не делает.",
         details: {
           overview:
-            "Автоматизированные воркфлоу, которые связывают 400+ приложений и тихо ведут вашу операционку в фоне. Убираем ручной ввод, копи-паст и переключение вкладок, которые съедают 10+ часов команды в неделю.",
+            "Представьте: одно событие запускает цепочку действий между вашими программами. Пришёл заказ → записался в таблицу → клиент получил сообщение → менеджер увидел уведомление. Мы собираем такие цепочки, размещаем их и следим, чтобы всё работало без сбоев.",
           how: [
-            "Аудитим рутину, которая забирает часы у команды.",
-            "Переносим каждую задачу в визуальный надёжный n8n-воркфлоу.",
-            "Подключаем приложения — CRM, почту, таблицы, Slack, AI-модели.",
-            "Добавляем мониторинг и алерты — ничего не ломается молча.",
+            "Смотрим, что вы каждый день делаете руками.",
+            "Собираем цепочку — одно событие, и программы делают всё сами.",
+            "Добавляем проверки, чтобы ничего не терялось.",
+            "Запускаем, следим и улучшаем.",
           ],
-          features: ["400+ интеграций", "AI-шаги внутри", "Алерты об ошибках", "Self-hosted опция"],
+          features: ["Цепочки из нескольких шагов", "Соединяем любые программы", "Защита от ошибок", "Размещение и присмотр"],
         },
       },
       {
@@ -405,19 +595,19 @@ const ru: Dict = {
         },
       },
       {
-        tag: "Маркетинг",
-        title: "Маркетинг",
-        body: "Позиционирование, воронки, контент-системы и платные циклы — измеряем с первого дня, рост компаундируется.",
+        tag: "Дизайн",
+        title: "Дизайн",
+        body: "Логотипы, фирменный стиль, дизайн сайтов и оформление соцсетей — понятный и узнаваемый образ, которому доверяют.",
         details: {
           overview:
-            "Позиционирование, воронки, контент-системы и платные циклы привлечения — измеряем с первого дня, чтобы рост компаундировался, а не утекал. Относимся к маркетингу как к инженерной системе, а не к угадайке.",
+            "Всё визуальное для вашего бизнеса — логотип, фирменный стиль, дизайн сайта и приложения, оформление соцсетей и презентаций. Делаем так, чтобы выглядело профессионально и единообразно, и клиенты доверяли вам с первого взгляда.",
           how: [
-            "Фиксируем позиционирование и профиль идеального клиента.",
-            "Проектируем воронку и контент-движок, который её кормит.",
-            "Запускаем платные циклы с чистой сквозной атрибуцией.",
-            "Оптимизируем по реальным цифрам, реинвестируем в рост.",
+            "Изучаем ваш бизнес и кто ваши клиенты.",
+            "Рисуем логотип и понятный фирменный стиль — цвета и шрифты.",
+            "Применяем его везде — сайт, соцсети, презентации.",
+            "Отдаём готовые файлы и простые правила использования.",
           ],
-          features: ["Спринт позиционирования", "Контент-движок", "Платные циклы", "Сквозная аналитика"],
+          features: ["Логотип и стиль", "Дизайн сайта / UI", "Оформление соцсетей", "Бренд-гайдлайны"],
         },
       },
     ],
@@ -425,11 +615,35 @@ const ru: Dict = {
   approach: {
     kicker: "НАШ ПОДХОД",
     title: "От идеи до результата за 4 шага",
+    stepLabel: "ШАГ",
     steps: [
-      { n: "01", title: "Discovery", body: "Изучаем ваш бизнес изнутри — процессы, боли и цели — чтобы найти AI-возможности с максимальным эффектом.", tag: "ТИПИЧНО: 2-3 СОЗВОНА + АУДИТ" },
+      { n: "01", title: "Исследование", body: "Изучаем ваш бизнес изнутри — процессы, боли и цели — чтобы найти AI-возможности с максимальным эффектом.", tag: "ТИПИЧНО: 2-3 СОЗВОНА + АУДИТ" },
       { n: "02", title: "Стратегия", body: "Проектируем решение с роадмапом, таймлайном и ROI-проекцией — вы точно знаете, чего ждать.", tag: "ИТОГ: ТЕХНИЧЕСКАЯ СПЕКА + ROI-МОДЕЛЬ" },
-      { n: "03", title: "Build", body: "Внедряем и интегрируем AI-решение в текущие инструменты и процессы. Без сбоев, только результат.", tag: "ЕЖЕНЕДЕЛЬНЫЕ ДЕМО + ИТЕРАЦИИ" },
+      { n: "03", title: "Разработка", body: "Внедряем и интегрируем AI-решение в текущие инструменты и процессы. Без сбоев, только результат.", tag: "ЕЖЕНЕДЕЛЬНЫЕ ДЕМО + ИТЕРАЦИИ" },
       { n: "04", title: "Поддержка", body: "Оптимизация, мониторинг и масштабирование — AI продолжает работать пока бизнес растёт.", tag: "SLA-ГАРАНТИИ" },
+    ],
+  },
+  about: {
+    kicker: "КТО МЫ",
+    title: ["Проектируем,", "разрабатываем и", "интегрируем в бизнес."],
+    lead: "Aqly — агентство, которое проектирует, разрабатывает и интегрирует продукты в ваш бизнес. Главное для нас — интеграция: подключаем AI, ботов и автоматизации к вашим системам (CRM, платежи, данные), чтобы всё работало вместе. С вами напрямую общается команда, которая ведёт проект от первого звонка до боевого деплоя.",
+    values: [
+      {
+        title: "Скорость",
+        body: "Запускаем рабочий AI за ~30 дней, а не за 9 месяцев. Короткие итерации, еженедельные демо, без бюрократии.",
+      },
+      {
+        title: "Инженерия",
+        body: "Реальные системы, вшитые в ваш стек — CRM, платежи, данные. Не обёрнутая демка-чатбот.",
+      },
+      {
+        title: "Прозрачность",
+        body: "Понятный роадмап, понятные цены, понятная модель ROI. Вы всегда знаете, за что платите.",
+      },
+      {
+        title: "Партнёрство",
+        body: "Строим вдолгую — мониторинг, оптимизация и масштабирование по мере роста, а не «сдал и забыл».",
+      },
     ],
   },
   form: {
@@ -439,9 +653,9 @@ const ru: Dict = {
     expect: {
       title: "Что получите",
       items: [
-        "Бесплатная 30-минутная консультация",
-        "Ответ в течение 24 часов",
-        "Скоупинг проекта без обязательств",
+        "Бесплатная консультация",
+        "Ответ в течение 1 часа",
+        "Оценим проект без обязательств",
         "Прозрачные цены с порога",
       ],
       email: "Хотите написать напрямую?",
@@ -453,7 +667,7 @@ const ru: Dict = {
       website: { label: "Сайт (необязательно)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Интересующие услуги",
-        options: ["Telegram-боты", "Веб-сайты", "AI-голосовые помощники", "n8n Workflows", "Интеграция AI", "Маркетинг"],
+        options: ["Telegram-боты", "Веб-сайты", "AI-голосовые помощники", "Связка программ", "Интеграция AI", "Дизайн"],
       },
       timeline: {
         label: "Сроки проекта",
@@ -469,6 +683,12 @@ const ru: Dict = {
       },
     },
     submit: "Записаться на бесплатную консультацию",
+    sending: "Отправляем…",
+    sent: "Отправлено — ответим в течение 24 часов",
+    sendError: "Не удалось отправить — попробуйте ещё раз или напишите нам.",
+    successTitle: "Ваше сообщение отправлено",
+    successBody: "Спасибо! Мы получили вашу заявку и ответим вам в течение часа.",
+    successTag: "Скоро свяжемся с вами",
     errorHint: "Сначала заполните выделенные поля.",
     required: "Это поле обязательно",
   },
@@ -480,38 +700,427 @@ const ru: Dict = {
         { label: "Telegram-боты", href: "#services" },
         { label: "Веб-сайты", href: "#services" },
         { label: "AI-голосовые помощники", href: "#services" },
-        { label: "n8n Workflows", href: "#services" },
+        { label: "Связка программ", href: "#services" },
         { label: "Интеграция AI", href: "#services" },
-        { label: "Маркетинг", href: "#services" },
+        { label: "Дизайн", href: "#services" },
       ] },
       { title: "Компания", links: [
+        { label: "О нас", href: "#about" },
         { label: "Подход", href: "#approach" },
         { label: "Контакты", href: "#contact" },
       ] },
     ],
-    socialTitle: "Соцсети",
+    socialTitle: "Мы в соцсетях",
     social: [
-      { label: "Telegram", href: "https://t.me/aqly" },
-      { label: "Telegram-бот", href: "https://t.me/aqly_bot" },
-      { label: "YouTube", href: "https://youtube.com/@aqly" },
-      { label: "Instagram", href: "https://instagram.com/aqly" },
-      { label: "LinkedIn", href: "https://linkedin.com/company/aqly" },
+      { label: "Telegram", href: "https://t.me/aqly", icon: "telegram" },
+      { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
+      { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
+      { label: "Facebook", href: "https://facebook.com/aqly", icon: "facebook" },
     ],
     rights: "© 2026 Aqly.io · Все права защищены",
     nav: ["Политика приватности", "Условия"],
   },
 }
 
-const dicts = { en, ru }
+const tj: Dict = {
+  banner: {
+    label: "НАВ · ПЛЕЙБУКИ 2026",
+    text: "Чӣ тавр дастаҳои муосир AI-ро дар 30 рӯз ба кор меандозанд — на 9 моҳ",
+    cta: "Хондани роҳнамо",
+  },
+  nav: {
+    about: "Дар бораи мо",
+    services: "Хидматҳо",
+    approach: "Равиш",
+    blog: "Блог",
+    community: "Ҷомеа",
+    contact: "Тамос",
+  },
+  hero: {
+    eyebrow: "AI-АГЕНТӢ · АВВАЛ МУҲАНДИСӢ",
+    title: ["AI-ро ба", "бартарии беҳамтои", "худ табдил диҳед."],
+    subtitle:
+      "Aqly агентҳои фармоишии AI, Telegram-ботҳо, сайтҳо, пайвасти барномаҳо ва системаҳои рушд месозад, ки ба дастаи шумо ҳафтае 10+ соат сарфа мекунад. Аз ғоя то ба кор андохтан — ҳама чизро ба ӯҳда мегирем.",
+    primary: "Сабт ба машварат",
+    secondary: "Хидматҳои мо",
+    pill: "Telegram · Веб · Автоматика · RAG · Рушд",
+    trust: "47 лоиҳа · 12 кишвар · ҳафтае 10+ соат сарфа",
+    tags: [
+      { label: "Telegram", href: "#services" },
+      { label: "Веб", href: "#services" },
+      { label: "Автоматика", href: "#services" },
+      { label: "RAG", href: "#services" },
+      { label: "Рушд", href: "#services" },
+    ],
+    mockTitle: "Aqly Агент",
+    mockStatus: "фаъол",
+    mockLog: [
+      "12 лиди нав ба ICP мувофиқ",
+      "Ғанӣ, баҳогузорӣ, ба CRM ҳамоҳанг",
+      "Slack #sales огоҳ · 3 вохӯрӣ сабт",
+    ],
+    mockReq: "То охири рӯз 2 400 дархости баргардониро коркард кун",
+    mockMeta: "947 ҳалшуда · 1 453 дар навбат",
+    mockBadge: "98% худкор ҳал",
+    mockProcessing: "Агент кор истода",
+    chat: {
+      title: "Aqly Агент",
+      status: "онлайн",
+      typing: "навишта истода",
+      placeholder: "Паём",
+      turns: [
+        { role: "user", text: "Шумо кадом хидматҳо доред? 🤔", card: false },
+        { role: "agent", text: "Салом — аз шиносоӣ шодам 👋", card: false },
+        { role: "agent", text: "Мо агентҳои AI, Telegram-ботҳо, сайтҳо ва пайвасти барномаҳо месозем — пурра аз аввал то охир ⚡", card: false },
+        { role: "user", text: "Метавонед ба ман боти фурӯши Telegram созед? 🤖", card: false },
+        { role: "agent", text: "Албатта. Ҳозир спецификацияи кӯтоҳ омода мекунам…", card: false },
+        { role: "agent", text: "Тайёр — ин карти хидмати шумо:", card: true },
+        { role: "user", text: "Аъло — биёед оғоз кунем 🚀", card: false },
+        { role: "agent", text: "Қабул — ҳозир занги оғозиро сабт мекунам ✅", card: false },
+      ],
+      cardTitle: "Telegram-бот",
+      cardBody: "Агенти фурӯш ва дастгирии 24/7, ба CRM пайваст",
+      cardTag: "Барои оғоз тайёр",
+      success: "Дархост иҷро шуд · муштарӣ розӣ",
+      counter: "Имрӯз бот ба %n паём ҷавоб дод",
+      quickReplies: ["Нархаш чанд аст?", "Шумо чӣ кор мекунед?", "Ба занг сабт кунед"],
+      replies: {
+        price: "Аз $5k — вобаста ба ҳаҷм. Аксари лоиҳаҳо $5k то $15k мешаванд ⚡",
+        services: "Мо агентҳои AI, Telegram-ботҳо, сайтҳо ва пайвасти барномаҳо месозем — пурра аз аввал то охир 🚀",
+        booking: "Албатта! Вақтро ин ҷо интихоб кунед 👉 aqly.io/call",
+        fallback: "Саволи хуб — беҳтараш дар занги кӯтоҳ муҳокима мекунем. «Ба занг сабт кунед»-ро пахш кунед 👇",
+      },
+    },
+  },
+  cases: {
+    kicker: "КЕЙСҲО",
+    title: "Натиҷаҳо, на ваъдаҳо.",
+    lead: "Чанд системае, ки мо ба кор андохтем — ва рақамҳое, ки онҳо тағйир доданд.",
+    readCase: "Хондани кейс",
+    problemLabel: "Мушкил",
+    solutionLabel: "Ҳал",
+    resultLabel: "Натиҷа",
+    items: [
+      {
+        client: "Northwind",
+        category: "Telegram-бот",
+        name: "Боти баҳодиҳии лидҳо",
+        problem: "Аз даст додани 40% лидҳои воридотӣ дар марҳилаи баҳодиҳӣ.",
+        solution: "Telegram-боти ба CRM пайваст, ки лидҳоро баҳо медиҳад ва 24/7 ба занг сабт мекунад.",
+        results: [
+          { value: "3.2×", label: "конверсия" },
+          { value: "6 ҳафта", label: "то оғоз" },
+          { value: "$120k", label: "ROI / сол" },
+        ],
+        stack: ["Next.js", "Claude", "Notion", "Stripe"],
+      },
+      {
+        client: "Lumen",
+        category: "Интегратсияи AI",
+        name: "Копайлоти дастгирӣ",
+        problem: "Дастаи дастгирӣ зери тикетҳои такрорӣ монда буд.",
+        solution: "Копайлот дар асоси Claude, ки тикетҳоро дар ҷо менависад ва ҳал мекунад.",
+        results: [
+          { value: "71%", label: "худкор ҳал" },
+          { value: "8 рӯз", label: "то оғоз" },
+          { value: "−44%", label: "вақти ҷавоб" },
+        ],
+        stack: ["Python", "Claude", "Zendesk", "Postgres"],
+      },
+      {
+        client: "Voltage",
+        category: "Сайт + рушд",
+        name: "Аз нав сохтани сайти маркетингӣ",
+        problem: "Сайти суст ва оддӣ бо конверсияи камтар аз 1%.",
+        solution: "Сайти аз нав сохташуда дар Next.js бо воронкаҳое, ки аз рӯзи аввал чен мешаванд.",
+        results: [
+          { value: "98", label: "Lighthouse" },
+          { value: "2.6×", label: "бақайдгирӣ" },
+          { value: "5 ҳафта", label: "то оғоз" },
+        ],
+        stack: ["Next.js", "Vercel", "GA4", "Figma"],
+      },
+    ],
+  },
+  finalCta: {
+    kicker: "ТАЙЁРЕД?",
+    title: ["Тайёред AI-ро ба", "бартарии худ табдил диҳед?"],
+    sub: "Машварати ройгони 30-дақиқагӣ, бе ӯҳдадорӣ.",
+    button: "Ба занг сабт шавед",
+    orPrefix: "ё ба мо нависед:",
+  },
+  stack: {
+    title: "Технологияҳо ва платформаҳо",
+  },
+  build: {
+    kicker: "МО ЧӢ МЕСОЗЕМ",
+    title: "Ҳалли AI, ки натиҷа медиҳад",
+    learnMore: "Муфассал",
+    modalCta: "Сабт ба машварат",
+    modalCtaTitle: "Тайёред инро созед?",
+    modalCtaSub: "Машварати ройгони 30-дақиқагӣ — бе ӯҳдадорӣ.",
+    modalHow: "Чӣ тавр кор мекунад",
+    modalIncludes: "Чӣ дохил мешавад",
+    items: [
+      {
+        tag: "Telegram-ботҳо",
+        title: "Telegram-ботҳо",
+        body: "Агентҳои муколамавӣ, ки лидҳоро баҳо медиҳанд, мефурӯшанд, ҷалб мекунанд ва дастгирӣ мекунанд — мустақиман дар Telegram. Ба CRM ва пардохтҳои шумо пайваст.",
+        details: {
+          overview:
+            "Telegram-бот як агенти муколамавии ҳамеша фаъол аст, ки дар барномае зиндагӣ мекунад, ки муштариёни шумо аллакай ҳар рӯз истифода мебаранд. Ӯ забони табииро мефаҳмад, контекстро дар хотир мегирад ва метавонад бифурӯшад, ҷалб кунад, дастгирӣ кунад ва пардохтҳоро қабул кунад — бе иштироки инсон.",
+          how: [
+            "Корбар ба бот менависад — ӯ ниятро ба забони оддӣ мефаҳмад.",
+            "Контекстро аз CRM, ҳуҷҷатҳо ва системаи пардохт мегирад.",
+            "Ҷавоб медиҳад, сабт мекунад, мефурӯшад ё ҳангоми зарурат ба инсон мегузаронад.",
+            "Ҳар муколама дар як дашборд сабт ва баҳогузорӣ мешавад.",
+          ],
+          features: ["CRM + пардохтҳо", "Бисёрзабонӣ", "Гузариш ба инсон", "Таҳлили зинда"],
+        },
+      },
+      {
+        tag: "Сайтҳо",
+        title: "Сайтҳо",
+        body: "Сайтҳои маркетингӣ ва дашбордҳои сатҳи production. Маҳсулнокӣ, SEO ва дизайн то стандарти enterprise сайқалёфта.",
+        details: {
+          overview:
+            "Мо сайтҳои маркетингӣ ва дашбордҳои маҳсулоти сатҳи production тарроҳӣ ва ба кор медарорем — тез, дастрас, барои ҷустуҷӯ оптимизатсияшуда ва то пиксел сайқалёфта дар сатҳи enterprise, ки бренди шумо сазовори он аст.",
+          how: [
+            "Мавқеъ, аудитория ва ҳадафҳои конверсияи шуморо муайян мекунем.",
+            "Системаи фарқкунанда тарроҳӣ мекунем — шрифт, ранг, ҳаракат, тарҳ.",
+            "Дар стеки муосир (Next.js) бо холҳои Lighthouse 90+ месозем.",
+            "Ба кор меандозем, чен мекунем ва такмил медиҳем — таҳлил аз рӯзи аввал пайваст.",
+          ],
+          features: ["Next.js + edge-ҳостинг", "SEO + Core Web Vitals", "Тайёр барои CMS", "Таҳлили дарунсохт"],
+        },
+      },
+      {
+        tag: "Ёрдамчиёни овозии AI",
+        title: "Ёрдамчиёни овозии AI",
+        body: "Агенти овозии ба инсон монанд, ки рост дар сайти шумо ҷойгир аст. Ҳар меҳмонро мегирад, ҷавоб медиҳад, баҳо медиҳад ва дар вақти воқеӣ сабт мекунад — он қадар воқеӣ, ки занадагон намефаҳманд, ки ин AI аст.",
+        details: {
+          overview:
+            "Ёрдамчии овозии фармоишии AI ҳамчун виҷет рост дар сайти шумо зиндагӣ мекунад. Меҳмон онро пахш мекунад ва дарҳол бо агенте сӯҳбат мекунад, ки овозаш он қадар табиист, ки аз инсони воқеӣ фарқ намекунад. Ӯ ба саволҳо ҷавоб медиҳад, лидро баҳо медиҳад, эътирозҳоро бартараф мекунад ва ба занг сабт мекунад — 24/7, барои ҳар меҳмоне, ки аксари сайтҳо ором аз даст медиҳанд.",
+          how: [
+            "Меҳмон виҷети овозиро дар сайт пахш мекунад — бе барнома, бе занг задан.",
+            "Агент ӯро бо овози гарм ва ба инсон монанд пешвоз мегирад.",
+            "Ниятро мефаҳмад, ҷавоб медиҳад ва маълумоти зиндаро аз стеки шумо мегирад.",
+            "Баҳо медиҳад, вохӯриро сабт мекунад ё ба дастаи шумо мегузаронад — дарҳол.",
+          ],
+          features: ["Овози ба инсон монанд", "Виҷети сайт", "Ҷавоби фаврии 24/7", "Сабт ва тақсими зангҳо"],
+        },
+      },
+      {
+        tag: "Пайвасти барномаҳо",
+        title: "Пайвасти барномаҳо",
+        body: "Мо барномаҳои шуморо ба як занҷир мепайвандем: лид меояд, ба ҷадвал сабт мешавад, ба муштарӣ паём меравад ва дастаи шумо огоҳ мешавад. Касе инро бо даст намекунад.",
+        details: {
+          overview:
+            "Тасаввур кунед: як рӯйдод дар барномаҳои шумо занҷирро оғоз мекунад — фармоиш меояд → ба ҷадвал сабт мешавад → муштарӣ паём мегирад → менеҷери шумо огоҳ мешавад. Мо чунин занҷирҳоро месозем, ҷойгир мекунем ва бе халал нигоҳ медорем.",
+          how: [
+            "Менигарем, ки шумо ҳар рӯз чиро бо даст мекунед.",
+            "Занҷирро месозем — як рӯйдод, боқиро барномаҳои шумо мекунанд.",
+            "Санҷишҳо илова мекунем, то ҳеҷ чиз гум нашавад.",
+            "Ба кор меандозем, назорат мекунем ва такмил медиҳем.",
+          ],
+          features: ["Занҷирҳои бисёрзина", "Пайванди ҳар барнома", "Ҳифз аз хатоҳо", "Ҷойгиркунӣ + назорат"],
+        },
+      },
+      {
+        tag: "Интегратсияи AI",
+        title: "Интегратсияи AI",
+        body: "AI-и пешрафтаро ба тиҷорат ва маҳсулоти худ ворид кунед — дастгирии чати худкор, тавлиди контент ва копайлотҳо дар моделҳои Claude ва сатҳи GPT, ки даромадро баланд мебардоранд ва муштариёни бештарро фаро мегиранд.",
+        details: {
+          overview:
+            "Мо AI-и пешсафро рост ба тиҷорат ва маҳсулоти шумо муттаҳид мекунем — на чатботи оддӣ, балки дастгирии чати худкор, тавлиди контент, копайлотҳо ва воситаҳои қарорбарорӣ дар пешрафтатарин моделҳои абрӣ (Claude, сатҳи GPT). Натиҷа: хароҷоти камтар, конверсияи баландтар ва муштариён 24/7 фарогирифташуда.",
+          how: [
+            "Дастгирии чати худкор, ки шабонарӯзӣ ҷавоб медиҳад ва ҳал мекунад.",
+            "Тавлиди контент — пост, мактуб ва матни маҳсулот аз рӯи дархост.",
+            "Копайлотҳо ва ёрдамчиён рост ба маҳсулоти мавҷудаи шумо пайваст.",
+            "Дар моделҳои пешрафтаи абрӣ (Claude, сатҳи GPT) кор мекунад — бехатар ва миқёспазир.",
+          ],
+          features: ["Худкоркунии дастгирии чат", "Тавлиди контент", "Моделҳои Claude ва сатҳи GPT", "Афзоиши даромад ва фарогирӣ"],
+        },
+      },
+      {
+        tag: "Дизайн",
+        title: "Дизайн",
+        body: "Логотип, услуби фирмавӣ, дизайни сайт ва оформлении шабакаҳои иҷтимоӣ — намуди фаҳмо ва шинохташаванда, ки ба он бовар мекунанд.",
+        details: {
+          overview:
+            "Ҳама чизи намоёни бизнеси шумо — логотип, услуби фирмавӣ, дизайни сайт ва замима, оформлении шабакаҳои иҷтимоӣ ва презентатсияҳо. Тавре месозем, ки касбӣ ва якхела намоён шавад ва муштариён аз нигоҳи аввал ба шумо бовар кунанд.",
+          how: [
+            "Бизнеси шумо ва муштариёнатонро меомӯзем.",
+            "Логотип ва услуби фаҳмои фирмавӣ — рангҳо ва шрифтҳо — мекашем.",
+            "Онро дар ҳама ҷо татбиқ мекунем — сайт, шабакаҳо, презентатсия.",
+            "Файлҳои тайёр ва қоидаҳои оддии истифодаро месупорем.",
+          ],
+          features: ["Логотип ва услуб", "Дизайни сайт / UI", "Оформлении шабакаҳо", "Бренд-гайдлайн"],
+        },
+      },
+    ],
+  },
+  approach: {
+    kicker: "РАВИШИ МО",
+    title: "Аз ғоя то натиҷа дар 4 қадам",
+    stepLabel: "ҚАДАМ",
+    steps: [
+      {
+        n: "01",
+        title: "Омӯзиш",
+        body: "Тиҷорати шуморо аз дарун меомӯзем — равандҳо, мушкилот ва ҳадафҳоро — то имкониятҳои AI-и бонатиҷатаринро ёбем.",
+        tag: "ОДАТАН: 2-3 ЗАНГ + АУДИТИ ASYNC",
+      },
+      {
+        n: "02",
+        title: "Стратегия",
+        body: "Ҳалли дурустро бо роҳнамои равшан, ҷадвали вақт ва пешбинии ROI тарроҳӣ мекунем, то шумо дақиқ донед, чиро интизор шавед.",
+        tag: "НАТИҶА: СПЕЦИФИКАТСИЯИ ТЕХНИКӢ + МОДЕЛИ ROI",
+      },
+      {
+        n: "03",
+        title: "Сохтан",
+        body: "Ҳалли AI-и шуморо бо воситаҳо ва равандҳои мавҷуда татбиқ ва муттаҳид мекунем. Бе халал, танҳо натиҷа.",
+        tag: "ДЕМОИ ҲАФТАГӢ + ТАҲВИЛИ ЗИНА БА ЗИНА",
+      },
+      {
+        n: "04",
+        title: "Дастгирӣ",
+        body: "Оптимизатсия, назорат ва миқёскунии доимӣ, то AI-и шумо ҳамзамон бо рушди тиҷорат натиҷа диҳад.",
+        tag: "ВАҚТИ ҶАВОБИ КАФОЛАТНОКИ SLA",
+      },
+    ],
+  },
+  about: {
+    kicker: "МО КӢ ҲАСТЕМ",
+    title: ["Тарроҳӣ,", "таҳия ва", "интегратсия ба бизнес."],
+    lead: "Aqly агентиест, ки маҳсулотҳоро тарроҳӣ, таҳия ва ба бизнеси шумо интегратсия мекунад. Барои мо асосаш интегратсия аст: AI, ботҳо ва автоматизатсияҳоро ба системаҳои мавҷудаи шумо (CRM, пардохтҳо, маълумот) пайваст мекунем, то ҳама якҷоя кор кунад. Шумо рост бо дастае сӯҳбат мекунед, ки лоиҳаро аз занги аввал то ба кор андохтан пеш мебарад.",
+    values: [
+      {
+        title: "Суръат",
+        body: "AI-и тайёрро дар ~30 рӯз ба кор меандозем, на 9 моҳ. Давраҳои кӯтоҳ, демои ҳафтагӣ, бе бюрократия.",
+      },
+      {
+        title: "Аввал муҳандисӣ",
+        body: "Системаҳои воқеӣ, ба стеки шумо пайваст — CRM, пардохтҳо, маълумот. На демои чатботи печонидашуда.",
+      },
+      {
+        title: "Шаффофият",
+        body: "Роҳнамои равшан, нархи равшан, модели равшани ROI. Шумо ҳамеша медонед, ки барои чӣ пул медиҳед.",
+      },
+      {
+        title: "Шарикӣ",
+        body: "Мо барои дарозмуддат месозем — назорат, оптимизатсия ва миқёскунӣ ҳамзамон бо рушди шумо, на «сохтему фаромӯш кардем».",
+      },
+    ],
+  },
+  form: {
+    kicker: "ОҒОЗ",
+    title: "Дар бораи лоиҳаи шумо сӯҳбат кунем",
+    lede: "Бигӯед, чӣ месозед — нишон медиҳем, ки AI чӣ тавр онро суръат мебахшад.",
+    expect: {
+      title: "Чиро интизор шавед",
+      items: [
+        "Машварати ройгони 30-дақиқагӣ",
+        "Ҷавоб дар давоми 24 соат",
+        "Баҳодиҳии лоиҳа бе ӯҳдадорӣ",
+        "Нархи шаффоф аз аввал",
+      ],
+      email: "Мехоҳед рост нависед?",
+    },
+    progress: "Пешрафти форма",
+    fields: {
+      name: { label: "Ном", placeholder: "Номи пурраи шумо" },
+      email: { label: "Email", placeholder: "you@company.com" },
+      website: { label: "Суроғаи сайт (ихтиёрӣ)", placeholder: "https://yourcompany.com" },
+      services: {
+        label: "Хидматҳои мавриди таваҷҷӯҳ",
+        options: ["Telegram-ботҳо", "Сайтҳо", "Ёрдамчиёни овозии AI", "Пайвасти барномаҳо", "Интегратсияи AI", "Дизайн"],
+      },
+      timeline: {
+        label: "Мӯҳлати лоиҳа",
+        options: ["Ҳарчи зудтар", "1-3 моҳ", "3-6 моҳ", "Меомӯзам"],
+      },
+      challenge: {
+        label: "Мушкили асосии тиҷорат",
+        placeholder: "Дар бораи мушкили асосие, ки ҳал кардан мехоҳед, нависед...",
+      },
+      budget: {
+        label: "Буҷети тахминӣ",
+        options: ["То $5k", "$5k - $15k", "$15k - $30k", "$30k+"],
+      },
+    },
+    submit: "Ба машварати ройгон сабт шавед",
+    sending: "Фиристода истодааст…",
+    sent: "Фиристода шуд — дар давоми 24 соат ҷавоб медиҳем",
+    sendError: "Фиристода нашуд — лутфан боз кӯшиш кунед ё ба мо нависед.",
+    successTitle: "Дархости шумо фиристода шуд",
+    successBody: "Ташаккур! Паёми шуморо гирифтем ва дар давоми як соат ҷавоб медиҳем.",
+    successTag: "Ба зудӣ дар тамос мешавем",
+    errorHint: "Аввал майдонҳои ҷудошударо пур кунед.",
+    required: "Ин майдон ҳатмист",
+  },
+  footer: {
+    tagline: "Ҳалли фармоишии AI, ки ба тиҷорати шумо ҳафтае 10+ соат сарфа мекунад.",
+    email: "hello@aqly.io",
+    cols: [
+      { title: "Хидматҳо", links: [
+        { label: "Telegram-ботҳо", href: "#services" },
+        { label: "Сайтҳо", href: "#services" },
+        { label: "Ёрдамчиёни овозии AI", href: "#services" },
+        { label: "Пайвасти барномаҳо", href: "#services" },
+        { label: "Интегратсияи AI", href: "#services" },
+        { label: "Дизайн", href: "#services" },
+      ] },
+      { title: "Ширкат", links: [
+        { label: "Дар бораи мо", href: "#about" },
+        { label: "Равиши мо", href: "#approach" },
+        { label: "Тамос", href: "#contact" },
+      ] },
+    ],
+    socialTitle: "Дар шабакаҳо",
+    social: [
+      { label: "Telegram", href: "https://t.me/aqly", icon: "telegram" },
+      { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
+      { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
+      { label: "Facebook", href: "https://facebook.com/aqly", icon: "facebook" },
+    ],
+    rights: "© 2026 Aqly.io · Ҳамаи ҳуқуқҳо ҳифз шудаанд",
+    nav: ["Сиёсати махфият", "Шартҳои хидмат"],
+  },
+}
+
+const dicts = { en, ru, tj }
 
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: Dict }
-const I18nCtx = createContext<Ctx>({ lang: "en", setLang: () => {}, t: en })
+const I18nCtx = createContext<Ctx>({ lang: "ru", setLang: () => {}, t: ru })
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>("en")
+  const [lang, setLangState] = useState<Lang>("ru")
+  const [pulse, setPulse] = useState(false)
+  const langRef = useRef(lang)
+  langRef.current = lang
+
+  // Switching language gives the content a brief opacity dip, masking the
+  // instant text swap so it reads as a graceful settle rather than a flicker.
+  // Opacity only (no filter/transform) — those would re-contain the fixed navbar.
+  const setLang = useCallback((l: Lang) => {
+    if (l === langRef.current) return
+    setPulse(true)
+    setLangState(l)
+  }, [])
+
+  useEffect(() => {
+    if (!pulse) return
+    const id = setTimeout(() => setPulse(false), 150)
+    return () => clearTimeout(id)
+  }, [pulse, lang])
+
   return (
     <I18nCtx.Provider value={{ lang, setLang, t: dicts[lang] }}>
-      {children}
+      <div className="lang-pulse" data-pulse={pulse ? "" : undefined}>
+        {children}
+      </div>
     </I18nCtx.Provider>
   )
 }

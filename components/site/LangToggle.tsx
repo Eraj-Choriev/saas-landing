@@ -1,14 +1,15 @@
 "use client"
 
 import { useId } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import { useI18n, type Lang } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 export function LangToggle({ tone = "ink" }: { tone?: "ink" | "cream" }) {
   const { lang, setLang } = useI18n()
   const uid = useId()
-  const items: Lang[] = ["en", "ru"]
+  const reduce = useReducedMotion()
+  const items: Lang[] = ["ru", "en", "tj"]
 
   return (
     <div
@@ -27,7 +28,7 @@ export function LangToggle({ tone = "ink" }: { tone?: "ink" | "cream" }) {
             onClick={() => setLang(l)}
             aria-pressed={isActive}
             className={cn(
-              "relative z-10 rounded-full px-3 py-1.5 transition-colors duration-200",
+              "relative z-10 rounded-full px-3 py-1.5 transition-[color,transform] duration-200 active:scale-[0.94]",
               isActive
                 ? "text-ink font-semibold"
                 : tone === "ink"
@@ -44,7 +45,11 @@ export function LangToggle({ tone = "ink" }: { tone?: "ink" | "cream" }) {
                     ? "bg-brand-blue"
                     : "bg-cream-50"
                 )}
-                transition={{ type: "spring", stiffness: 340, damping: 30, mass: 0.5 }}
+                transition={
+                  reduce
+                    ? { duration: 0 }
+                    : { type: "spring", duration: 0.5, bounce: 0.2 }
+                }
               />
             )}
             <span className="relative">{l}</span>

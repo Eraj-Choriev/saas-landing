@@ -7,3 +7,9 @@ next-env.d.ts
 
 /out/
 /services/
+
+# local tooling / agent artifacts
+/.claude/
+/.agents/
+/.playwright-mcp/
+/design-audit/

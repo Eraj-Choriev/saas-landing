@@ -17,15 +17,12 @@
 }
 
 html {
-  scroll-behavior: smooth;
-  /* clears sticky navbar when jumping to anchors */
+  /* Click-driven anchor jumps are animated in JS (components/site/SmoothScroll)
+     with a custom eased curve. Native behavior stays instant on purpose so it
+     doesn't fight the per-frame rAF loop. */
+  scroll-behavior: auto;
+  /* offset for native jumps not handled by JS — on-load #hash, back/forward */
   scroll-padding-top: 96px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
 }
 
 html,
@@ -40,9 +37,22 @@ body {
   color: #fff;
 }
 
+/* Language-switch content settle — opacity only (filter/transform would
+   re-contain the fixed navbar). Masks the instant text swap. */
+.lang-pulse {
+  transition: opacity 220ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.lang-pulse[data-pulse] {
+  opacity: 0.78;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lang-pulse[data-pulse] {
+    opacity: 1;
+  }
+}
+
 .font-display {
   font-optical-sizing: auto;
-  font-variation-settings: "opsz" 144, "SOFT" 30;
 }
 
 .text-balance {
@@ -71,16 +81,8 @@ body {
   scrollbar-width: none;
 }
 
-.glow-aqua {
-  box-shadow: 0 0 0 1px rgba(169, 202, 249, 0.22),
-    0 12px 60px -16px rgba(169, 202, 249, 0.45);
-}
-
 .hairline {
   border-color: rgba(10, 14, 19, 0.08);
-}
-.hairline-dark {
-  border-color: rgba(255, 255, 255, 0.08);
 }
 
 /* hero aurora base */
@@ -90,14 +92,6 @@ body {
     radial-gradient(50% 40% at 80% 20%, rgba(255,91,36,0.18), transparent 60%),
     radial-gradient(70% 60% at 50% 100%, rgba(209,122,0,0.22), transparent 60%),
     linear-gradient(180deg, #0A0E13 0%, #0A0E13 60%, #130e08 100%);
-}
-
-/* glassmorphism navbar — light frosted pill for cream sections */
-.glass-light {
-  background: rgba(251, 248, 242, 0.62);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border-color: rgba(10, 14, 19, 0.08);
 }
 
 /* glassmorphism panel — frosted glass for the dark hero */
@@ -119,6 +113,31 @@ body {
   filter: blur(70px);
   will-change: transform;
   pointer-events: none;
+}
+
+/* engineered diagonal hairlines for hero — static CSS, GPU-cheap.
+   Two brand-tinted line sets at offset angles, faded toward the
+   top-right so the headline (left) stays clean. Replaces the old
+   WebGL line-field — no JS, no lag, identical "engineered" feel. */
+.hero-lines {
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      114deg,
+      transparent 0,
+      transparent 37px,
+      rgba(169, 202, 249, 0.06) 38px,
+      transparent 39px
+    ),
+    repeating-linear-gradient(
+      114deg,
+      transparent 0,
+      transparent 93px,
+      rgba(255, 91, 36, 0.05) 94px,
+      transparent 95px
+    );
+  -webkit-mask-image: radial-gradient(120% 95% at 82% 8%, #000 0%, transparent 68%);
+  mask-image: radial-gradient(120% 95% at 82% 8%, #000 0%, transparent 68%);
 }
 
 @keyframes drift-a {
@@ -199,11 +218,21 @@ body {
   transform: scaleX(1);
 }
 
-/* spotlight that follows cursor on cards */
-.card-spotlight {
-  background: radial-gradient(
-    240px circle at var(--mx, 50%) var(--my, 50%),
-    rgba(169, 202, 249, 0.14),
-    transparent 70%
-  );
+/* ElevenLabs convai widget — force readable theme.
+   Widget exposes `--el-*` custom properties that inherit into its Shadow DOM.
+   Dashboard config had set the text light on a light surface → invisible.
+   `!important` on a custom property in a stylesheet wins over the widget's
+   inline value, so this locks a legible light-surface / dark-text theme. */
+elevenlabs-convai {
+  --el-base: #ffffff !important;           /* widget surface */
+  --el-base-hover: #f3efe6 !important;     /* hover bg */
+  --el-base-active: #ece6da !important;    /* active bg */
+  --el-base-border: rgba(11, 15, 20, 0.12) !important;
+  --el-base-subtle: rgba(11, 15, 20, 0.55) !important;  /* secondary text */
+  --el-base-primary: #0b0f14 !important;   /* main text/title */
+  --el-accent: #ff5b24 !important;         /* coral call button */
+  --el-accent-hover: #e54e1c !important;
+  --el-accent-active: #cf4517 !important;
+  --el-accent-primary: #ffffff !important; /* text on coral button */
 }
+

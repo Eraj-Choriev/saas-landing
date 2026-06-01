@@ -1,15 +1,24 @@
 import type { Metadata } from "next"
-import { Fraunces } from "next/font/google"
-import { GeistSans } from "geist/font/sans"
+import { Playfair_Display, Manrope } from "next/font/google"
 import { GeistMono } from "geist/font/mono"
 import { I18nProvider } from "@/lib/i18n"
+import { SmoothScroll } from "@/components/site/SmoothScroll"
+import { VoiceAgent } from "@/components/site/VoiceAgent"
 import "./globals.css"
 
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
+// Display — high-contrast editorial serif, full Cyrillic (works for RU + EN)
+const playfair = Playfair_Display({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-playfair",
   display: "swap",
-  axes: ["SOFT"],
+  style: ["normal", "italic"],
+})
+
+// Body — refined geometric sans, full Cyrillic (+ ext for Tajik ғ ӣ қ ӯ ҳ ҷ)
+const manrope = Manrope({
+  subsets: ["latin", "cyrillic", "cyrillic-ext"],
+  variable: "--font-manrope",
+  display: "swap",
 })
 
 export const metadata: Metadata = {
@@ -30,11 +39,15 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="en"
-      className={`${fraunces.variable} ${GeistSans.variable} ${GeistMono.variable}`}
+      lang="ru"
+      className={`${playfair.variable} ${manrope.variable} ${GeistMono.variable}`}
     >
       <body className="font-sans antialiased">
-        <I18nProvider>{children}</I18nProvider>
+        <I18nProvider>
+          <SmoothScroll />
+          {children}
+          <VoiceAgent />
+        </I18nProvider>
       </body>
     </html>
   )

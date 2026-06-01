@@ -25,6 +25,12 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          # NEXT_PUBLIC_* is inlined at build time. Both values are public:
+          # the ElevenLabs agent-id is locked to the domain in the dashboard,
+          # the lead endpoint is a public Cloudflare Worker URL.
+          NEXT_PUBLIC_ELEVENLABS_AGENT_ID: agent_5801kt12qkk0exhr47yy5qm6anbz
+          NEXT_PUBLIC_LEAD_ENDPOINT: https://aqly-lead.corieaerac.workers.dev
       - run: touch ./out/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

@@ -1,0 +1,75 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Overview
+
+`aqly-landing` — single-page marketing site for Aqly.io (an AI agency). Next.js 15 App Router, statically exported to GitHub Pages. No backend, no database, no test suite.
+
+## Commands
+
+```bash
+npm run dev      # local dev server at http://localhost:3000
+npm run build    # static export → ./out (also what CI runs)
+npm run start    # serve a production build
+npm run lint     # next lint
+```
+
+There are no tests.
+
+## Deployment
+
+`.github/workflows/deploy.yml` builds and deploys to GitHub Pages on push to `master` (or manual `workflow_dispatch`). The build output is `./out` (Next `output: "export"`).
+
+Critical: in production the site is served under `/saas-landing` (the `repo` const in `next.config.mjs`). `basePath`/`assetPrefix` are set only when `NODE_ENV === "production"`, so:
+- Local dev serves at root; prod serves under `/saas-landing`.
+- `images.unoptimized: true` and `trailingSlash: true` are required for static export — do not remove.
+- Reference public assets by root-relative path (`/telegram.png`); Next rewrites the basePath. Hardcoding `/saas-landing/...` breaks local dev.
+
+## Architecture
+
+The whole site is one route. `app/page.tsx` composes section components from `components/site/` in render order: `Navbar → Hero → TechStack → About → WhatWeBuild → CaseStudies → Approach → ContactForm → FinalCTA → Footer`. To add/reorder a section, edit `app/page.tsx`.
+
+- `app/layout.tsx` — root layout, fonts (Playfair Display display, Manrope sans, Geist Mono), metadata, wraps everything in `I18nProvider`.
+- `components/site/` — one file per landing section. All are `"use client"` (interactive / use the i18n hook).
+- `components/ui/` — shadcn/Radix-style primitives (`button`, `wordmark`).
+- `lib/utils.ts` — `cn()` (clsx + tailwind-merge).
+
+Path alias `@/*` → repo root (`tsconfig.json`).
+
+### i18n — all copy lives in `lib/i18n.tsx`
+
+This is the content source of truth. Components read text via the `useI18n()` hook → `{ lang, setLang, t }`, then `t.hero.title` etc. `LangToggle` flips `lang`.
+
+- `en` is the canonical dictionary; its shape defines the `Dict` type. `ru` and `tj` (Tajik) are typed `Dict`, so each must mirror `en`'s exact nested shape or TS fails to compile.
+- All three (`en`, `ru`, `tj`) are fully translated. When adding UI text, add the key to **all three** — do not hardcode strings in components. `LangToggle` cycles `ru / en / tj`.
+- Tajik uses Cyrillic-extended letters (ғ ӣ қ ӯ ҳ ҷ). Playfair Display has no `cyrillic-ext` Google subset (renders these via its `cyrillic` set / serif fallback); Manrope loads `cyrillic-ext`. Verified no tofu across display/body/mono.
+- Default language is `"ru"` (`I18nProvider` initial state).
+
+### Service detail modals
+
+`WhatWeBuild` lists services (data from `t.build.items`). `ServiceModal` (Radix Dialog) shows per-service detail. The modal title sits in a solid dark bar **below** the visual (not overlaid) so it's always legible. `ServiceVisual` renders a per-service **interactive demo** (`index`-mapped): 0 Telegram chat (clickable quick-replies + input + typewriter), 1 Websites case carousel (auto-rotate, pause on hover, Lighthouse badges), 2 Voice — a waveform teaser + "talk to the agent" button that opens the real ElevenLabs Conversational-AI agent (see `VoiceAgent`), 3 Connected-tools flow (scenario tabs + travelling data packet), 4 AI live terminal (typewriter API calls), 5 Marketing chart (growing bars + tabs + hover tooltip + annotation). Pure DOM/SVG + framer-motion, no image/media assets. Demos start ~300ms after open (`useStarted`), loops pause after 10s idle (`useActive`), and honor `prefers-reduced-motion` (static final frame). Demo copy is localized inline by `lang` (ru/en/tj).
+
+### Hero animation
+
+`Hero` background is pure CSS (no WebGL/JS canvas): drifting `.aurora-blob` gradients (`animate-drift-a/b/c`) plus a static `.hero-lines` diagonal line-field, both defined in `app/globals.css`. The right column is `HeroChat` — an interactive Telegram-style demo that auto-plays the scripted `t.hero.chat.turns`, then accepts quick-reply chips + freeform input (keyword-matched to `t.hero.chat.replies`), with an animated `LiveCounter`. Honors `prefers-reduced-motion` (renders the full thread statically).
+
+### Other sections
+
+- `CaseStudies` (`#cases`) — dark section, 3 result-driven case cards (`t.cases`).
+- `FinalCTA` — cream pre-footer conversion block, serif headline with italic coral accent (`t.finalCta`).
+- `VoiceAgent` — global ElevenLabs Conversational-AI widget (custom element + CDN script), mounted once in `app/layout.tsx`. Gated by `NEXT_PUBLIC_ELEVENLABS_AGENT_ID` (public-safe; lock the agent to your domain in the ElevenLabs dashboard Security tab). Other components open it via the `window` event `aqly:open-voice` (the AI-voice service modal button dispatches it). Renders nothing if the env var is unset.
+
+### Contact form
+
+`ContactForm` POSTs the lead to `process.env.NEXT_PUBLIC_LEAD_ENDPOINT` (a Cloudflare Worker — see `telegram-worker.js`, which forwards to Telegram via the Bot API). If the env var is unset, submit resets local state only. No Next API route; see `.env.local.example`.
+
+## Styling
+
+Tailwind with a custom token set in `tailwind.config.ts`:
+- Colors: `cream-*`, `ink`/`ink-*`, `aqua-*`, `brand.{blue,amber,gold,coral}`, `accent`.
+- Fonts: `font-display` (Playfair Display), `font-sans` (Manrope), `font-mono` (Geist Mono).
+- Custom keyframes/animations: `animate-marquee`, `animate-shimmer`, `animate-fade-up`.
+- Base styles, aurora and grain effects in `app/globals.css`.
+
+Animations also use `framer-motion`. Icons from `lucide-react`.

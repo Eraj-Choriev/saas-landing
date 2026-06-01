@@ -1,9 +1,49 @@
 "use client"
 
+import { motion } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 import { Wordmark } from "@/components/ui/wordmark"
 import { LangToggle } from "./LangToggle"
-import { ArrowUpRight } from "lucide-react"
+
+/* ── brand glyphs + accent colour per network ── */
+type SocialIcon = "telegram" | "whatsapp" | "instagram" | "facebook"
+
+const SOCIAL_META: Record<SocialIcon, { color: string; Glyph: () => JSX.Element }> = {
+  telegram: {
+    color: "#229ED9",
+    Glyph: () => (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
+        <path d="M21.94 4.5 18.9 19.2c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.18c-.25.25-.46.46-.94.46l.33-4.78L18.6 6.4c.38-.34-.08-.53-.6-.19L6.2 13.55l-4.66-1.46c-1.01-.32-1.03-1.01.21-1.5l18.2-7.02c.84-.31 1.58.2 1.3 1.43Z" />
+      </svg>
+    ),
+  },
+  whatsapp: {
+    color: "#25D366",
+    Glyph: () => (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
+        <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.9c0 1.76.46 3.45 1.34 4.95L2 22l5.3-1.39c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm0 18.13c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.13.82.84-3.05-.2-.31a8.18 8.18 0 0 1-1.26-4.36c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.55-3.7 8.24-8.24 8.24Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29Z" />
+      </svg>
+    ),
+  },
+  instagram: {
+    color: "#E1306C",
+    Glyph: () => (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.9} aria-hidden>
+        <rect x="3" y="3" width="18" height="18" rx="5.2" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  facebook: {
+    color: "#1877F2",
+    Glyph: () => (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
+        <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.49-3.91 3.78-3.91 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.44 2.91h-2.34V22c4.78-.76 8.44-4.92 8.44-9.94Z" />
+      </svg>
+    ),
+  },
+}
 
 export function Footer() {
   const { t } = useI18n()
@@ -45,25 +85,51 @@ export function Footer() {
               </div>
             ))}
 
-            {/* social — Telegram, bots, website, etc. with animated underline */}
+            {/* social — brand-tinted icon buttons with hover lift + glow */}
             <div className="col-span-2 sm:col-span-2">
               <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink/45">
                 {t.footer.socialTitle}
               </p>
-              <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5">
-                {t.footer.social.map((s) => (
-                  <li key={s.label}>
-                    <a
-                      href={s.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="link-underline group inline-flex items-center gap-1 text-[14px] text-ink/75 hover:text-ink"
+              <ul className="mt-4 flex flex-wrap gap-3">
+                {t.footer.social.map((s, i) => {
+                  const meta = SOCIAL_META[s.icon as SocialIcon]
+                  if (!meta) return null
+                  const { color, Glyph } = meta
+                  return (
+                    <motion.li
+                      key={s.label}
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.4, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
                     >
-                      {s.label}
-                      <ArrowUpRight className="h-3.5 w-3.5 text-ink/30 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-coral" />
-                    </a>
-                  </li>
-                ))}
+                      <a
+                        href={s.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={s.label}
+                        className="group relative grid h-11 w-11 place-items-center overflow-hidden rounded-2xl border border-ink/10 bg-cream-50 text-ink/55 transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:text-white"
+                        style={{ ["--c" as string]: color }}
+                      >
+                        {/* brand fill sweeps up on hover */}
+                        <span
+                          className="absolute inset-0 origin-bottom scale-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-100"
+                          style={{ backgroundColor: color }}
+                          aria-hidden
+                        />
+                        {/* glow */}
+                        <span
+                          className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                          style={{ boxShadow: `0 12px 30px -10px ${color}` }}
+                          aria-hidden
+                        />
+                        <span className="relative transition-transform duration-300 group-hover:scale-110">
+                          <Glyph />
+                        </span>
+                      </a>
+                    </motion.li>
+                  )
+                })}
               </ul>
             </div>
           </div>

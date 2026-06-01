@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Check, Mail, Send, AlertCircle } from "lucide-react"
+import { Check, Mail, Send, AlertCircle, Loader2 } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -24,11 +24,16 @@ const initial: FormState = {
   challenge: "",
 }
 
+const LEAD_ENDPOINT = process.env.NEXT_PUBLIC_LEAD_ENDPOINT
+
 export function ContactForm() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [form, setForm] = useState<FormState>(initial)
   const [submitted, setSubmitted] = useState(false)
   const [attempted, setAttempted] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState(false)
+  const [company, setCompany] = useState("") // honeypot — humans never fill this
   const formRef = useRef<HTMLFormElement>(null)
 
   // per-field validity — drives the red highlighting
@@ -60,16 +65,40 @@ export function ContactForm() {
     }))
   }
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (allValid) {
-      setSubmitted(true)
+    if (!allValid) {
+      // incomplete → flag errors + jump to first invalid field
+      setAttempted(true)
+      const firstInvalid = formRef.current?.querySelector("[data-invalid='true']")
+      firstInvalid?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
-    // incomplete → flag errors + jump to first invalid field
-    setAttempted(true)
-    const firstInvalid = formRef.current?.querySelector("[data-invalid='true']")
-    firstInvalid?.scrollIntoView({ behavior: "smooth", block: "center" })
+
+    setSendError(false)
+    setSending(true)
+    try {
+      // no endpoint configured yet → optimistic success (dev / not wired)
+      if (LEAD_ENDPOINT) {
+        const res = await fetch(LEAD_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...form, company, lang }),
+        })
+        if (!res.ok) throw new Error("send failed")
+      }
+      setSubmitted(true)
+      // show success card, then reset back to a fresh empty form
+      window.setTimeout(() => {
+        setForm(initial)
+        setAttempted(false)
+        setSubmitted(false)
+      }, 5000)
+    } catch {
+      setSendError(true)
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -136,11 +165,17 @@ export function ContactForm() {
             </div>
           </aside>
 
-          {/* form */}
-          <form
+          {/* form / success */}
+          <AnimatePresence mode="wait">
+          {submitted ? (
+            <SuccessCard key="success" t={t} />
+          ) : (
+          <motion.form
+            key="form"
             ref={formRef}
             onSubmit={onSubmit}
             noValidate
+            exit={{ opacity: 0, y: -8, transition: { duration: 0.25 } }}
             className="rounded-3xl border border-ink/8 bg-cream-50 p-6 sm:p-8 space-y-7"
           >
             <div className="grid gap-5 sm:grid-cols-2">
@@ -263,6 +298,18 @@ export function ContactForm() {
               </p>
             </FieldGroup>
 
+            {/* honeypot — hidden from humans; bots fill it and get dropped server-side */}
+            <input
+              type="text"
+              name="company"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              className="absolute left-[-9999px] h-0 w-0 opacity-0"
+            />
+
             {/* global error hint */}
             <AnimatePresence>
               {attempted && !allValid && !submitted && (
@@ -276,25 +323,36 @@ export function ContactForm() {
                   {t.form.errorHint}
                 </motion.div>
               )}
+              {sendError && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -6, height: 0 }}
+                  className="flex items-center gap-2 rounded-2xl border border-brand-coral/30 bg-brand-coral/[0.06] px-4 py-3 text-[13.5px] text-brand-coral"
+                >
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  {t.form.sendError}
+                </motion.div>
+              )}
             </AnimatePresence>
 
             <motion.button
               type="submit"
-              disabled={submitted}
+              disabled={sending}
               whileTap={{ scale: 0.98 }}
               className={cn(
                 "group relative inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-[15px] font-medium transition-colors",
-                submitted
-                  ? "bg-brand-blue/70 text-ink cursor-default"
+                sending
+                  ? "bg-ink/80 text-cream-50 cursor-wait"
                   : allValid
                     ? "bg-brand-blue text-ink hover:bg-brand-blue/90"
                     : "bg-ink text-cream-50 hover:bg-ink/90"
               )}
             >
-              {submitted ? (
+              {sending ? (
                 <>
-                  <Check className="h-4 w-4 text-brand-coral" />
-                  Sent
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {t.form.sending}
                 </>
               ) : (
                 <>
@@ -303,10 +361,96 @@ export function ContactForm() {
                 </>
               )}
             </motion.button>
-          </form>
+          </motion.form>
+          )}
+          </AnimatePresence>
         </div>
       </div>
     </section>
+  )
+}
+
+/* ── celebratory success card — animated, replaces the form on submit ── */
+function SuccessCard({ t }: { t: ReturnType<typeof useI18n>["t"] }) {
+  return (
+    <motion.div
+      key="success"
+      initial={{ opacity: 0, y: 16, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      className="relative flex flex-col items-center overflow-hidden rounded-3xl border border-ink/8 bg-cream-50 px-6 py-16 text-center sm:px-10 sm:py-20"
+    >
+      {/* soft accent wash */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 opacity-70"
+        style={{ background: "radial-gradient(60% 80% at 50% 0%, rgba(169,202,249,0.22), transparent 70%)" }}
+        aria-hidden
+      />
+
+      {/* animated check medallion */}
+      <motion.div
+        initial={{ scale: 0, rotate: -25 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ delay: 0.12, type: "spring", stiffness: 220, damping: 14 }}
+        className="relative grid h-20 w-20 place-items-center rounded-full bg-brand-blue text-ink"
+      >
+        {/* ping ring */}
+        <motion.span
+          className="absolute inset-0 rounded-full"
+          style={{ boxShadow: "0 0 0 2px rgba(169,202,249,0.55)" }}
+          initial={{ scale: 1, opacity: 0.6 }}
+          animate={{ scale: 1.7, opacity: 0 }}
+          transition={{ delay: 0.35, duration: 1, ease: "easeOut" }}
+          aria-hidden
+        />
+        <motion.svg
+          viewBox="0 0 24 24"
+          className="h-10 w-10"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={3}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <motion.path
+            d="M5 13l4 4L19 7"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ delay: 0.32, duration: 0.5, ease: "easeOut" }}
+          />
+        </motion.svg>
+      </motion.div>
+
+      <motion.h3
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.28, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="relative mt-7 font-display text-[28px] leading-tight tracking-tight text-ink sm:text-[34px]"
+      >
+        {t.form.successTitle}
+      </motion.h3>
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.38, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="relative mt-3 max-w-sm text-[15.5px] leading-[1.55] text-ink/65 text-pretty"
+      >
+        {t.form.successBody}
+      </motion.p>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="relative mt-7 flex items-center gap-2 rounded-full border border-ink/10 bg-cream-100 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-ink/55"
+      >
+        <span className="relative grid place-items-center">
+          <span className="absolute h-2.5 w-2.5 animate-ping rounded-full bg-emerald-400/50" />
+          <span className="h-2 w-2 rounded-full bg-emerald-400" />
+        </span>
+        {t.form.successTag}
+      </motion.div>
+    </motion.div>
   )
 }
 
