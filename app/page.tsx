@@ -6,7 +6,6 @@ import { WhatWeBuild } from "@/components/site/WhatWeBuild"
 import { CaseStudies } from "@/components/site/CaseStudies"
 import { Approach } from "@/components/site/Approach"
 import { ContactForm } from "@/components/site/ContactForm"
-import { FinalCTA } from "@/components/site/FinalCTA"
 import { Footer } from "@/components/site/Footer"
 
 export default function Page() {
@@ -20,7 +19,6 @@ export default function Page() {
       <CaseStudies />
       <Approach />
       <ContactForm />
-      <FinalCTA />
       <Footer />
     </main>
   )

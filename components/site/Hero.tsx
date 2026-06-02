@@ -114,17 +114,6 @@ export function Hero() {
               </Button>
             </motion.div>
 
-            {/* trust line — instant credibility */}
-            <motion.p
-              variants={reveal}
-              custom={7}
-              initial="hidden"
-              animate="show"
-              className="mt-6 text-[13px] tracking-tight text-cream-100/50"
-            >
-              {t.hero.trust}
-            </motion.p>
-
             {/* clickable topic tags → jump to services */}
             <motion.div
               variants={reveal}
