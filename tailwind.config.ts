@@ -63,6 +63,9 @@ const config: Config = {
       letterSpacing: {
         tightest: "-0.045em",
       },
+      transitionTimingFunction: {
+        smooth: "cubic-bezier(0.16, 1, 0.3, 1)",
+      },
       borderRadius: {
         "4xl": "2rem",
       },

@@ -155,7 +155,7 @@ function ServiceCard({
         style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}
       />
 
-      <div className="relative flex items-start justify-between">
+      <div className="relative flex w-full items-start justify-between">
         <div className="grid h-12 w-12 place-items-center rounded-2xl bg-ink text-cream-50 transition-all duration-300 group-hover:-rotate-6 group-hover:scale-110">
           <Icon className="h-5 w-5 transition-colors duration-300" style={{ color }} strokeWidth={1.75} />
         </div>

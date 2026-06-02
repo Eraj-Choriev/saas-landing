@@ -113,7 +113,7 @@ export function Footer() {
                       >
                         {/* brand fill sweeps up on hover */}
                         <span
-                          className="absolute inset-0 origin-bottom scale-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-100"
+                          className="absolute inset-0 origin-bottom scale-y-0 transition-transform duration-300 ease-smooth group-hover:scale-y-100"
                           style={{ backgroundColor: color }}
                           aria-hidden
                         />
