@@ -6,6 +6,7 @@ node_modules
 next-env.d.ts
 
 /out/
+/.preview/
 /services/
 
 # local tooling / agent artifacts

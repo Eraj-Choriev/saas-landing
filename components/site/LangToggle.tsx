@@ -1,15 +1,14 @@
 "use client"
 
-import { useId } from "react"
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import { useI18n, type Lang } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 export function LangToggle({ tone = "ink" }: { tone?: "ink" | "cream" }) {
   const { lang, setLang } = useI18n()
-  const uid = useId()
   const reduce = useReducedMotion()
   const items: Lang[] = ["ru", "en", "tj"]
+  const activeIndex = Math.max(0, items.indexOf(lang))
 
   return (
     <div
@@ -20,6 +19,20 @@ export function LangToggle({ tone = "ink" }: { tone?: "ink" | "cream" }) {
           : "bg-white/5 border border-white/10"
       )}
     >
+      {/* single sliding pill — positioned inside the container (transform only),
+          so it never measures against the viewport and stays smooth on scroll */}
+      <motion.span
+        aria-hidden
+        className={cn(
+          "absolute left-0.5 top-0.5 bottom-0.5 rounded-full shadow-sm",
+          tone === "ink" ? "bg-brand-blue" : "bg-cream-50"
+        )}
+        style={{ width: "calc((100% - 4px) / 3)" }}
+        animate={{ x: `${activeIndex * 100}%` }}
+        transition={
+          reduce ? { duration: 0 } : { type: "spring", duration: 0.5, bounce: 0.2 }
+        }
+      />
       {items.map((l) => {
         const isActive = lang === l
         return (
@@ -28,7 +41,7 @@ export function LangToggle({ tone = "ink" }: { tone?: "ink" | "cream" }) {
             onClick={() => setLang(l)}
             aria-pressed={isActive}
             className={cn(
-              "relative z-10 rounded-full px-3 py-1.5 transition-[color,transform] duration-200 active:scale-[0.94]",
+              "relative z-10 flex-1 rounded-full px-3 py-1.5 text-center transition-[color,transform] duration-200 active:scale-[0.94]",
               isActive
                 ? "text-ink font-semibold"
                 : tone === "ink"
@@ -36,22 +49,6 @@ export function LangToggle({ tone = "ink" }: { tone?: "ink" | "cream" }) {
                   : "text-cream-100/60 hover:text-cream-100/90"
             )}
           >
-            {isActive && (
-              <motion.span
-                layoutId={`lang-pill-${uid}`}
-                className={cn(
-                  "absolute inset-0 rounded-full shadow-sm",
-                  tone === "ink"
-                    ? "bg-brand-blue"
-                    : "bg-cream-50"
-                )}
-                transition={
-                  reduce
-                    ? { duration: 0 }
-                    : { type: "spring", duration: 0.5, bounce: 0.2 }
-                }
-              />
-            )}
             <span className="relative">{l}</span>
           </button>
         )

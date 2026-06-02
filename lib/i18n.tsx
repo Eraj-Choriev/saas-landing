@@ -69,7 +69,7 @@ const en = {
       counter: "Today the bot answered %n messages",
       quickReplies: ["How much does it cost?", "What do you do?", "Book a call"],
       replies: {
-        price: "From $5k — it depends on scope. Most projects land between $5k and $15k ⚡",
+        price: "It depends on your project and goals. Leave a request — we'll get in touch and scope it with you ⚡",
         services: "We build AI agents, Telegram bots, websites and connected tools — fully end to end 🚀",
         booking: "Of course! Grab a slot here 👉 aqly.io/call",
         fallback: "Great question — easiest to cover it on a quick call. Tap “Book a call” 👇",
@@ -114,7 +114,7 @@ const en = {
       {
         client: "Voltage",
         category: "Website + growth",
-        name: "Marketing site rebuild",
+        name: "Website rebuild",
         problem: "A slow, generic site converting under 1%.",
         solution: "A rebuilt Next.js site with funnels instrumented from day one.",
         results: [
@@ -129,7 +129,7 @@ const en = {
   finalCta: {
     kicker: "READY?",
     title: ["Ready to turn AI into", "your advantage?"],
-    sub: "Free 30-minute consultation. No obligation.",
+    sub: "Free consultation. No obligation.",
     button: "Book a call",
     orPrefix: "or email us:",
   },
@@ -142,7 +142,7 @@ const en = {
     learnMore: "Learn more",
     modalCta: "Book a consultation",
     modalCtaTitle: "Ready to build this?",
-    modalCtaSub: "Free 30-min consultation — no obligation.",
+    modalCtaSub: "Free consultation — no obligation.",
     modalHow: "How it works",
     modalIncludes: "What's included",
     items: [
@@ -165,10 +165,10 @@ const en = {
       {
         tag: "Websites",
         title: "Websites",
-        body: "Production-grade marketing sites and dashboards. Performance, SEO and design polished to enterprise standard.",
+        body: "Production-grade websites and dashboards. Performance, SEO and design polished to enterprise standard.",
         details: {
           overview:
-            "We design and ship production-grade marketing sites and product dashboards — fast, accessible, search-optimised and pixel-polished to an enterprise standard your brand deserves.",
+            "We design and ship production-grade websites and product dashboards — fast, accessible, search-optimised and pixel-polished to an enterprise standard your brand deserves.",
           how: [
             "We map your positioning, audience and conversion goals.",
             "Design a distinctive system — type, colour, motion, layout.",
@@ -278,7 +278,7 @@ const en = {
   about: {
     kicker: "WHO WE ARE",
     title: ["We design,", "build & integrate", "into your business."],
-    lead: "Aqly is an agency that designs, builds and integrates products into your business. Integration is the core of what we do: we wire AI, bots and automations into your existing systems — CRM, payments, data — so everything works as one. You talk straight to the team that owns the project from first call to live deployment.",
+    lead: "Aqly is an agency that designs, builds and integrates products into your business. Integration is the core of what we do: we wire AI, bots and automations into your existing systems — CRM, data and tools — so everything works as one. You talk straight to the team that owns the project from first call to live deployment.",
     values: [
       {
         title: "Speed",
@@ -286,7 +286,7 @@ const en = {
       },
       {
         title: "Engineering-first",
-        body: "Real systems wired into your stack — CRM, payments, data. Not a wrapped chatbot demo.",
+        body: "Real systems wired into your stack — CRM, data and tools. Not a wrapped chatbot demo.",
       },
       {
         title: "Transparency",
@@ -305,8 +305,8 @@ const en = {
     expect: {
       title: "What to expect",
       items: [
-        "Free 30-minute consultation",
-        "Response within 24 hours",
+        "Free consultation",
+        "Response within 30 minutes",
         "No-obligation project scoping",
         "Transparent pricing upfront",
       ],
@@ -336,10 +336,10 @@ const en = {
     },
     submit: "Book Your Free Consultation",
     sending: "Sending…",
-    sent: "Sent — we'll reply within 24h",
+    sent: "Sent — we'll reply within 30 min",
     sendError: "Couldn't send — please try again or email us.",
     successTitle: "Your request has been sent",
-    successBody: "Thank you! We've received your message and will get back to you within the hour.",
+    successBody: "Thank you! We've received your message and will get back to you within 30 minutes.",
     successTag: "We'll be in touch shortly",
     errorHint: "Please fill in the highlighted fields first.",
     required: "This field is required",
@@ -402,7 +402,7 @@ const ru: Dict = {
       { label: "Веб", href: "#services" },
       { label: "Связки", href: "#services" },
       { label: "RAG", href: "#services" },
-      { label: "Маркетинг", href: "#services" },
+      { label: "Дизайн", href: "#services" },
     ],
     mockTitle: "Aqly Агент",
     mockStatus: "онлайн",
@@ -437,7 +437,7 @@ const ru: Dict = {
       counter: "Сегодня бот ответил на %n сообщений",
       quickReplies: ["Сколько стоит?", "Что вы делаете?", "Запишите на созвон"],
       replies: {
-        price: "От $5k — зависит от объёма. Большинство проектов укладываются в $5k–$15k ⚡",
+        price: "Зависит от вашего проекта и задач. Оставьте заявку — мы свяжемся и всё рассчитаем ⚡",
         services: "Строим AI-агентов, Telegram-ботов, сайты и связки программ — полностью под ключ 🚀",
         booking: "Конечно! Выберите слот здесь 👉 aqly.io/call",
         fallback: "Хороший вопрос — проще обсудить на коротком созвоне. Нажмите «Запишите на созвон» 👇",
@@ -482,7 +482,7 @@ const ru: Dict = {
       {
         client: "Voltage",
         category: "Сайт + рост",
-        name: "Переделка маркетинг-сайта",
+        name: "Переделка сайта",
         problem: "Медленный шаблонный сайт с конверсией ниже 1%.",
         solution: "Сайт заново на Next.js с воронками, измеряемыми с первого дня.",
         results: [
@@ -497,7 +497,7 @@ const ru: Dict = {
   finalCta: {
     kicker: "ГОТОВЫ?",
     title: ["Готовы превратить AI", "в преимущество?"],
-    sub: "Бесплатная 30-минутная консультация, без обязательств.",
+    sub: "Бесплатная консультация, без обязательств.",
     button: "Записаться на созвон",
     orPrefix: "или напишите:",
   },
@@ -510,7 +510,7 @@ const ru: Dict = {
     learnMore: "Подробнее",
     modalCta: "Записаться на созвон",
     modalCtaTitle: "Готовы запустить?",
-    modalCtaSub: "Бесплатная консультация 30 минут, без обязательств.",
+    modalCtaSub: "Бесплатная консультация, без обязательств.",
     modalHow: "Как это работает",
     modalIncludes: "Что входит",
     items: [
@@ -626,7 +626,7 @@ const ru: Dict = {
   about: {
     kicker: "КТО МЫ",
     title: ["Проектируем,", "разрабатываем и", "интегрируем в бизнес."],
-    lead: "Aqly — агентство, которое проектирует, разрабатывает и интегрирует продукты в ваш бизнес. Главное для нас — интеграция: подключаем AI, ботов и автоматизации к вашим системам (CRM, платежи, данные), чтобы всё работало вместе. С вами напрямую общается команда, которая ведёт проект от первого звонка до боевого деплоя.",
+    lead: "Aqly — агентство, которое проектирует, разрабатывает и интегрирует продукты в ваш бизнес. Главное для нас — интеграция: подключаем AI, ботов и автоматизации к вашим системам (CRM, данные, сервисы), чтобы всё работало вместе. С вами напрямую общается команда, которая ведёт проект от первого звонка до боевого деплоя.",
     values: [
       {
         title: "Скорость",
@@ -634,7 +634,7 @@ const ru: Dict = {
       },
       {
         title: "Инженерия",
-        body: "Реальные системы, вшитые в ваш стек — CRM, платежи, данные. Не обёрнутая демка-чатбот.",
+        body: "Реальные системы, вшитые в ваш стек — CRM, данные, сервисы. Не обёрнутая демка-чатбот.",
       },
       {
         title: "Прозрачность",
@@ -654,7 +654,7 @@ const ru: Dict = {
       title: "Что получите",
       items: [
         "Бесплатная консультация",
-        "Ответ в течение 1 часа",
+        "Ответ в течение 30 минут",
         "Оценим проект без обязательств",
         "Прозрачные цены с порога",
       ],
@@ -684,10 +684,10 @@ const ru: Dict = {
     },
     submit: "Записаться на бесплатную консультацию",
     sending: "Отправляем…",
-    sent: "Отправлено — ответим в течение 24 часов",
+    sent: "Отправлено — ответим в течение 30 минут",
     sendError: "Не удалось отправить — попробуйте ещё раз или напишите нам.",
     successTitle: "Ваше сообщение отправлено",
-    successBody: "Спасибо! Мы получили вашу заявку и ответим вам в течение часа.",
+    successBody: "Спасибо! Мы получили вашу заявку и ответим вам в течение 30 минут.",
     successTag: "Скоро свяжемся с вами",
     errorHint: "Сначала заполните выделенные поля.",
     required: "Это поле обязательно",
@@ -785,7 +785,7 @@ const tj: Dict = {
       counter: "Имрӯз бот ба %n паём ҷавоб дод",
       quickReplies: ["Нархаш чанд аст?", "Шумо чӣ кор мекунед?", "Ба занг сабт кунед"],
       replies: {
-        price: "Аз $5k — вобаста ба ҳаҷм. Аксари лоиҳаҳо $5k то $15k мешаванд ⚡",
+        price: "Вобаста ба лоиҳа ва вазифаҳои шумо. Дархост гузоред — мо тамос мегирем ва ҳисоб мекунем ⚡",
         services: "Мо агентҳои AI, Telegram-ботҳо, сайтҳо ва пайвасти барномаҳо месозем — пурра аз аввал то охир 🚀",
         booking: "Албатта! Вақтро ин ҷо интихоб кунед 👉 aqly.io/call",
         fallback: "Саволи хуб — беҳтараш дар занги кӯтоҳ муҳокима мекунем. «Ба занг сабт кунед»-ро пахш кунед 👇",
@@ -830,7 +830,7 @@ const tj: Dict = {
       {
         client: "Voltage",
         category: "Сайт + рушд",
-        name: "Аз нав сохтани сайти маркетингӣ",
+        name: "Аз нав сохтани сайт",
         problem: "Сайти суст ва оддӣ бо конверсияи камтар аз 1%.",
         solution: "Сайти аз нав сохташуда дар Next.js бо воронкаҳое, ки аз рӯзи аввал чен мешаванд.",
         results: [
@@ -845,7 +845,7 @@ const tj: Dict = {
   finalCta: {
     kicker: "ТАЙЁРЕД?",
     title: ["Тайёред AI-ро ба", "бартарии худ табдил диҳед?"],
-    sub: "Машварати ройгони 30-дақиқагӣ, бе ӯҳдадорӣ.",
+    sub: "Машварати ройгон, бе ӯҳдадорӣ.",
     button: "Ба занг сабт шавед",
     orPrefix: "ё ба мо нависед:",
   },
@@ -858,7 +858,7 @@ const tj: Dict = {
     learnMore: "Муфассал",
     modalCta: "Сабт ба машварат",
     modalCtaTitle: "Тайёред инро созед?",
-    modalCtaSub: "Машварати ройгони 30-дақиқагӣ — бе ӯҳдадорӣ.",
+    modalCtaSub: "Машварати ройгон — бе ӯҳдадорӣ.",
     modalHow: "Чӣ тавр кор мекунад",
     modalIncludes: "Чӣ дохил мешавад",
     items: [
@@ -881,10 +881,10 @@ const tj: Dict = {
       {
         tag: "Сайтҳо",
         title: "Сайтҳо",
-        body: "Сайтҳои маркетингӣ ва дашбордҳои сатҳи production. Маҳсулнокӣ, SEO ва дизайн то стандарти enterprise сайқалёфта.",
+        body: "Сайтҳо ва дашбордҳои сатҳи production. Маҳсулнокӣ, SEO ва дизайн то стандарти enterprise сайқалёфта.",
         details: {
           overview:
-            "Мо сайтҳои маркетингӣ ва дашбордҳои маҳсулоти сатҳи production тарроҳӣ ва ба кор медарорем — тез, дастрас, барои ҷустуҷӯ оптимизатсияшуда ва то пиксел сайқалёфта дар сатҳи enterprise, ки бренди шумо сазовори он аст.",
+            "Мо сайтҳо ва дашбордҳои маҳсулоти сатҳи production тарроҳӣ ва ба кор медарорем — тез, дастрас, барои ҷустуҷӯ оптимизатсияшуда ва то пиксел сайқалёфта дар сатҳи enterprise, ки бренди шумо сазовори он аст.",
           how: [
             "Мавқеъ, аудитория ва ҳадафҳои конверсияи шуморо муайян мекунем.",
             "Системаи фарқкунанда тарроҳӣ мекунем — шрифт, ранг, ҳаракат, тарҳ.",
@@ -994,7 +994,7 @@ const tj: Dict = {
   about: {
     kicker: "МО КӢ ҲАСТЕМ",
     title: ["Тарроҳӣ,", "таҳия ва", "интегратсия ба бизнес."],
-    lead: "Aqly агентиест, ки маҳсулотҳоро тарроҳӣ, таҳия ва ба бизнеси шумо интегратсия мекунад. Барои мо асосаш интегратсия аст: AI, ботҳо ва автоматизатсияҳоро ба системаҳои мавҷудаи шумо (CRM, пардохтҳо, маълумот) пайваст мекунем, то ҳама якҷоя кор кунад. Шумо рост бо дастае сӯҳбат мекунед, ки лоиҳаро аз занги аввал то ба кор андохтан пеш мебарад.",
+    lead: "Aqly агентиест, ки маҳсулотҳоро тарроҳӣ, таҳия ва ба бизнеси шумо интегратсия мекунад. Барои мо асосаш интегратсия аст: AI, ботҳо ва автоматизатсияҳоро ба системаҳои мавҷудаи шумо (CRM, маълумот, хидматҳо) пайваст мекунем, то ҳама якҷоя кор кунад. Шумо рост бо дастае сӯҳбат мекунед, ки лоиҳаро аз занги аввал то ба кор андохтан пеш мебарад.",
     values: [
       {
         title: "Суръат",
@@ -1002,7 +1002,7 @@ const tj: Dict = {
       },
       {
         title: "Аввал муҳандисӣ",
-        body: "Системаҳои воқеӣ, ба стеки шумо пайваст — CRM, пардохтҳо, маълумот. На демои чатботи печонидашуда.",
+        body: "Системаҳои воқеӣ, ба стеки шумо пайваст — CRM, маълумот, хидматҳо. На демои чатботи печонидашуда.",
       },
       {
         title: "Шаффофият",
@@ -1021,8 +1021,8 @@ const tj: Dict = {
     expect: {
       title: "Чиро интизор шавед",
       items: [
-        "Машварати ройгони 30-дақиқагӣ",
-        "Ҷавоб дар давоми 24 соат",
+        "Машварати ройгон",
+        "Ҷавоб дар давоми 30 дақиқа",
         "Баҳодиҳии лоиҳа бе ӯҳдадорӣ",
         "Нархи шаффоф аз аввал",
       ],
@@ -1052,10 +1052,10 @@ const tj: Dict = {
     },
     submit: "Ба машварати ройгон сабт шавед",
     sending: "Фиристода истодааст…",
-    sent: "Фиристода шуд — дар давоми 24 соат ҷавоб медиҳем",
+    sent: "Фиристода шуд — дар давоми 30 дақиқа ҷавоб медиҳем",
     sendError: "Фиристода нашуд — лутфан боз кӯшиш кунед ё ба мо нависед.",
     successTitle: "Дархости шумо фиристода шуд",
-    successBody: "Ташаккур! Паёми шуморо гирифтем ва дар давоми як соат ҷавоб медиҳем.",
+    successBody: "Ташаккур! Паёми шуморо гирифтем ва дар давоми 30 дақиқа ҷавоб медиҳем.",
     successTag: "Ба зудӣ дар тамос мешавем",
     errorHint: "Аввал майдонҳои ҷудошударо пур кунед.",
     required: "Ин майдон ҳатмист",

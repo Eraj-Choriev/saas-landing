@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "preview": "next build && npm run start",
+    "start": "rm -rf .preview && mkdir -p .preview/saas-landing && cp -R out/. .preview/saas-landing/ && npx --yes serve .preview -l 3000",
     "lint": "next lint"
   },
   "dependencies": {

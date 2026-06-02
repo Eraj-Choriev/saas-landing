@@ -2,19 +2,37 @@
 
 import * as React from "react"
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
-import { Mic, Send, ArrowUpRight } from "lucide-react"
+import {
+  Mic,
+  Send,
+  Globe,
+  FileText,
+  MessageSquare,
+  Database,
+  CreditCard,
+  Users,
+  Mail,
+  Calendar,
+  Megaphone,
+  Sparkles,
+  PenTool,
+  Square,
+  Type,
+  type LucideIcon,
+} from "lucide-react"
 import { useI18n, type Lang } from "@/lib/i18n"
 
 /**
- * ServiceVisual — per-service INTERACTIVE demo shown at the top of each modal.
- * The principle: don't illustrate the idea, let the visitor touch the product.
+ * ServiceVisual — per-service animated demo shown at the top of each modal.
+ * Principle: don't illustrate the idea — show the product moving on its own.
  * index maps to service order in i18n (0 Telegram … 5 Design).
  * Pure DOM/SVG + framer-motion (no external libs, no media assets).
  *
- * Shared rules (per brief):
+ * Shared rules:
  *  - demos start ~300ms after the modal has faded in (`useStarted`)
- *  - looping demos pause after 10s of no pointer activity (`useActive`)
+ *  - looping demos pause after 12s of no pointer activity (`useActive`)
  *  - prefers-reduced-motion → render a sensible static final frame
+ *  - NO manual controls: everything autoplays / auto-cycles
  */
 const EASE = [0.16, 1, 0.3, 1] as const
 const BG = "radial-gradient(120% 120% at 50% 0%, #141a22 0%, #0b0f14 62%)"
@@ -32,7 +50,7 @@ function useStarted(delay = 300) {
 }
 
 // pause looping demos after inactivity — saves CPU, stops distracting the reader
-function useActive(timeout = 10000) {
+function useActive(timeout = 12000) {
   const [active, setActive] = React.useState(true)
   React.useEffect(() => {
     let timer: ReturnType<typeof setTimeout>
@@ -66,18 +84,21 @@ export function ServiceVisual({ index, color }: { index: number; color: string }
     <WebsitesDemo key="1" {...common} />,
     <VoiceDemo key="2" {...common} />,
     <FlowDemo key="3" {...common} />,
-    <TerminalDemo key="4" {...common} />,
+    <IntegrationHub key="4" {...common} />,
     <DesignDemo key="5" {...common} />,
   ]
 
   return (
-    <div className="relative h-[230px] w-full overflow-hidden sm:h-[260px]" style={{ background: BG }}>
+    <div
+      className="relative h-[300px] w-full overflow-hidden sm:h-[360px] lg:h-[400px]"
+      style={{ background: BG }}
+    >
       <div
         className="pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(80%_80%_at_50%_30%,#000,transparent)]"
         style={{
           backgroundImage:
             "linear-gradient(rgba(255,255,255,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.035) 1px,transparent 1px)",
-          backgroundSize: "26px 26px",
+          backgroundSize: "28px 28px",
         }}
         aria-hidden
       />
@@ -120,9 +141,9 @@ function ChatDemo({ color, reduce, started, lang }: Demo) {
       q: tr(lang, "Сколько стоит?", "How much?", "Нархаш чанд?"),
       a: tr(
         lang,
-        "От $5 000 — зависит от объёма и интеграций. Сделать бесплатную оценку?",
-        "From $5,000 — depends on scope and integrations. Want a free estimate?",
-        "Аз $5 000 — вобаста ба ҳаҷм ва интегратсияҳо. Баҳои ройгон кунам?"
+        "Зависит от вашего проекта и интеграций. Оставьте заявку — мы свяжемся и всё рассчитаем.",
+        "It depends on your project and integrations. Leave a request — we'll get in touch and scope it.",
+        "Вобаста ба лоиҳа ва интегратсияҳои шумо. Дархост гузоред — мо тамос мегирем ва ҳисоб мекунем."
       ),
       next: ["booking", "abilities"],
     },
@@ -235,7 +256,7 @@ function ChatDemo({ color, reduce, started, lang }: Demo) {
   }
 
   return (
-    <div className="absolute inset-0 mx-auto flex max-w-[440px] flex-col px-4 pt-3 pb-3">
+    <div className="absolute inset-0 mx-auto flex max-w-[480px] flex-col px-4 pt-3 pb-3">
       <div className="flex items-center gap-2 pb-2">
         <div className="grid h-7 w-7 place-items-center rounded-full bg-[#229ED9] font-display text-[13px] text-white">a</div>
         <div className="leading-tight">
@@ -315,7 +336,7 @@ function Typewriter({ text, speed = 18 }: { text: string; speed?: number }) {
   return <>{text.slice(0, n)}</>
 }
 
-/* ════════════════ 2 · Websites — case carousel + metrics ════════════════ */
+/* ════════════════ 2 · Websites — auto-rotating case browser ════════════════ */
 
 function WebsitesDemo({ color, reduce, started, lang }: Demo) {
   const cases = [
@@ -323,57 +344,104 @@ function WebsitesDemo({ color, reduce, started, lang }: Demo) {
     { name: "Lumen", url: "lumen.app", accent: "#a9caf9", lh: 98, lcp: "0.9s", cls: "0.02" },
     { name: "Voltage", url: "voltage.co", accent: "#d17a00", lh: 97, lcp: "1.0s", cls: "0.01" },
   ]
+  const DUR = 4200
   const [i, setI] = React.useState(0)
-  const [hover, setHover] = React.useState(false)
   const active = useActive()
   React.useEffect(() => {
-    if (reduce || !started || hover || !active) return
-    const id = setInterval(() => setI((v) => (v + 1) % cases.length), 4000)
+    if (reduce || !started || !active) return
+    const id = setInterval(() => setI((v) => (v + 1) % cases.length), DUR)
     return () => clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduce, started, hover, active])
+  }, [reduce, started, active])
 
   const c = cases[i]
   return (
-    <div className="absolute inset-0 grid place-items-center px-5" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-      <div className="w-full max-w-[420px]">
-        <div className="overflow-hidden rounded-xl border border-white/12 bg-[#11161c] shadow-xl">
+    <div className="absolute inset-0 grid place-items-center px-5 sm:px-10">
+      <div className="w-full max-w-[640px]">
+        <div className="overflow-hidden rounded-2xl border border-white/12 bg-[#11161c] shadow-2xl">
           {/* browser chrome */}
-          <div className="flex items-center gap-2 border-b border-white/8 px-3 py-2">
-            <span className="flex gap-1"><i className="h-2 w-2 rounded-full bg-white/25" /><i className="h-2 w-2 rounded-full bg-white/25" /><i className="h-2 w-2 rounded-full bg-white/25" /></span>
-            <span className="ml-1 truncate rounded-md bg-white/[0.06] px-2 py-0.5 font-mono text-[10.5px] text-cream-100/55">https://{c.url}</span>
+          <div className="flex items-center gap-2 border-b border-white/8 px-3.5 py-2.5">
+            <span className="flex gap-1.5">
+              <i className="h-2.5 w-2.5 rounded-full bg-[#ff5f56]" />
+              <i className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
+              <i className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
+            </span>
+            <span className="ml-2 flex-1 truncate rounded-md bg-white/[0.06] px-2.5 py-1 text-center font-mono text-[11px] text-cream-100/55">
+              https://{c.url}
+            </span>
           </div>
           {/* stylized site preview */}
-          <div className="relative h-[110px] sm:h-[128px]">
+          <div className="relative h-[160px] sm:h-[210px]">
             <AnimatePresence mode="wait">
-              <motion.div key={i} initial={reduce ? false : { opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }}
-                exit={reduce ? undefined : { opacity: 0, x: -24 }} transition={{ duration: 0.35, ease: EASE }}
-                className="absolute inset-0 p-3" style={{ background: `radial-gradient(120% 90% at 80% 0%, ${c.accent}22, transparent 60%), #0e1318` }}>
-                <div className="h-2.5 w-20 rounded-full" style={{ background: c.accent }} />
-                <div className="mt-3 h-3.5 w-3/4 rounded bg-white/15" />
-                <div className="mt-1.5 h-3.5 w-1/2 rounded bg-white/10" />
-                <div className="mt-3 inline-block h-5 w-24 rounded-full" style={{ background: `${c.accent}cc` }} />
-                {/* metrics badge */}
-                <div className="absolute bottom-3 right-3 rounded-lg border border-white/12 bg-ink/70 px-2.5 py-1.5 backdrop-blur">
-                  <div className="flex items-center gap-2 text-[11px]">
-                    <span className="font-mono font-semibold text-emerald-400">Lighthouse {c.lh}</span>
+              <motion.div
+                key={i}
+                initial={reduce ? false : { opacity: 0, x: 28 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={reduce ? undefined : { opacity: 0, x: -28 }}
+                transition={{ duration: 0.4, ease: EASE }}
+                className="absolute inset-0"
+                style={{ background: `radial-gradient(130% 90% at 82% 0%, ${c.accent}26, transparent 58%), #0e1318` }}
+              >
+                {/* fake site nav */}
+                <div className="flex items-center justify-between px-4 pt-3.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-3 w-3 rounded-[5px]" style={{ background: c.accent }} />
+                    <span className="font-display text-[12px] text-cream-50">{c.name}</span>
                   </div>
+                  <div className="hidden gap-3 sm:flex">
+                    {[0, 1, 2].map((d) => <span key={d} className="h-1.5 w-7 rounded-full bg-white/12" />)}
+                  </div>
+                </div>
+                {/* hero */}
+                <div className="grid grid-cols-5 gap-3 px-4 pt-5">
+                  <div className="col-span-3">
+                    <div className="h-3.5 w-4/5 rounded bg-white/18" />
+                    <div className="mt-2 h-3.5 w-3/5 rounded bg-white/12" />
+                    <div className="mt-2 h-2 w-2/3 rounded bg-white/8" />
+                    <div className="mt-3.5 inline-block h-6 w-28 rounded-full" style={{ background: c.accent }} />
+                  </div>
+                  <motion.div
+                    className="col-span-2 rounded-xl"
+                    style={{ background: `linear-gradient(140deg, ${c.accent}cc, ${c.accent}33)`, minHeight: 64 }}
+                    animate={reduce ? {} : { y: [0, -4, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                </div>
+                {/* card row */}
+                <div className="hidden grid-cols-3 gap-2.5 px-4 pt-4 sm:grid">
+                  {[0, 1, 2].map((d) => (
+                    <div key={d} className="rounded-lg border border-white/8 bg-white/[0.04] p-2">
+                      <span className="block h-2 w-2 rounded-full" style={{ background: c.accent }} />
+                      <div className="mt-1.5 h-1.5 w-full rounded bg-white/12" />
+                      <div className="mt-1 h-1.5 w-2/3 rounded bg-white/8" />
+                    </div>
+                  ))}
+                </div>
+                {/* metrics badge */}
+                <div className="absolute bottom-3 right-3 rounded-lg border border-white/12 bg-ink/75 px-2.5 py-1.5 backdrop-blur">
+                  <div className="font-mono text-[11px] font-semibold text-emerald-400">Lighthouse {c.lh}</div>
                   <div className="mt-0.5 font-mono text-[9.5px] text-cream-100/55">LCP {c.lcp} · CLS {c.cls}</div>
                 </div>
-                {hover && (
-                  <a href="#contact" className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10.5px] font-medium text-ink">
-                    {tr(lang, "Открыть", "View live", "Кушодан")} <ArrowUpRight className="h-3 w-3" />
-                  </a>
-                )}
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
-        {/* dots */}
-        <div className="mt-3 flex items-center justify-center gap-1.5">
+        {/* autoplay progress segments (non-interactive) */}
+        <div className="mt-3.5 flex items-center justify-center gap-2">
           {cases.map((_, d) => (
-            <button key={d} aria-label={`Case ${d + 1}`} onClick={() => setI(d)}
-              className="h-1.5 rounded-full transition-all duration-300" style={{ width: d === i ? 18 : 6, background: d === i ? color : "rgba(255,255,255,0.25)" }} />
+            <div key={d} className="h-1 w-10 overflow-hidden rounded-full bg-white/12">
+              {d === i && !reduce && (
+                <motion.div
+                  key={`fill-${i}`}
+                  className="h-full rounded-full"
+                  style={{ background: color }}
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: DUR / 1000, ease: "linear" }}
+                />
+              )}
+              {d === i && reduce && <div className="h-full w-full rounded-full" style={{ background: color }} />}
+            </div>
           ))}
         </div>
       </div>
@@ -391,15 +459,15 @@ function VoiceDemo({ color, reduce, lang }: Demo) {
       /* noop */
     }
   }
-  const bars = Array.from({ length: 32 })
+  const bars = Array.from({ length: 40 })
 
   return (
     <div className="absolute inset-0 grid place-items-center px-6">
-      <div className="w-full max-w-[420px] text-center">
+      <div className="w-full max-w-[460px] text-center">
         {/* live waveform teaser */}
-        <div className="mx-auto mb-5 flex h-12 items-center justify-center gap-[3px]">
+        <div className="mx-auto mb-6 flex h-16 items-center justify-center gap-[3px]">
           {bars.map((_, i) => {
-            const base = 5 + Math.abs(Math.sin(i * 0.55)) * 20
+            const base = 6 + Math.abs(Math.sin(i * 0.55)) * 26
             return (
               <motion.span
                 key={i}
@@ -414,10 +482,10 @@ function VoiceDemo({ color, reduce, lang }: Demo) {
 
         <button
           onClick={open}
-          className="group mx-auto inline-flex items-center gap-2.5 rounded-full py-2.5 pl-3 pr-5 text-[14px] font-medium text-white transition-transform hover:scale-[1.03] active:scale-95"
+          className="group mx-auto inline-flex items-center gap-2.5 rounded-full py-3 pl-3.5 pr-6 text-[15px] font-medium text-white transition-transform hover:scale-[1.03] active:scale-95"
           style={{ background: `linear-gradient(135deg, ${color}, #d17a00)`, boxShadow: `0 14px 36px -12px ${color}` }}
         >
-          <span className="relative grid h-8 w-8 place-items-center rounded-full bg-white/20">
+          <span className="relative grid h-9 w-9 place-items-center rounded-full bg-white/20">
             {!reduce && (
               <motion.span
                 className="absolute inset-0 rounded-full"
@@ -431,7 +499,7 @@ function VoiceDemo({ color, reduce, lang }: Demo) {
           {tr(lang, "Поговорить с агентом", "Talk to the agent", "Бо агент гап занед")}
         </button>
 
-        <p className="mx-auto mt-4 max-w-[300px] text-pretty text-[12px] leading-snug text-cream-100/50">
+        <p className="mx-auto mt-5 max-w-[320px] text-pretty text-[12.5px] leading-snug text-cream-100/50">
           {tr(
             lang,
             "Живой голосовой агент на базе ElevenLabs — реальный разговор прямо в браузере.",
@@ -444,13 +512,20 @@ function VoiceDemo({ color, reduce, lang }: Demo) {
   )
 }
 
-/* ════════════════ 4 · Connected Tools — animated flow + scenario tabs ════════════════ */
+/* ════════════════ 4 · Connected Tools — auto-cycling flow with real icons ════════════════ */
+
+type App = { label: string; Icon: LucideIcon; brand: string }
 
 function FlowDemo({ color, reduce, started, lang }: Demo) {
-  const scenarios = [
+  const scenarios: { name: string; apps: App[]; labels: string[] }[] = [
     {
-      name: tr(lang, "E-commerce", "E-commerce", "E-commerce"),
-      apps: ["Tilda", "Notion", "Telegram", "AmoCRM"],
+      name: "E-commerce",
+      apps: [
+        { label: "Tilda", Icon: Globe, brand: "#ff5b24" },
+        { label: "Notion", Icon: FileText, brand: "#e6e6e6" },
+        { label: "Telegram", Icon: Send, brand: "#229ED9" },
+        { label: "AmoCRM", Icon: Users, brand: "#2a9df4" },
+      ],
       labels: [
         tr(lang, "Заявка", "Order", "Дархост"),
         tr(lang, "Запись", "Saved", "Сабт"),
@@ -459,82 +534,122 @@ function FlowDemo({ color, reduce, started, lang }: Demo) {
       ],
     },
     {
-      name: tr(lang, "SaaS", "SaaS", "SaaS"),
-      apps: ["Webflow", "Stripe", "Slack", "HubSpot"],
+      name: "SaaS",
+      apps: [
+        { label: "Webflow", Icon: Globe, brand: "#4353ff" },
+        { label: "Stripe", Icon: CreditCard, brand: "#8b7bff" },
+        { label: "Slack", Icon: MessageSquare, brand: "#ecb22e" },
+        { label: "HubSpot", Icon: Users, brand: "#ff7a59" },
+      ],
       labels: [
         tr(lang, "Регистрация", "Sign-up", "Бақайдгирӣ"),
         tr(lang, "Оплата", "Payment", "Пардохт"),
-        tr(lang, "Уведомление", "Notify", "Огоҳнома"),
+        tr(lang, "Алерт", "Notify", "Огоҳӣ"),
         tr(lang, "Контакт", "Contact", "Тамос"),
       ],
     },
     {
-      name: tr(lang, "Lead-gen", "Lead-gen", "Lead-gen"),
-      apps: ["Meta Ads", "Airtable", "Email", "Bitrix24"],
+      name: "Lead-gen",
+      apps: [
+        { label: "Meta Ads", Icon: Megaphone, brand: "#1877f2" },
+        { label: "Airtable", Icon: Database, brand: "#fcb400" },
+        { label: "Email", Icon: Mail, brand: "#ff7a59" },
+        { label: "Bitrix24", Icon: Users, brand: "#2fc7f7" },
+      ],
       labels: [
         tr(lang, "Клик", "Click", "Клик"),
-        tr(lang, "Сохранение", "Save", "Захира"),
+        tr(lang, "Захват", "Capture", "Захира"),
         tr(lang, "Письмо", "Email", "Мактуб"),
         tr(lang, "Воронка", "Funnel", "Воронка"),
       ],
     },
   ]
-  const [tab, setTab] = React.useState(0)
-  const [step, setStep] = React.useState(reduce ? 3 : -1)
+
+  // single ticker drives both the travelling packet (step) and scenario rotation
+  const CYCLE = 6 // 0..3 connect, 4..5 hold then switch
+  const [tick, setTick] = React.useState(0)
   const active = useActive()
+  React.useEffect(() => {
+    if (reduce || !started || !active) return
+    const id = setInterval(() => setTick((t) => t + 1), 1100)
+    return () => clearInterval(id)
+  }, [reduce, started, active])
+
+  const tab = reduce ? 0 : Math.floor(tick / CYCLE) % scenarios.length
+  const step = reduce ? 3 : Math.min(tick % CYCLE, 3)
   const sc = scenarios[tab]
 
-  React.useEffect(() => {
-    setStep(reduce ? 3 : -1)
-    if (reduce || !started || !active) return
-    let s = -1
-    const id = setInterval(() => {
-      s = s >= 3 ? 0 : s + 1
-      setStep(s)
-    }, 1100)
-    return () => clearInterval(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab, reduce, started, active])
-
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-5">
-      {/* tabs */}
-      <div className="flex gap-1.5">
-        {scenarios.map((s, i) => (
-          <button key={s.name} onClick={() => setTab(i)}
-            className="rounded-full px-2.5 py-1 text-[11px] transition-colors"
-            style={i === tab ? { background: color, color: "#0b0f14", fontWeight: 600 } : { background: "rgba(255,255,255,0.06)", color: "rgba(243,239,230,0.6)" }}>
-            {s.name}
-          </button>
-        ))}
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-5 sm:px-10">
+      {/* auto-rotating scenario label */}
+      <div className="flex items-center gap-2">
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-cream-100/40">
+          {tr(lang, "Сценарий", "Scenario", "Сенария")}
+        </span>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={sc.name}
+            initial={reduce ? false : { opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? undefined : { opacity: 0, y: -6 }}
+            transition={{ duration: 0.3 }}
+            className="rounded-full px-3 py-1 text-[12px] font-semibold"
+            style={{ background: color, color: "#0b0f14" }}
+          >
+            {sc.name}
+          </motion.span>
+        </AnimatePresence>
       </div>
 
       {/* nodes */}
-      <div className="flex w-full max-w-[440px] items-start justify-between">
+      <div className="flex w-full max-w-[600px] items-start justify-between">
         {sc.apps.map((app, i) => {
           const on = step >= i
           return (
-            <React.Fragment key={app}>
-              <div className="flex flex-col items-center gap-1.5" style={{ width: 78 }}>
-                <motion.div className="grid h-12 w-12 place-items-center rounded-xl border text-center font-mono text-[10px] leading-tight"
-                  animate={{ borderColor: on ? color : "rgba(255,255,255,0.12)", boxShadow: on ? `0 0 18px -4px ${color}` : "0 0 0 0 transparent", color: on ? "#fff" : "rgba(243,239,230,0.55)" }}
-                  transition={{ duration: 0.3 }} style={{ background: "#11161c" }}>
-                  {app}
+            <React.Fragment key={`${tab}-${app.label}`}>
+              <div className="flex flex-col items-center gap-2" style={{ width: 92 }}>
+                <motion.div
+                  className="relative grid h-16 w-16 place-items-center rounded-2xl border"
+                  animate={{
+                    borderColor: on ? `${app.brand}` : "rgba(255,255,255,0.12)",
+                    boxShadow: on ? `0 0 26px -6px ${app.brand}` : "0 0 0 0 transparent",
+                    scale: step === i ? 1.06 : 1,
+                  }}
+                  transition={{ duration: 0.35, ease: EASE }}
+                  style={{ background: "#11161c" }}
+                >
+                  <app.Icon
+                    className="h-6 w-6 transition-colors duration-300"
+                    style={{ color: on ? app.brand : "rgba(243,239,230,0.5)" }}
+                    strokeWidth={1.75}
+                  />
                 </motion.div>
+                <span className="text-center font-mono text-[10.5px] leading-tight text-cream-100/55">{app.label}</span>
                 <AnimatePresence>
                   {on && (
-                    <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                      className="text-center text-[10px] leading-tight" style={{ color }}>
+                    <motion.span
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-center text-[10.5px] font-medium leading-tight"
+                      style={{ color }}
+                    >
                       {sc.labels[i]}
                     </motion.span>
                   )}
                 </AnimatePresence>
               </div>
               {i < sc.apps.length - 1 && (
-                <div className="relative mt-6 h-px flex-1" style={{ background: "rgba(255,255,255,0.12)" }}>
-                  <motion.div className="absolute -top-[3px] h-1.5 w-1.5 rounded-full" style={{ background: color }}
-                    animate={{ left: step === i ? ["0%", "100%"] : step > i ? "100%" : "0%", opacity: step >= i ? 1 : 0 }}
-                    transition={{ duration: 0.9, ease: "easeInOut" }} />
+                <div className="relative mt-8 h-px flex-1" style={{ background: "rgba(255,255,255,0.12)" }}>
+                  <motion.div
+                    className="absolute -top-[3px] h-2 w-2 rounded-full"
+                    style={{ background: color, boxShadow: `0 0 10px ${color}` }}
+                    animate={{
+                      left: step === i ? ["0%", "100%"] : step > i ? "100%" : "0%",
+                      opacity: step >= i ? 1 : 0,
+                    }}
+                    transition={{ duration: 0.9, ease: "easeInOut" }}
+                  />
                 </div>
               )}
             </React.Fragment>
@@ -545,85 +660,146 @@ function FlowDemo({ color, reduce, started, lang }: Demo) {
   )
 }
 
-/* ════════════════ 5 · AI Integration — live terminal ════════════════ */
+/* ════════════════ 5 · AI Integration — everything plugs into one hub ════════════════ */
 
-type Line = { t: "cmd" | "warn" | "ok" | "comment"; text: string }
-
-function TerminalDemo({ color, reduce, started, lang }: Demo) {
-  const scenarios: Line[][] = [
-    [
-      { t: "cmd", text: "$ curl https://api.aqly.io/analyze" },
-      { t: "comment", text: '  -d \'{ "query": "хочу заказать сайт" }\'' },
-      { t: "warn", text: "⠙ routing to Claude Opus 4…" },
-      { t: "ok", text: "✓ 0.4s  { intent: \"website\", score: 87, route: \"sales\" }" },
-    ],
-    [
-      { t: "cmd", text: "$ aqly generate --type=post" },
-      { t: "warn", text: "⠹ drafting content…" },
-      { t: "ok", text: "✓ 0.6s  { title: \"5 AI wins\", words: 480, tone: \"expert\" }" },
-    ],
-    [
-      { t: "cmd", text: "$ aqly support --ticket=4821" },
-      { t: "warn", text: "⠸ reading history…" },
-      { t: "ok", text: "✓ 0.3s  { reply_drafted: true, csat_pred: 0.94 }" },
-    ],
+function IntegrationHub({ color, reduce, started, lang }: Demo) {
+  const nodes: { Icon: LucideIcon; label: string; brand: string }[] = [
+    { Icon: Users, label: "CRM", brand: "#2a9df4" },
+    { Icon: CreditCard, label: "Stripe", brand: "#8b7bff" },
+    { Icon: MessageSquare, label: "Slack", brand: "#ecb22e" },
+    { Icon: Database, label: "Data", brand: "#00b894" },
+    { Icon: Mail, label: "Email", brand: "#ff7a59" },
+    { Icon: Calendar, label: "Calendar", brand: "#e84393" },
   ]
-  const [sc, setSc] = React.useState(0)
-  const [shown, setShown] = React.useState(reduce ? scenarios[0].length : 0)
-  const [chars, setChars] = React.useState(0)
-  const active = useActive()
-  const lines = scenarios[sc]
+  // elliptical layout in % of the demo box
+  const pos = nodes.map((_, i) => {
+    const a = ((-90 + i * (360 / nodes.length)) * Math.PI) / 180
+    return { x: 50 + 33 * Math.cos(a), y: 52 + 34 * Math.sin(a) }
+  })
 
+  const MAX = nodes.length + 3 // connect one-by-one, then hold, then reset
+  const [tick, setTick] = React.useState(reduce ? MAX : 0)
+  const active = useActive()
   React.useEffect(() => {
-    if (reduce || !started || !active) { setShown(reduce ? lines.length : shown); return }
-    setShown(0); setChars(0)
-    let li = 0, ci = 0
-    const id = setInterval(() => {
-      const cur = lines[li]
-      if (!cur) {
-        clearInterval(id)
-        setTimeout(() => setSc((v) => (v + 1) % scenarios.length), 1800)
-        return
-      }
-      ci += 2
-      setChars(ci)
-      if (ci >= cur.text.length) {
-        setShown((s) => Math.max(s, li + 1))
-        li += 1; ci = 0; setChars(0)
-      }
-    }, 28)
+    if (reduce || !started || !active) return
+    const id = setInterval(() => setTick((t) => (t >= MAX ? 0 : t + 1)), 720)
     return () => clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sc, reduce, started, active])
+  }, [reduce, started, active])
 
-  const colorOf = (t: Line["t"]) => t === "cmd" ? "#58A6FF" : t === "ok" ? "#3FB950" : t === "warn" ? "#D29922" : "#8B949E"
+  const allDone = tick >= nodes.length
 
   return (
-    <div className="absolute inset-0 grid place-items-center px-5">
-      <div className="w-full max-w-[440px] overflow-hidden rounded-xl border border-white/10" style={{ background: "#0D1117" }}>
-        <div className="flex items-center gap-2 border-b border-white/8 px-3 py-2">
-          <span className="flex gap-1"><i className="h-2 w-2 rounded-full bg-[#ff5f56]" /><i className="h-2 w-2 rounded-full bg-[#ffbd2e]" /><i className="h-2 w-2 rounded-full bg-[#27c93f]" /></span>
-          <span className="ml-1 font-mono text-[10.5px] text-cream-100/45">api-request.sh</span>
+    <div className="absolute inset-0">
+      {/* connection lines + travelling data packets */}
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        {pos.map((p, i) => {
+          const on = tick > i
+          return (
+            <g key={i}>
+              <motion.line
+                x1={50} y1={52} x2={p.x} y2={p.y}
+                stroke={on ? color : "rgba(255,255,255,0.12)"}
+                strokeWidth={1}
+                vectorEffect="non-scaling-stroke"
+                initial={false}
+                animate={{ pathLength: on ? 1 : 0.001, opacity: on ? 0.7 : 0.25 }}
+                transition={{ duration: 0.5, ease: EASE }}
+              />
+              {on && !reduce && (
+                <motion.circle
+                  r={1.4}
+                  fill={color}
+                  initial={{ cx: p.x, cy: p.y, opacity: 0 }}
+                  animate={{ cx: [p.x, 50], cy: [p.y, 52], opacity: [0, 1, 0] }}
+                  transition={{ duration: 1.1, repeat: Infinity, ease: "easeIn", delay: i * 0.1 }}
+                />
+              )}
+            </g>
+          )
+        })}
+      </svg>
+
+      {/* satellite nodes */}
+      {nodes.map((n, i) => {
+        const on = tick > i
+        return (
+          <div
+            key={n.label}
+            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1"
+            style={{ left: `${pos[i].x}%`, top: `${pos[i].y}%` }}
+          >
+            <motion.div
+              className="grid h-12 w-12 place-items-center rounded-2xl border sm:h-14 sm:w-14"
+              animate={{
+                borderColor: on ? n.brand : "rgba(255,255,255,0.12)",
+                boxShadow: on ? `0 0 22px -4px ${n.brand}` : "0 0 0 0 transparent",
+                scale: on ? 1 : 0.92,
+              }}
+              transition={{ duration: 0.4, ease: EASE }}
+              style={{ background: "#11161c" }}
+            >
+              <n.Icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: on ? n.brand : "rgba(243,239,230,0.45)" }} strokeWidth={1.75} />
+            </motion.div>
+            <span className="font-mono text-[9.5px] text-cream-100/45">{n.label}</span>
+          </div>
+        )
+      })}
+
+      {/* central hub */}
+      <div className="absolute left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={{ top: "52%" }}>
+        <div className="relative grid h-[68px] w-[68px] place-items-center sm:h-[76px] sm:w-[76px]">
+          {/* rotating dashed orbit */}
+          {!reduce && (
+            <motion.span
+              className="absolute inset-[-10px] rounded-full"
+              style={{ border: `1px dashed ${color}55` }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
+            />
+          )}
+          {/* pulse ring when fully integrated */}
+          <AnimatePresence>
+            {allDone && !reduce && (
+              <motion.span
+                className="absolute inset-0 rounded-full"
+                style={{ border: `1.5px solid ${color}` }}
+                initial={{ scale: 1, opacity: 0.7 }}
+                animate={{ scale: 1.9, opacity: 0 }}
+                transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
+              />
+            )}
+          </AnimatePresence>
+          {/* core */}
+          <div
+            className="grid h-full w-full place-items-center rounded-full text-white"
+            style={{ background: `linear-gradient(140deg, ${color}, #d17a00)`, boxShadow: `0 0 40px -8px ${color}` }}
+          >
+            <Sparkles className="h-7 w-7" strokeWidth={1.75} />
+          </div>
         </div>
-        <div className="h-[150px] overflow-hidden p-3 font-mono text-[11.5px] leading-[1.55] sm:h-[168px]">
-          {lines.map((ln, i) => {
-            if (i > shown) return null
-            const typingLine = i === shown && chars < ln.text.length && !reduce
-            const text = typingLine ? ln.text.slice(0, chars) : ln.text
-            return (
-              <div key={`${sc}-${i}`} style={{ color: colorOf(ln.t) }} className="whitespace-pre-wrap break-words">
-                {text}
-                {typingLine && <span className="ml-0.5 inline-block h-3 w-1.5 translate-y-0.5 animate-pulse" style={{ background: color }} />}
-              </div>
-            )
-          })}
-        </div>
+        <div className="mt-3 font-display text-[15px] text-cream-50">Aqly</div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={allDone ? "done" : "wiring"}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={reduce ? undefined : { opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="font-mono text-[10.5px]"
+            style={{ color: allDone ? "#3FB950" : "rgba(243,239,230,0.5)" }}
+          >
+            {allDone
+              ? tr(lang, "всё связано ✓", "all connected ✓", "ҳама пайваст ✓")
+              : tr(lang, "подключение…", "connecting…", "пайвастшавӣ…")}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   )
 }
 
-/* ════════════════ 6 · Design — brand-kit preview: logo + palette + type ════════════════ */
+/* ════════════════ 6 · Design — animated cursor builds a brand ════════════════ */
 
 type Brand = {
   name: string
@@ -651,9 +827,7 @@ const BRANDS: Brand[] = [
     font: "var(--font-mono), monospace",
     fontLabel: "Geist Mono",
     palette: ["#0b0f14", "#ff5b24", "#d17a00", "#f3efe6"],
-    Mark: ({ c }) => (
-      <path d="M56 18 32 54h16l-6 28 26-40H52l4-24Z" fill={c} />
-    ),
+    Mark: ({ c }) => <path d="M56 18 32 54h16l-6 28 26-40H52l4-24Z" fill={c} />,
   },
   {
     name: "Bloom",
@@ -670,68 +844,147 @@ const BRANDS: Brand[] = [
   },
 ]
 
+// targets in % of the artboard — cursor visits each, "clicks", element materialises
+const STEPS = [
+  { to: [27, 50] as const, key: "mark" },
+  { to: [70, 36] as const, key: "word" },
+  { to: [66, 74] as const, key: "palette" },
+]
+
 function DesignDemo({ color, reduce, started, lang }: Demo) {
-  const [tab, setTab] = React.useState(0)
-  const b = BRANDS[tab]
-  const tagline = tr(lang, "Фирменный стиль", "Brand identity", "Услуби фирмавӣ")
-  const tabNames = [
-    tr(lang, "Засечки", "Serif", "Серифӣ"),
-    tr(lang, "Смелый", "Bold", "Ҷасур"),
-    tr(lang, "Мягкий", "Soft", "Нарм"),
-  ]
+  const [brand, setBrand] = React.useState(0)
+  const [p, setP] = React.useState(reduce ? STEPS.length - 1 : -1)
+  const [click, setClick] = React.useState(0)
+  const active = useActive()
+
+  React.useEffect(() => {
+    if (reduce) {
+      setP(STEPS.length - 1)
+      return
+    }
+    if (!started || !active) return
+    setP(-1)
+    let local = -1
+    const id = setInterval(() => {
+      local += 1
+      if (local < STEPS.length) {
+        setP(local)
+        setClick((k) => k + 1)
+      } else if (local >= STEPS.length + 1) {
+        // finished + held → rebuild with next brand
+        setBrand((b) => (b + 1) % BRANDS.length)
+        local = -1
+        setP(-1)
+      }
+    }, 1300)
+    return () => clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce, started, active])
+
+  const b = BRANDS[brand]
+  const show = (key: string) => {
+    const idx = STEPS.findIndex((s) => s.key === key)
+    return p >= idx
+  }
+  const inBoard = p >= 0 && p < STEPS.length
+  const cursor = inBoard ? STEPS[p].to : ([8, 90] as const)
+  const tagline = tr(lang, "Дизайн на ваших глазах", "Design, drawn live", "Дизайн дар пеши назар")
 
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-5">
-      <div className="flex w-full max-w-[440px] items-center justify-between">
-        <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream-100/45">{tagline}</span>
-        <div className="flex gap-1.5">
-          {tabNames.map((name, i) => (
-            <button key={name} onClick={() => setTab(i)}
-              className="rounded-full px-2.5 py-1 text-[11px] transition-colors"
-              style={i === tab ? { background: color, color: "#0b0f14", fontWeight: 600 } : { background: "rgba(255,255,255,0.06)", color: "rgba(243,239,230,0.6)" }}>
-              {name}
-            </button>
-          ))}
+    <div className="absolute inset-0 grid place-items-center px-5 sm:px-10">
+      <div className="w-full max-w-[620px]">
+        <div className="mb-2.5 flex items-center justify-between">
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-cream-100/40">{tagline}</span>
+          <span className="font-mono text-[10.5px] text-cream-100/40" style={{ color }}>{b.fontLabel}</span>
         </div>
-      </div>
 
-      <div className="flex w-full max-w-[440px] items-stretch gap-3">
-        {/* logo tile */}
-        <motion.div
-          key={`tile-${tab}`}
-          className="flex aspect-square w-[140px] shrink-0 flex-col items-center justify-center gap-2 rounded-2xl border border-white/10"
-          style={{ background: "rgba(255,255,255,0.04)" }}
-          initial={reduce ? false : { scale: 0.92, opacity: 0 }}
-          animate={started || reduce ? { scale: 1, opacity: 1 } : { scale: 0.92, opacity: 0 }}
-          transition={{ duration: 0.45, ease: EASE }}>
-          <svg viewBox="0 0 100 100" className="h-14 w-14">
-            <b.Mark c={b.palette[1]} />
-          </svg>
-          <span className="text-[18px] leading-none text-cream-50" style={{ fontFamily: b.font }}>{b.name}</span>
-        </motion.div>
-
-        {/* right: wordmark sample + palette + font */}
-        <div className="flex min-w-0 flex-1 flex-col justify-between gap-2.5">
-          <div
-            className="rounded-xl border border-white/10 px-3 py-2.5"
-            style={{ background: "rgba(255,255,255,0.04)" }}>
-            <div className="truncate text-[26px] leading-tight text-cream-50" style={{ fontFamily: b.font }}>
-              {b.name}<span style={{ color: b.palette[1] }}>.</span>
-            </div>
-            <div className="mt-0.5 font-mono text-[10px] text-cream-100/45">Aa Bb Cc · {b.fontLabel}</div>
-          </div>
-
-          {/* palette */}
-          <div className="flex gap-1.5">
-            {b.palette.map((p, i) => (
-              <motion.div key={`${tab}-${i}`}
-                className="h-9 flex-1 rounded-lg border border-white/10"
-                style={{ background: p }}
-                initial={reduce ? false : { y: 8, opacity: 0 }}
-                animate={started || reduce ? { y: 0, opacity: 1 } : { y: 8, opacity: 0 }}
-                transition={{ duration: 0.4, delay: reduce ? 0 : 0.15 + i * 0.07, ease: EASE }} />
+        {/* artboard */}
+        <div
+          className="relative h-[210px] overflow-hidden rounded-2xl border border-white/10 sm:h-[250px]"
+          style={{
+            background:
+              "radial-gradient(110% 90% at 20% 0%, rgba(255,255,255,0.05), transparent 60%), #0e1318",
+          }}
+        >
+          {/* design-tool left rail (decorative) */}
+          <div className="absolute left-0 top-0 flex h-full w-9 flex-col items-center gap-3 border-r border-white/8 bg-white/[0.03] pt-4">
+            {[PenTool, Square, Type].map((Ic, k) => (
+              <Ic key={k} className="h-4 w-4" style={{ color: k === 0 ? color : "rgba(243,239,230,0.4)" }} strokeWidth={1.75} />
             ))}
           </div>
+
+          {/* === logo tile (key 'mark') === */}
+          <motion.div
+            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04]"
+            style={{ left: "27%", top: "50%", width: 116, height: 116 }}
+            animate={{ opacity: show("mark") ? 1 : 0, scale: show("mark") ? 1 : 0.9 }}
+            transition={{ duration: 0.45, ease: EASE }}
+          >
+            <svg viewBox="0 0 100 100" className="h-12 w-12">
+              <b.Mark c={b.palette[1]} />
+            </svg>
+            <span className="text-[16px] leading-none text-cream-50" style={{ fontFamily: b.font }}>{b.name}</span>
+          </motion.div>
+
+          {/* === wordmark (key 'word') === */}
+          <motion.div
+            className="absolute -translate-y-1/2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3"
+            style={{ left: "48%", top: "36%", width: "44%" }}
+            animate={{ opacity: show("word") ? 1 : 0, y: show("word") ? "-50%" : "-42%" }}
+            transition={{ duration: 0.4, ease: EASE }}
+          >
+            <div className="truncate text-[28px] leading-tight text-cream-50" style={{ fontFamily: b.font }}>
+              {b.name}<span style={{ color: b.palette[1] }}>.</span>
+            </div>
+            <div className="mt-0.5 font-mono text-[10px] text-cream-100/45">Aa Bb Cc 123</div>
+          </motion.div>
+
+          {/* === palette (key 'palette') === */}
+          <div className="absolute flex gap-2" style={{ left: "48%", top: "63%", width: "44%" }}>
+            {b.palette.map((sw, i) => (
+              <motion.div
+                key={`${brand}-${i}`}
+                className="h-9 flex-1 rounded-lg border border-white/10"
+                style={{ background: sw }}
+                animate={{
+                  opacity: show("palette") ? 1 : 0,
+                  y: show("palette") ? 0 : 10,
+                }}
+                transition={{ duration: 0.35, delay: show("palette") ? i * 0.08 : 0, ease: EASE }}
+              />
+            ))}
+          </div>
+
+          {/* === animated cursor + click ripple === */}
+          {!reduce && (
+            <>
+              <motion.div
+                className="pointer-events-none absolute z-20"
+                initial={false}
+                animate={{ left: `${cursor[0]}%`, top: `${cursor[1]}%` }}
+                transition={{ duration: 0.7, ease: EASE }}
+                style={{ translateX: "-2px", translateY: "-2px" }}
+              >
+                {/* click ripple */}
+                <AnimatePresence>
+                  {inBoard && (
+                    <motion.span
+                      key={click}
+                      className="absolute -left-1 -top-1 rounded-full"
+                      style={{ width: 26, height: 26, border: `1.5px solid ${color}` }}
+                      initial={{ scale: 0.2, opacity: 0.8 }}
+                      animate={{ scale: 1.6, opacity: 0 }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                    />
+                  )}
+                </AnimatePresence>
+                {/* pointer */}
+                <svg width="20" height="20" viewBox="0 0 20 20" className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                  <path d="M3 2l13 6.5-5.4 1.7-2.4 5.3z" fill="#fff" stroke="#0b0f14" strokeWidth="1.1" strokeLinejoin="round" />
+                </svg>
+              </motion.div>
+            </>
+          )}
         </div>
       </div>
     </div>
