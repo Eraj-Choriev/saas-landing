@@ -106,68 +106,29 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* drifting aurora blobs for hero — slow, calm, organic */
-.aurora-blob {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(70px);
-  will-change: transform;
-  pointer-events: none;
-}
-
-/* engineered diagonal hairlines for hero — static CSS, GPU-cheap.
-   Two brand-tinted line sets at offset angles, faded toward the
-   top-right so the headline (left) stays clean. Replaces the old
-   WebGL line-field — no JS, no lag, identical "engineered" feel. */
-.hero-lines {
-  pointer-events: none;
+/* Hero warm gradient mesh — base layer.
+   Coral (top-right) → amber (bottom-left) → faint cream → deep dark base.
+   Biased so the left column stays dark and the headline stays crisp.
+   Animates background-position only (compositor-cheap, no repaint of blobs). */
+.hero-mesh {
+  background-color: #0a0e13;
   background-image:
-    repeating-linear-gradient(
-      114deg,
-      transparent 0,
-      transparent 37px,
-      rgba(169, 202, 249, 0.06) 38px,
-      transparent 39px
-    ),
-    repeating-linear-gradient(
-      114deg,
-      transparent 0,
-      transparent 93px,
-      rgba(255, 91, 36, 0.05) 94px,
-      transparent 95px
-    );
-  -webkit-mask-image: radial-gradient(120% 95% at 82% 8%, #000 0%, transparent 68%);
-  mask-image: radial-gradient(120% 95% at 82% 8%, #000 0%, transparent 68%);
+    radial-gradient(42% 52% at 82% 14%, rgba(255, 91, 36, 0.32), transparent 60%),
+    radial-gradient(46% 56% at 16% 86%, rgba(209, 122, 0, 0.26), transparent 62%),
+    radial-gradient(34% 42% at 64% 96%, rgba(243, 239, 230, 0.10), transparent 60%),
+    linear-gradient(180deg, #0a0e13 0%, #0a0e13 52%, #150d06 100%);
+  background-size: 170% 170%, 175% 175%, 160% 160%, 100% 100%;
+  background-position: 0% 0%, 100% 100%, 50% 100%, 0 0;
+  animation: hero-mesh-flow 28s ease-in-out infinite alternate;
+  will-change: background-position;
 }
-
-@keyframes drift-a {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  33%  { transform: translate3d(8%, 6%, 0) scale(1.12); }
-  66%  { transform: translate3d(-6%, 10%, 0) scale(0.95); }
-  100% { transform: translate3d(0, 0, 0) scale(1); }
+@keyframes hero-mesh-flow {
+  0%   { background-position: 0% 0%,   100% 100%, 50% 100%, 0 0; }
+  100% { background-position: 26% 18%, 74% 82%,   58% 88%,  0 0; }
 }
-@keyframes drift-b {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  40%  { transform: translate3d(-10%, 8%, 0) scale(1.15); }
-  80%  { transform: translate3d(6%, -6%, 0) scale(0.9); }
-  100% { transform: translate3d(0, 0, 0) scale(1); }
-}
-@keyframes drift-c {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  50%  { transform: translate3d(10%, -8%, 0) scale(1.1); }
-  100% { transform: translate3d(0, 0, 0) scale(1); }
-}
-
-.animate-drift-a { animation: drift-a 22s ease-in-out infinite; }
-.animate-drift-b { animation: drift-b 28s ease-in-out infinite; }
-.animate-drift-c { animation: drift-c 25s ease-in-out infinite; }
-
+.hero-mesh--static { animation: none; }
 @media (prefers-reduced-motion: reduce) {
-  .animate-drift-a,
-  .animate-drift-b,
-  .animate-drift-c {
-    animation: none;
-  }
+  .hero-mesh { animation: none; }
 }
 
 /* shake for invalid form fields */

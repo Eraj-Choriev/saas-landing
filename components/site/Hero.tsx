@@ -17,35 +17,75 @@ const reveal = {
 
 export function Hero() {
   const { t } = useI18n()
+  const reduce = useReducedMotion()
+  const spotRef = React.useRef<HTMLDivElement>(null)
+
+  // cursor-following spotlight — drives CSS vars via rAF, no React re-render,
+  // listener scoped to the hero <section> so it never costs anything elsewhere
+  React.useEffect(() => {
+    if (reduce) return
+    const el = spotRef.current
+    const sec = el?.parentElement
+    if (!el || !sec) return
+    let raf = 0
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        const r = sec.getBoundingClientRect()
+        el.style.setProperty("--hx", `${((e.clientX - r.left) / r.width) * 100}%`)
+        el.style.setProperty("--hy", `${((e.clientY - r.top) / r.height) * 100}%`)
+        el.style.opacity = "1"
+      })
+    }
+    const onLeave = () => { el.style.opacity = "0" }
+    sec.addEventListener("pointermove", onMove, { passive: true })
+    sec.addEventListener("pointerleave", onLeave)
+    return () => {
+      cancelAnimationFrame(raf)
+      sec.removeEventListener("pointermove", onMove)
+      sec.removeEventListener("pointerleave", onLeave)
+    }
+  }, [reduce])
+
   return (
     <section className="relative isolate flex min-h-screen items-center overflow-hidden">
-      {/* base dark gradient */}
-      <div className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,#0A0E13_0%,#0A0E13_58%,#130e08_100%)]" />
+      {/* ── base: slow flowing warm gradient mesh (coral → dark → amber/cream) ── */}
+      <div className={`hero-mesh absolute inset-0 -z-30 ${reduce ? "hero-mesh--static" : ""}`} aria-hidden />
 
-      {/* drifting aurora blobs — slow, calm, organic */}
-      <div className="absolute inset-0 -z-10 overflow-hidden" aria-hidden>
-        <div className="aurora-blob animate-drift-a left-[-8%] top-[6%] h-[34rem] w-[34rem] bg-[radial-gradient(circle,rgba(169,202,249,0.42),transparent_65%)]" />
-        <div className="aurora-blob animate-drift-b right-[-10%] top-[-6%] h-[30rem] w-[30rem] bg-[radial-gradient(circle,rgba(255,91,36,0.3),transparent_65%)]" />
-        <div className="aurora-blob animate-drift-c left-[28%] bottom-[-14%] h-[36rem] w-[36rem] bg-[radial-gradient(circle,rgba(209,122,0,0.34),transparent_65%)]" />
-      </div>
+      {/* ── Linear-style fine dot grid, crisp, fades toward edges ── */}
+      <div
+        className="absolute inset-0 -z-20 opacity-[0.55] [mask-image:radial-gradient(115%_85%_at_50%_0%,#000_35%,transparent_88%)]"
+        style={{
+          backgroundImage: "radial-gradient(rgba(255,255,255,0.13) 1px, transparent 1.5px)",
+          backgroundSize: "22px 22px",
+        }}
+        aria-hidden
+      />
 
-      {/* engineered diagonal hairlines — static, cheap, brand-tinted */}
-      <div className="hero-lines absolute inset-0 -z-10" aria-hidden />
+      {/* ── cursor-following radial spotlight (warm) ── */}
+      <div
+        ref={spotRef}
+        className="pointer-events-none absolute inset-0 -z-20 opacity-0 transition-opacity duration-500"
+        style={{
+          background:
+            "radial-gradient(440px circle at var(--hx,50%) var(--hy,40%), rgba(255,91,36,0.20), rgba(209,122,0,0.08) 40%, transparent 62%)",
+        }}
+        aria-hidden
+      />
 
       {/* readability scrim — keeps the headline crisp */}
       <div
-        className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#0A0E13_0%,rgba(10,14,19,0.72)_28%,rgba(10,14,19,0.15)_58%,transparent_78%)]"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#0A0E13_0%,rgba(10,14,19,0.72)_28%,rgba(10,14,19,0.14)_58%,transparent_80%)]"
         aria-hidden
       />
       <div
         className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-[linear-gradient(180deg,transparent,#0A0E13)]"
         aria-hidden
       />
-
-      {/* fine grid + top glow */}
-      <div className="absolute inset-0 -z-10 bg-grid-ink bg-[size:48px_48px] opacity-40 [mask-image:radial-gradient(80%_60%_at_50%_0%,#000,transparent)]" />
+      {/* top glow */}
       <div
-        className="absolute inset-x-0 top-0 -z-10 h-[60%] bg-[radial-gradient(60%_50%_at_50%_0%,rgba(169,202,249,0.16),transparent_70%)]"
+        className="absolute inset-x-0 top-0 -z-10 h-[55%] bg-[radial-gradient(60%_50%_at_50%_0%,rgba(255,91,36,0.10),transparent_70%)]"
         aria-hidden
       />
 
