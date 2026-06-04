@@ -49,7 +49,9 @@ export function Footer() {
   const { t } = useI18n()
   return (
     <footer className="bg-cream-100 border-t border-ink/10">
-      <div className="container py-16 sm:py-20">
+      {/* extra bottom padding clears the fixed ElevenLabs voice widget
+          (bottom-right launcher) so the legal row is never occluded */}
+      <div className="container pt-16 pb-32 sm:pt-20 sm:pb-28">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_2.5fr] lg:gap-16">
           <div>
             <Wordmark />

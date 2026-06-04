@@ -52,17 +52,18 @@ export default {
         .replace(/>/g, "&gt;")
 
     const name = esc(data.name).slice(0, 200)
-    const email = esc(data.email).slice(0, 200)
+    const phone = esc(data.phone).slice(0, 50)
     const website = esc(data.website).slice(0, 300)
     const services = Array.isArray(data.services)
       ? data.services.map(esc).join(", ").slice(0, 500)
       : ""
-    const timeline = esc(data.timeline).slice(0, 100)
     const challenge = esc(data.challenge).slice(0, 2000)
     const lang = esc(data.lang).slice(0, 5)
 
-    // basic sanity check — don't relay empty junk
-    if (name.length < 2 || !/\S+@\S+\.\S+/.test(email)) {
+    // basic sanity check — don't relay empty junk.
+    // Tajik number: +992 + 9 digits = 12 digits total incl. country code.
+    const phoneDigits = String(data.phone ?? "").replace(/\D/g, "")
+    if (name.length < 2 || phoneDigits.length !== 12 || !phoneDigits.startsWith("992")) {
       return json({ ok: false, error: "invalid" }, 422, cors)
     }
 
@@ -72,29 +73,26 @@ export default {
         ? {
             title: "Новая заявка — Aqly",
             name: "Имя",
-            email: "Email",
+            phone: "Телефон",
             site: "Сайт",
             services: "Услуги",
-            timeline: "Сроки",
             project: "Проект",
           }
         : {
             title: "New lead — Aqly",
             name: "Name",
-            email: "Email",
+            phone: "Phone",
             site: "Site",
             services: "Services",
-            timeline: "Timeline",
             project: "Project",
           }
 
     const text =
       `🟢 <b>${L.title}</b>\n\n` +
       `👤 <b>${L.name}:</b> ${name}\n` +
-      `✉️ <b>${L.email}:</b> ${email}\n` +
+      `📞 <b>${L.phone}:</b> ${phone}\n` +
       (website ? `🌐 <b>${L.site}:</b> ${website}\n` : "") +
       (services ? `🧩 <b>${L.services}:</b> ${services}\n` : "") +
-      (timeline ? `⏱ <b>${L.timeline}:</b> ${timeline}\n` : "") +
       (challenge ? `\n💬 <b>${L.project}:</b>\n${challenge}` : "")
 
     const tg = await fetch(

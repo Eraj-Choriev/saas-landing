@@ -68,7 +68,7 @@ export function Approach() {
             className="pointer-events-none absolute left-5 top-0 w-px bg-gradient-to-b from-brand-blue via-brand-amber to-brand-coral lg:hidden"
           />
 
-          <ul className="space-y-12 lg:space-y-24">
+          <ul className="space-y-12 lg:space-y-16">
             {t.approach.steps.map((step, i) => {
               const isRight = i % 2 === 1
               const { Icon, color } = STEP_META[i]
@@ -76,16 +76,29 @@ export function Approach() {
                 <li key={i} className="relative">
                   <NodeDot progress={scrollYProgress} index={i} total={t.approach.steps.length} color={color} />
 
-                  <div
-                    className={`grid grid-cols-1 lg:grid-cols-2 lg:gap-12 ${isRight ? "lg:[&>div]:col-start-2" : ""}`}
-                  >
+                  <div className="grid grid-cols-1 items-center lg:grid-cols-2 lg:gap-12">
+                    {/* giant ghost step-number balances the empty column on desktop */}
+                    <div
+                      className={`pointer-events-none hidden select-none lg:flex ${
+                        isRight ? "lg:order-1 justify-end pr-14" : "lg:order-2 justify-start pl-14"
+                      }`}
+                      aria-hidden
+                    >
+                      <span
+                        className="font-display text-[150px] font-medium leading-none tracking-tightest"
+                        style={{ color: `${color}1f` }}
+                      >
+                        {step.n}
+                      </span>
+                    </div>
+
                     <motion.div
                       initial={{ opacity: 0, y: 36, x: isRight ? 28 : -28 }}
                       whileInView={{ opacity: 1, y: 0, x: 0 }}
                       viewport={{ once: true, margin: "-120px" }}
                       transition={{ type: "spring", stiffness: 90, damping: 18, mass: 0.7 }}
                       whileHover={{ y: -5 }}
-                      className="relative pl-14 lg:pl-0"
+                      className={`relative pl-14 lg:pl-0 ${isRight ? "lg:order-2" : "lg:order-1"}`}
                     >
                       <div
                         className="group relative overflow-hidden rounded-3xl border border-ink/8 bg-cream-100 p-7 shadow-[0_24px_60px_-40px_rgba(10,14,19,0.25)] transition-shadow duration-300 sm:p-8"

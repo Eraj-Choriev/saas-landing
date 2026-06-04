@@ -3,9 +3,12 @@ import { Hero } from "@/components/site/Hero"
 import { TechStack } from "@/components/site/TechStack"
 import { About } from "@/components/site/About"
 import { WhatWeBuild } from "@/components/site/WhatWeBuild"
-import { CaseStudies } from "@/components/site/CaseStudies"
+import { WhyNow } from "@/components/site/WhyNow"
 import { Approach } from "@/components/site/Approach"
+import { Pricing } from "@/components/site/Pricing"
+import { FAQ } from "@/components/site/FAQ"
 import { ContactForm } from "@/components/site/ContactForm"
+import { FinalCTA } from "@/components/site/FinalCTA"
 import { Footer } from "@/components/site/Footer"
 
 export default function Page() {
@@ -16,9 +19,12 @@ export default function Page() {
       <TechStack />
       <About />
       <WhatWeBuild />
-      <CaseStudies />
+      <WhyNow />
       <Approach />
+      <Pricing />
+      <FAQ />
       <ContactForm />
+      <FinalCTA />
       <Footer />
     </main>
   )

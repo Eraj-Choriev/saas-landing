@@ -8,19 +8,17 @@ import { cn } from "@/lib/utils"
 
 type FormState = {
   name: string
-  email: string
+  phone: string
   website: string
   services: string[]
-  timeline: string
   challenge: string
 }
 
 const initial: FormState = {
   name: "",
-  email: "",
+  phone: "+992 ",
   website: "",
   services: [],
-  timeline: "",
   challenge: "",
 }
 
@@ -40,16 +38,19 @@ export function ContactForm() {
   const valid = useMemo(
     () => ({
       name: form.name.trim().length >= 2,
-      email: /\S+@\S+\.\S+/.test(form.email),
+      // Tajik number: +992 followed by 9 digits (12 digits total incl. country code)
+      phone: (() => {
+        const d = form.phone.replace(/\D/g, "")
+        return d.length === 12 && d.startsWith("992")
+      })(),
       services: form.services.length > 0,
-      timeline: !!form.timeline,
       challenge: form.challenge.trim().length >= 20,
     }),
     [form]
   )
 
   const filled = Object.values(valid).filter(Boolean).length
-  const total = 5
+  const total = 4
   const pct = (filled / total) * 100
   const allValid = filled === total
 
@@ -189,14 +190,14 @@ export function ContactForm() {
                 placeholder={t.form.fields.name.placeholder}
               />
               <Field
-                label={t.form.fields.email.label}
+                label={t.form.fields.phone.label}
                 required
-                type="email"
-                invalid={err("email")}
+                type="tel"
+                invalid={err("phone")}
                 errorText={t.form.required}
-                value={form.email}
-                onChange={(v) => setForm((f) => ({ ...f, email: v }))}
-                placeholder={t.form.fields.email.placeholder}
+                value={form.phone}
+                onChange={(v) => setForm((f) => ({ ...f, phone: v }))}
+                placeholder={t.form.fields.phone.placeholder}
               />
             </div>
 
@@ -225,7 +226,7 @@ export function ContactForm() {
                         on
                           ? "border-brand-blue bg-brand-blue/10 text-ink"
                           : err("services")
-                            ? "border-brand-coral/50 bg-brand-coral/[0.04] text-ink/65 hover:border-brand-coral"
+                            ? "border-danger/60 bg-danger/[0.07] text-ink/70 hover:border-danger"
                             : "border-ink/10 bg-cream-100 text-ink/65 hover:border-ink/25"
                       )}
                     >
@@ -235,7 +236,7 @@ export function ContactForm() {
                           on
                             ? "bg-brand-blue border-brand-blue text-ink"
                             : err("services")
-                              ? "border-brand-coral/60"
+                              ? "border-danger/70"
                               : "border-ink/20"
                         )}
                       >
@@ -245,32 +246,6 @@ export function ContactForm() {
                     </button>
                   )
                 })}
-              </div>
-            </FieldGroup>
-
-            {/* timeline */}
-            <FieldGroup invalid={err("timeline")} errorText={t.form.required}>
-              <Label required invalid={err("timeline")}>
-                {t.form.fields.timeline.label}
-              </Label>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {t.form.fields.timeline.options.map((s) => (
-                  <button
-                    type="button"
-                    key={s}
-                    onClick={() => setForm((f) => ({ ...f, timeline: s }))}
-                    className={cn(
-                      "relative rounded-full border px-4 py-2 text-[13px] transition-colors",
-                      form.timeline === s
-                        ? "border-brand-coral bg-brand-coral text-white"
-                        : err("timeline")
-                          ? "border-brand-coral/50 bg-brand-coral/[0.04] text-ink/70 hover:border-brand-coral"
-                          : "border-ink/10 bg-cream-100 text-ink/70 hover:border-ink/25"
-                    )}
-                  >
-                    {s}
-                  </button>
-                ))}
               </div>
             </FieldGroup>
 
@@ -289,7 +264,7 @@ export function ContactForm() {
                 className={cn(
                   "mt-3 w-full rounded-2xl border bg-cream-100 px-4 py-3 text-[14px] text-ink placeholder:text-ink/35 focus:outline-none focus:ring-4 transition-all resize-none",
                   err("challenge")
-                    ? "border-brand-coral focus:border-brand-coral focus:ring-brand-coral/15"
+                    ? "border-danger bg-danger/[0.05] focus:border-danger focus:ring-danger/20"
                     : "border-ink/10 focus:border-brand-blue focus:ring-brand-blue/20"
                 )}
               />
@@ -317,7 +292,7 @@ export function ContactForm() {
                   initial={{ opacity: 0, y: -6, height: 0 }}
                   animate={{ opacity: 1, y: 0, height: "auto" }}
                   exit={{ opacity: 0, y: -6, height: 0 }}
-                  className="flex items-center gap-2 rounded-2xl border border-brand-coral/30 bg-brand-coral/[0.06] px-4 py-3 text-[13.5px] text-brand-coral"
+                  className="flex items-center gap-2 rounded-2xl border border-danger/40 bg-danger/[0.08] px-4 py-3 text-[13.5px] text-danger"
                 >
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   {t.form.errorHint}
@@ -328,7 +303,7 @@ export function ContactForm() {
                   initial={{ opacity: 0, y: -6, height: 0 }}
                   animate={{ opacity: 1, y: 0, height: "auto" }}
                   exit={{ opacity: 0, y: -6, height: 0 }}
-                  className="flex items-center gap-2 rounded-2xl border border-brand-coral/30 bg-brand-coral/[0.06] px-4 py-3 text-[13.5px] text-brand-coral"
+                  className="flex items-center gap-2 rounded-2xl border border-danger/40 bg-danger/[0.08] px-4 py-3 text-[13.5px] text-danger"
                 >
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   {t.form.sendError}
@@ -339,26 +314,41 @@ export function ContactForm() {
             <motion.button
               type="submit"
               disabled={sending}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.985 }}
+              transition={{ type: "spring", stiffness: 400, damping: 26 }}
               className={cn(
-                "group relative inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-[15px] font-medium transition-colors",
-                sending
-                  ? "bg-ink/80 text-cream-50 cursor-wait"
-                  : allValid
-                    ? "bg-brand-blue text-ink hover:bg-brand-blue/90"
-                    : "bg-ink text-cream-50 hover:bg-ink/90"
+                "group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl px-6 py-[18px] text-[15px] font-semibold text-white transition-[filter,box-shadow] duration-300",
+                sending ? "cursor-wait" : "hover:brightness-[1.06]"
               )}
+              style={{
+                background:
+                  "linear-gradient(100deg, #ff5b24 0%, #ff7a3c 46%, #d17a00 100%)",
+                boxShadow: allValid
+                  ? "0 16px 44px -10px rgba(255,91,36,0.78), inset 0 1px 0 rgba(255,255,255,0.25)"
+                  : "0 12px 34px -14px rgba(255,91,36,0.5), inset 0 1px 0 rgba(255,255,255,0.2)",
+              }}
             >
+              {/* light sweep across the button on hover */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/35 to-transparent transition-transform duration-[800ms] ease-smooth group-hover:translate-x-full"
+              />
+              {/* fine top highlight */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/40"
+              />
               {sending ? (
-                <>
+                <span className="relative inline-flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   {t.form.sending}
-                </>
+                </span>
               ) : (
-                <>
+                <span className="relative inline-flex items-center gap-2">
                   {t.form.submit}
-                  <Send className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </>
+                  <Send className="h-4 w-4 transition-transform duration-300 ease-smooth group-hover:translate-x-1 group-hover:-translate-y-0.5" />
+                </span>
               )}
             </motion.button>
           </motion.form>
@@ -467,12 +457,12 @@ function Label({
     <label
       className={cn(
         "block text-[13px] font-medium transition-colors",
-        invalid ? "text-brand-coral" : "text-ink/85"
+        invalid ? "text-danger" : "text-ink/85"
       )}
     >
       {children}
       {required && (
-        <span className={invalid ? "text-brand-coral" : "text-brand-coral"}>
+        <span className={invalid ? "text-danger" : "text-ink/35"}>
           {" "}
           *
         </span>
@@ -495,7 +485,7 @@ function FieldGroup({
     <div data-invalid={invalid ? "true" : "false"} className={cn(invalid && "animate-shake")}>
       {children}
       {invalid && errorText && (
-        <p className="mt-2 flex items-center gap-1.5 text-[12px] text-brand-coral">
+        <p className="mt-2 flex items-center gap-1.5 text-[12px] text-danger">
           <AlertCircle className="h-3 w-3" />
           {errorText}
         </p>
@@ -545,7 +535,7 @@ function Field({
         )}
       />
       {invalid && errorText && (
-        <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-brand-coral">
+        <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-danger">
           <AlertCircle className="h-3 w-3" />
           {errorText}
         </p>

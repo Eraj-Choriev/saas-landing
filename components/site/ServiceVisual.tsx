@@ -336,29 +336,165 @@ function Typewriter({ text, speed = 18 }: { text: string; speed?: number }) {
   return <>{text.slice(0, n)}</>
 }
 
-/* ════════════════ 2 · Websites — auto-rotating case browser ════════════════ */
+/* ════════════════ 2 · Websites — live build & ship ════════════════ */
+
+// scripted fake cursor — glides between positions, ripples on click
+function Cursor({ x, y, clicking }: { x: number; y: number; clicking: boolean }) {
+  return (
+    <motion.div
+      className="pointer-events-none absolute left-0 top-0 z-30"
+      animate={{ x, y }}
+      transition={{ type: "spring", stiffness: 80, damping: 16, mass: 0.7 }}
+    >
+      <svg
+        width="20"
+        height="22"
+        viewBox="0 0 20 22"
+        fill="none"
+        className="drop-shadow-[0_2px_5px_rgba(0,0,0,0.55)]"
+      >
+        <path
+          d="M2 2 L2 18 L6.6 13.6 L10.6 20.4 L13.2 19.2 L9.4 12.4 L16 12 Z"
+          fill="#fff"
+          stroke="#0b0f14"
+          strokeWidth="1.1"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <AnimatePresence>
+        {clicking && (
+          <motion.span
+            className="absolute -left-1 -top-1 block h-7 w-7 rounded-full border-2 border-white"
+            initial={{ scale: 0.25, opacity: 0.85 }}
+            animate={{ scale: 1.5, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+// rAF count-up; resets to 0 then eases to `to` when `run` flips true
+function CountUp({ to, run, className }: { to: number; run: boolean; className?: string }) {
+  const [n, setN] = React.useState(0)
+  React.useEffect(() => {
+    if (!run) {
+      setN(0)
+      return
+    }
+    let raf = 0
+    let start = 0
+    const dur = 900
+    const tick = (ts: number) => {
+      if (!start) start = ts
+      const p = Math.min(1, (ts - start) / dur)
+      const e = 1 - Math.pow(1 - p, 3)
+      setN(Math.round(to * e))
+      if (p < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [run, to])
+  return <span className={className}>{n}</span>
+}
+
+// bento arrangements — one per case so the layout visibly changes each cycle
+const BENTO_LAYOUTS = [
+  ["col-span-2 h-16", "col-span-1 h-16", "col-span-1 h-14", "col-span-2 h-14"],
+  ["col-span-1 h-[72px]", "col-span-2 h-[72px]", "col-span-2 h-14", "col-span-1 h-14"],
+  ["col-span-3 h-12", "col-span-1 h-16", "col-span-1 h-16", "col-span-1 h-16"],
+]
 
 function WebsitesDemo({ color, reduce, started, lang }: Demo) {
   const cases = [
-    { name: "Northwind", url: "northwind.io", accent: "#ff5b24", lh: 99, lcp: "0.8s", cls: "0.01" },
-    { name: "Lumen", url: "lumen.app", accent: "#a9caf9", lh: 98, lcp: "0.9s", cls: "0.02" },
-    { name: "Voltage", url: "voltage.co", accent: "#d17a00", lh: 97, lcp: "1.0s", cls: "0.01" },
+    { name: "Northwind", url: "northwind.io", accent: "#ff5b24", lh: 99, lcp: "0.8s", cls: "0.01", layout: 0 },
+    { name: "Lumen", url: "lumen.app", accent: "#a9caf9", lh: 98, lcp: "0.9s", cls: "0.02", layout: 1 },
+    { name: "Voltage", url: "voltage.co", accent: "#d17a00", lh: 97, lcp: "1.0s", cls: "0.01", layout: 2 },
   ]
-  const DUR = 4200
-  const [i, setI] = React.useState(0)
+  const DUR = 9200
   const active = useActive()
+  const [cycle, setCycle] = React.useState(0)
+  const i = cycle % cases.length
+  const c = cases[i]
+  const bento = BENTO_LAYOUTS[c.layout]
+
+  // phase machine: 0 load · 1 build · 2 scroll · 3 ship
+  const [phase, setPhase] = React.useState(reduce ? 3 : 0)
+  const viewportRef = React.useRef<HTMLDivElement>(null)
+  const contentRef = React.useRef<HTMLDivElement>(null)
+  const [scroll, setScroll] = React.useState(0)
+
+  // measure how far the assembled page can scroll inside the viewport
+  React.useLayoutEffect(() => {
+    const measure = () => {
+      const vp = viewportRef.current
+      const ct = contentRef.current
+      if (!vp || !ct) return
+      setScroll(Math.max(0, ct.scrollHeight - vp.clientHeight))
+    }
+    measure()
+    window.addEventListener("resize", measure)
+    return () => window.removeEventListener("resize", measure)
+  }, [cycle])
+
+  // drive the timeline; loop to the next case at DUR
   React.useEffect(() => {
     if (reduce || !started || !active) return
-    const id = setInterval(() => setI((v) => (v + 1) % cases.length), DUR)
-    return () => clearInterval(id)
+    setPhase(0)
+    const t = [
+      setTimeout(() => setPhase(1), 600),
+      setTimeout(() => setPhase(2), 3300),
+      setTimeout(() => setPhase(3), 6700),
+      setTimeout(() => setCycle((v) => v + 1), DUR),
+    ]
+    return () => t.forEach(clearTimeout)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduce, started, active])
+  }, [cycle, reduce, started, active])
 
-  const c = cases[i]
+  // cursor choreography per phase (px relative to the browser window)
+  const cursorPos = [
+    { x: 300, y: 16, click: false }, // address bar
+    { x: 150, y: 150, click: true }, // click hero CTA
+    { x: 588, y: 120, click: false }, // ride the scrollbar
+    { x: 532, y: 214, click: true }, // tap the score badge
+  ]
+  const cur = cursorPos[phase]
+  const [clicking, setClicking] = React.useState(false)
+  React.useEffect(() => {
+    if (reduce || !cur.click) {
+      setClicking(false)
+      return
+    }
+    const a = setTimeout(() => setClicking(true), 380)
+    const b = setTimeout(() => setClicking(false), 920)
+    return () => {
+      clearTimeout(a)
+      clearTimeout(b)
+    }
+  }, [phase, reduce, cur.click])
+
+  const container = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.13, delayChildren: 0.08 } },
+  }
+  const item = {
+    hidden: { opacity: 0, y: 18 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+  }
+
+  const captions = [
+    tr(lang, "Загрузка…", "Loading…", "Боргузорӣ…"),
+    tr(lang, "Сборка макета", "Assembling layout", "Сохтани тарҳ"),
+    tr(lang, "Прокрутка страницы", "Scrolling the page", "Варақгардонӣ"),
+    tr(lang, `Готово · Lighthouse ${c.lh}`, `Shipped · Lighthouse ${c.lh}`, `Тайёр · Lighthouse ${c.lh}`),
+  ]
+
   return (
     <div className="absolute inset-0 grid place-items-center px-5 sm:px-10">
-      <div className="w-full max-w-[640px]">
-        <div className="overflow-hidden rounded-2xl border border-white/12 bg-[#11161c] shadow-2xl">
+      <div className="relative w-full max-w-[640px]">
+        <div className="relative overflow-hidden rounded-2xl border border-white/12 bg-[#0e1318] shadow-2xl">
           {/* browser chrome */}
           <div className="flex items-center gap-2 border-b border-white/8 px-3.5 py-2.5">
             <span className="flex gap-1.5">
@@ -366,83 +502,176 @@ function WebsitesDemo({ color, reduce, started, lang }: Demo) {
               <i className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
               <i className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
             </span>
-            <span className="ml-2 flex-1 truncate rounded-md bg-white/[0.06] px-2.5 py-1 text-center font-mono text-[11px] text-cream-100/55">
-              https://{c.url}
+            <span className="ml-2 flex flex-1 items-center gap-1.5 truncate rounded-md bg-white/[0.06] px-2.5 py-1 font-mono text-[11px] text-cream-100/60">
+              <span className="text-cream-100/35">https://</span>
+              {c.url}
+              {phase === 0 && !reduce && (
+                <motion.span
+                  className="ml-0.5 inline-block h-3 w-px bg-cream-100/50"
+                  animate={{ opacity: [1, 0, 1] }}
+                  transition={{ duration: 0.8, repeat: Infinity }}
+                />
+              )}
             </span>
           </div>
-          {/* stylized site preview */}
-          <div className="relative h-[160px] sm:h-[210px]">
-            <AnimatePresence mode="wait">
+
+          {/* viewport — the page being built scrolls inside here */}
+          <div ref={viewportRef} className="relative h-[176px] sm:h-[226px]">
+            <motion.div
+              animate={{ y: phase >= 2 ? -scroll : 0 }}
+              transition={{ duration: 3.0, ease: EASE }}
+              style={{ background: `radial-gradient(120% 70% at 82% 0%, ${c.accent}1f, transparent 60%), #0e1318` }}
+            >
               <motion.div
-                key={i}
-                initial={reduce ? false : { opacity: 0, x: 28 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={reduce ? undefined : { opacity: 0, x: -28 }}
-                transition={{ duration: 0.4, ease: EASE }}
-                className="absolute inset-0"
-                style={{ background: `radial-gradient(130% 90% at 82% 0%, ${c.accent}26, transparent 58%), #0e1318` }}
+                ref={contentRef}
+                variants={container}
+                initial={reduce ? "show" : "hidden"}
+                animate={phase >= 1 ? "show" : "hidden"}
+                className="space-y-3 p-4"
               >
-                {/* fake site nav */}
-                <div className="flex items-center justify-between px-4 pt-3.5">
+                {/* nav */}
+                <motion.div variants={item} className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <span className="h-3 w-3 rounded-[5px]" style={{ background: c.accent }} />
+                    <span className="h-3.5 w-3.5 rounded-[5px]" style={{ background: c.accent }} />
                     <span className="font-display text-[12px] text-cream-50">{c.name}</span>
                   </div>
-                  <div className="hidden gap-3 sm:flex">
-                    {[0, 1, 2].map((d) => <span key={d} className="h-1.5 w-7 rounded-full bg-white/12" />)}
+                  <div className="flex items-center gap-2.5">
+                    <span className="hidden gap-2.5 sm:flex">
+                      {[0, 1, 2].map((d) => (
+                        <span key={d} className="h-1.5 w-7 rounded-full bg-white/12" />
+                      ))}
+                    </span>
+                    <span className="h-5 w-16 rounded-full" style={{ background: `${c.accent}33` }} />
                   </div>
-                </div>
+                </motion.div>
+
                 {/* hero */}
-                <div className="grid grid-cols-5 gap-3 px-4 pt-5">
+                <motion.div variants={item} className="grid grid-cols-5 gap-3">
                   <div className="col-span-3">
-                    <div className="h-3.5 w-4/5 rounded bg-white/18" />
+                    <div className="h-3.5 w-4/5 rounded bg-white/20" />
                     <div className="mt-2 h-3.5 w-3/5 rounded bg-white/12" />
                     <div className="mt-2 h-2 w-2/3 rounded bg-white/8" />
-                    <div className="mt-3.5 inline-block h-6 w-28 rounded-full" style={{ background: c.accent }} />
+                    <div className="mt-3 inline-block h-6 w-28 rounded-full" style={{ background: c.accent }} />
                   </div>
                   <motion.div
                     className="col-span-2 rounded-xl"
-                    style={{ background: `linear-gradient(140deg, ${c.accent}cc, ${c.accent}33)`, minHeight: 64 }}
+                    style={{ background: `linear-gradient(140deg, ${c.accent}cc, ${c.accent}33)`, minHeight: 70 }}
                     animate={reduce ? {} : { y: [0, -4, 0] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                   />
-                </div>
-                {/* card row */}
-                <div className="hidden grid-cols-3 gap-2.5 px-4 pt-4 sm:grid">
-                  {[0, 1, 2].map((d) => (
-                    <div key={d} className="rounded-lg border border-white/8 bg-white/[0.04] p-2">
+                </motion.div>
+
+                {/* bento grid — span pattern changes per case */}
+                <motion.div variants={item} className="grid grid-cols-3 gap-2">
+                  {bento.map((cls, d) => (
+                    <motion.div
+                      key={d}
+                      className={`${cls} relative overflow-hidden rounded-lg border p-2`}
+                      style={
+                        d === 0
+                          ? { borderColor: `${c.accent}40`, background: `linear-gradient(135deg, ${c.accent}26, ${c.accent}08)` }
+                          : { borderColor: "rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.035)" }
+                      }
+                      animate={reduce || d !== 0 ? {} : { y: [0, -3, 0] }}
+                      transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+                    >
                       <span className="block h-2 w-2 rounded-full" style={{ background: c.accent }} />
                       <div className="mt-1.5 h-1.5 w-full rounded bg-white/12" />
                       <div className="mt-1 h-1.5 w-2/3 rounded bg-white/8" />
+                    </motion.div>
+                  ))}
+                </motion.div>
+
+                {/* stats strip */}
+                <motion.div variants={item} className="grid grid-cols-3 gap-2">
+                  {[
+                    { v: "+180%", k: tr(lang, "конверсия", "conversion", "табдил") },
+                    { v: c.lcp, k: "LCP" },
+                    { v: c.lh, k: "Lighthouse" },
+                  ].map((s, d) => (
+                    <div key={d} className="rounded-lg border border-white/8 bg-white/[0.03] px-2 py-1.5">
+                      <div className="font-mono text-[12px] font-semibold text-cream-50">{s.v}</div>
+                      <div className="text-[9px] text-cream-100/45">{s.k}</div>
                     </div>
                   ))}
-                </div>
-                {/* metrics badge */}
-                <div className="absolute bottom-3 right-3 rounded-lg border border-white/12 bg-ink/75 px-2.5 py-1.5 backdrop-blur">
-                  <div className="font-mono text-[11px] font-semibold text-emerald-400">Lighthouse {c.lh}</div>
-                  <div className="mt-0.5 font-mono text-[9.5px] text-cream-100/55">LCP {c.lcp} · CLS {c.cls}</div>
-                </div>
+                </motion.div>
+
+                {/* CTA band */}
+                <motion.div
+                  variants={item}
+                  className="flex items-center justify-between rounded-xl px-3 py-2.5"
+                  style={{ background: `linear-gradient(120deg, ${c.accent}, ${c.accent}99)` }}
+                >
+                  <div>
+                    <div className="h-2 w-24 rounded bg-black/25" />
+                    <div className="mt-1 h-1.5 w-16 rounded bg-black/15" />
+                  </div>
+                  <span className="h-6 w-20 rounded-full bg-ink/85" />
+                </motion.div>
               </motion.div>
+            </motion.div>
+
+            {/* scrollbar hint (rides down while scrolling) */}
+            {!reduce && (
+              <motion.div
+                className="absolute right-1 top-1.5 w-1 rounded-full bg-white/20"
+                style={{ height: 36 }}
+                animate={{ y: phase >= 2 ? 110 : 0, opacity: phase >= 1 ? 1 : 0 }}
+                transition={{ duration: 3.0, ease: EASE }}
+              />
+            )}
+
+            {/* Lighthouse badge — pops in on ship, score counts up */}
+            <AnimatePresence>
+              {phase >= 3 && (
+                <motion.div
+                  initial={reduce ? false : { opacity: 0, scale: 0.8, y: 8 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 22 }}
+                  className="absolute bottom-3 right-3 rounded-lg border border-emerald-400/30 bg-ink/80 px-2.5 py-1.5 backdrop-blur"
+                >
+                  <div className="font-mono text-[11px] font-semibold text-emerald-400">
+                    Lighthouse {reduce ? c.lh : <CountUp to={c.lh} run={phase >= 3} />}
+                  </div>
+                  <div className="mt-0.5 font-mono text-[9.5px] text-cream-100/55">
+                    LCP {c.lcp} · CLS {c.cls}
+                  </div>
+                </motion.div>
+              )}
             </AnimatePresence>
+
+            {/* scripted cursor */}
+            {!reduce && <Cursor x={cur.x} y={cur.y} clicking={clicking} />}
           </div>
         </div>
-        {/* autoplay progress segments (non-interactive) */}
-        <div className="mt-3.5 flex items-center justify-center gap-2">
-          {cases.map((_, d) => (
-            <div key={d} className="h-1 w-10 overflow-hidden rounded-full bg-white/12">
-              {d === i && !reduce && (
-                <motion.div
-                  key={`fill-${i}`}
-                  className="h-full rounded-full"
-                  style={{ background: color }}
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: DUR / 1000, ease: "linear" }}
-                />
-              )}
-              {d === i && reduce && <div className="h-full w-full rounded-full" style={{ background: color }} />}
-            </div>
-          ))}
+
+        {/* phase caption + case dots */}
+        <div className="mt-3 flex items-center justify-center gap-3">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={phase}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.25 }}
+              className="font-mono text-[11px] text-cream-100/55"
+            >
+              {reduce ? captions[3] : captions[phase]}
+            </motion.span>
+          </AnimatePresence>
+          <span className="flex items-center gap-1.5">
+            {cases.map((_, d) => (
+              <span
+                key={d}
+                className="h-1.5 rounded-full transition-all duration-300"
+                style={{
+                  width: d === i ? 16 : 6,
+                  background: d === i ? color : "rgba(255,255,255,0.18)",
+                }}
+              />
+            ))}
+          </span>
         </div>
       </div>
     </div>
@@ -662,193 +891,447 @@ function FlowDemo({ color, reduce, started, lang }: Demo) {
 
 /* ════════════════ 5 · AI Integration — everything plugs into one hub ════════════════ */
 
-function IntegrationHub({ color, reduce, started, lang }: Demo) {
-  const nodes: { Icon: LucideIcon; label: string; brand: string }[] = [
-    { Icon: Users, label: "CRM", brand: "#2a9df4" },
-    { Icon: CreditCard, label: "Stripe", brand: "#8b7bff" },
-    { Icon: MessageSquare, label: "Slack", brand: "#ecb22e" },
-    { Icon: Database, label: "Data", brand: "#00b894" },
-    { Icon: Mail, label: "Email", brand: "#ff7a59" },
-    { Icon: Calendar, label: "Calendar", brand: "#e84393" },
-  ]
-  // elliptical layout in % of the demo box
-  const pos = nodes.map((_, i) => {
-    const a = ((-90 + i * (360 / nodes.length)) * Math.PI) / 180
-    return { x: 50 + 33 * Math.cos(a), y: 52 + 34 * Math.sin(a) }
-  })
+function IntegrationHub({ reduce, started, lang }: Demo) {
+  const C = {
+    bg: "#141311",
+    surface: "#1E1D1A",
+    border: "#2A2926",
+    line: "#333130",
+    accent: "#C4704B",
+    text: "#E8E6E2",
+    dim: "#7A7772",
+    success: "#4ADE80",
+  }
+  const font = "var(--font-dmsans), var(--font-manrope), ui-sans-serif, system-ui, sans-serif"
 
-  const MAX = nodes.length + 3 // connect one-by-one, then hold, then reset
-  const [tick, setTick] = React.useState(reduce ? MAX : 0)
-  const active = useActive()
+  const NODES: { id: string; Icon: LucideIcon; label: string; x: number; y: number; desc: string }[] = [
+    { id: "crm", Icon: Users, label: "CRM", x: 50, y: 11,
+      desc: tr(lang, "Синхронизация контактов, сделок и воронки продаж", "Sync contacts, deals and the sales pipeline", "Ҳамоҳангсозии контактҳо, муомилаҳо ва воронкаи фурӯш") },
+    { id: "calendar", Icon: Calendar, label: "Calendar", x: 13, y: 31,
+      desc: tr(lang, "Автоматическое планирование встреч и напоминаний", "Automatic meeting scheduling and reminders", "Банақшагирии худкори вохӯриҳо ва ёдоварӣ") },
+    { id: "stripe", Icon: CreditCard, label: "Stripe", x: 87, y: 31,
+      desc: tr(lang, "Обработка платежей, подписок и выставление счетов", "Payments, subscriptions and invoicing", "Коркарди пардохтҳо, обунаҳо ва ҳисобнома") },
+    { id: "email", Icon: Mail, label: "Email", x: 13, y: 65,
+      desc: tr(lang, "Умная маршрутизация писем и автоответы", "Smart email routing and auto-replies", "Идоракунии оқилонаи мактубҳо ва ҷавобҳои худкор") },
+    { id: "slack", Icon: MessageSquare, label: "Slack", x: 87, y: 65,
+      desc: tr(lang, "Уведомления и команды прямо из чата", "Notifications and commands right from chat", "Огоҳиҳо ва фармонҳо рост аз чат") },
+    { id: "data", Icon: Database, label: "Database", x: 50, y: 85,
+      desc: tr(lang, "Миграция, трансформация и резервное копирование данных", "Data migration, transformation and backups", "Муҳоҷират, табдил ва нусхабардории додаҳо") },
+  ]
+
+  // measure the (max-600) panel so SVG works in real px → round dots, no stretch
+  const boxRef = React.useRef<HTMLDivElement>(null)
+  const [size, setSize] = React.useState({ w: 0, h: 0 })
+  React.useLayoutEffect(() => {
+    const el = boxRef.current
+    if (!el) return
+    const measure = () => setSize({ w: el.clientWidth, h: el.clientHeight })
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  // entrance: hub (200) → lines (700) → nodes (1200)
+  const [step, setStep] = React.useState(reduce ? 3 : 0)
   React.useEffect(() => {
-    if (reduce || !started || !active) return
-    const id = setInterval(() => setTick((t) => (t >= MAX ? 0 : t + 1)), 720)
+    if (reduce) {
+      setStep(3)
+      return
+    }
+    if (!started) return
+    const t = [
+      setTimeout(() => setStep(1), 200),
+      setTimeout(() => setStep(2), 700),
+      setTimeout(() => setStep(3), 1200),
+    ]
+    return () => t.forEach(clearTimeout)
+  }, [reduce, started])
+
+  // active = hovered node, else a gentle auto-cycle so the map feels alive
+  const [hovered, setHovered] = React.useState<string | null>(null)
+  const [auto, setAuto] = React.useState<string | null>(null)
+  React.useEffect(() => {
+    if (reduce || step < 3 || hovered) return
+    setAuto((a) => a ?? NODES[0].id)
+    const id = setInterval(() => {
+      setAuto((a) => {
+        const idx = a ? NODES.findIndex((n) => n.id === a) : -1
+        return NODES[(idx + 1) % NODES.length].id
+      })
+    }, 2600)
     return () => clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduce, started, active])
+  }, [reduce, step, hovered])
+  const active = hovered ?? (reduce ? null : auto)
 
-  const allDone = tick >= nodes.length
+  const { w, h } = size
+  const ready = w > 0 && h > 0
+  const cx = w / 2
+  const cy = h * 0.45
+  const coreR = 40
+  const nodeR = 30
+
+  const geo = NODES.map((n, i) => {
+    const nx = (w * n.x) / 100
+    const ny = (h * n.y) / 100
+    const vx = nx - cx
+    const vy = ny - cy
+    const len = Math.hypot(vx, vy) || 1
+    const ux = vx / len
+    const uy = vy / len
+    const sx = cx + ux * coreR
+    const sy = cy + uy * coreR
+    const ex = nx - ux * nodeR
+    const ey = ny - uy * nodeR
+    const lineLen = Math.hypot(ex - sx, ey - sy)
+    return { ...n, i, nx, ny, sx, sy, ex, ey, lineLen }
+  })
+
+  const Star = ({ c }: { c: string }) => (
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden style={{ transition: "fill 0.3s ease" }}>
+      <path
+        d="M12 2 C 13 9 15 11 22 12 C 15 13 13 15 12 22 C 11 15 9 13 2 12 C 9 11 11 9 12 2 Z"
+        fill={c}
+        style={{ transition: "fill 0.3s ease" }}
+      />
+    </svg>
+  )
 
   return (
-    <div className="absolute inset-0">
-      {/* connection lines + travelling data packets */}
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {pos.map((p, i) => {
-          const on = tick > i
-          return (
-            <g key={i}>
-              <motion.line
-                x1={50} y1={52} x2={p.x} y2={p.y}
-                stroke={on ? color : "rgba(255,255,255,0.12)"}
-                strokeWidth={1}
-                vectorEffect="non-scaling-stroke"
-                initial={false}
-                animate={{ pathLength: on ? 1 : 0.001, opacity: on ? 0.7 : 0.25 }}
-                transition={{ duration: 0.5, ease: EASE }}
-              />
-              {on && !reduce && (
-                <motion.circle
-                  r={1.4}
-                  fill={color}
-                  initial={{ cx: p.x, cy: p.y, opacity: 0 }}
-                  animate={{ cx: [p.x, 50], cy: [p.y, 52], opacity: [0, 1, 0] }}
-                  transition={{ duration: 1.1, repeat: Infinity, ease: "easeIn", delay: i * 0.1 }}
-                />
-              )}
-            </g>
-          )
-        })}
-      </svg>
+    <div className="absolute inset-0" style={{ fontFamily: font }}>
+      {/* opaque schematic ground — covers the parent gradient/glow */}
+      <div className="absolute inset-0" style={{ background: C.bg }} aria-hidden />
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `radial-gradient(${C.border} 1px, transparent 1px)`,
+          backgroundSize: "32px 32px",
+          opacity: 0.4,
+        }}
+        aria-hidden
+      />
 
-      {/* satellite nodes */}
-      {nodes.map((n, i) => {
-        const on = tick > i
-        return (
-          <div
-            key={n.label}
-            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1"
-            style={{ left: `${pos[i].x}%`, top: `${pos[i].y}%` }}
-          >
-            <motion.div
-              className="grid h-12 w-12 place-items-center rounded-2xl border sm:h-14 sm:w-14"
-              animate={{
-                borderColor: on ? n.brand : "rgba(255,255,255,0.12)",
-                boxShadow: on ? `0 0 22px -4px ${n.brand}` : "0 0 0 0 transparent",
-                scale: on ? 1 : 0.92,
-              }}
-              transition={{ duration: 0.4, ease: EASE }}
-              style={{ background: "#11161c" }}
-            >
-              <n.Icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: on ? n.brand : "rgba(243,239,230,0.45)" }} strokeWidth={1.75} />
-            </motion.div>
-            <span className="font-mono text-[9.5px] text-cream-100/45">{n.label}</span>
-          </div>
-        )
-      })}
+      {/* centred map panel (≤600px) */}
+      <div ref={boxRef} className="relative mx-auto h-full w-full" style={{ maxWidth: 600 }}>
+        {ready && (
+          <>
+            {/* connectors + data dots */}
+            <svg className="absolute inset-0" width={w} height={h} viewBox={`0 0 ${w} ${h}`} fill="none">
+              {geo.map((g) => {
+                const on = active === g.id
+                return (
+                  <line
+                    key={g.id}
+                    x1={g.sx}
+                    y1={g.sy}
+                    x2={g.ex}
+                    y2={g.ey}
+                    stroke={on ? C.accent : C.line}
+                    strokeWidth={on ? 1.5 : 0.75}
+                    strokeLinecap="round"
+                    style={
+                      reduce
+                        ? { transition: "stroke 0.3s ease, stroke-width 0.3s ease" }
+                        : {
+                            strokeDasharray: g.lineLen,
+                            strokeDashoffset: g.lineLen,
+                            animation: step >= 2 ? `imap-draw 0.7s ease ${g.i * 0.12}s forwards` : "none",
+                            transition: "stroke 0.3s ease, stroke-width 0.3s ease",
+                          }
+                    }
+                  />
+                )
+              })}
+              {/* data dot runs centre → active node */}
+              {active &&
+                !reduce &&
+                geo
+                  .filter((g) => g.id === active)
+                  .map((g) => (
+                    <circle key={`dot-${g.id}`} r={2.5} fill={C.accent}>
+                      <animateMotion dur="2s" repeatCount="indefinite" path={`M${g.sx} ${g.sy} L${g.ex} ${g.ey}`} />
+                    </circle>
+                  ))}
+            </svg>
 
-      {/* central hub */}
-      <div className="absolute left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={{ top: "52%" }}>
-        <div className="relative grid h-[68px] w-[68px] place-items-center sm:h-[76px] sm:w-[76px]">
-          {/* rotating dashed orbit */}
-          {!reduce && (
-            <motion.span
-              className="absolute inset-[-10px] rounded-full"
-              style={{ border: `1px dashed ${color}55` }}
-              animate={{ rotate: 360 }}
-              transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
-            />
-          )}
-          {/* pulse ring when fully integrated */}
-          <AnimatePresence>
-            {allDone && !reduce && (
-              <motion.span
-                className="absolute inset-0 rounded-full"
-                style={{ border: `1.5px solid ${color}` }}
-                initial={{ scale: 1, opacity: 0.7 }}
-                animate={{ scale: 1.9, opacity: 0 }}
-                transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
+            {/* pulse ring around the hub when a node is active */}
+            {active && !reduce && (
+              <span
+                className="pointer-events-none absolute rounded-full"
+                style={{
+                  left: cx,
+                  top: cy,
+                  width: 80,
+                  height: 80,
+                  border: `1px solid ${C.accent}`,
+                  animation: "imap-pulse 1.8s ease-out infinite",
+                }}
+                aria-hidden
               />
             )}
-          </AnimatePresence>
-          {/* core */}
-          <div
-            className="grid h-full w-full place-items-center rounded-full text-white"
-            style={{ background: `linear-gradient(140deg, ${color}, #d17a00)`, boxShadow: `0 0 40px -8px ${color}` }}
-          >
-            <Sparkles className="h-7 w-7" strokeWidth={1.75} />
-          </div>
-        </div>
-        <div className="mt-3 font-display text-[15px] text-cream-50">Aqly</div>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={allDone ? "done" : "wiring"}
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={reduce ? undefined : { opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="font-mono text-[10.5px]"
-            style={{ color: allDone ? "#3FB950" : "rgba(243,239,230,0.5)" }}
-          >
-            {allDone
-              ? tr(lang, "всё связано ✓", "all connected ✓", "ҳама пайваст ✓")
-              : tr(lang, "подключение…", "connecting…", "пайвастшавӣ…")}
-          </motion.div>
-        </AnimatePresence>
+
+            {/* central hub */}
+            <div
+              className="absolute"
+              style={{
+                left: cx,
+                top: cy,
+                transform: "translate(-50%, -50%)",
+                opacity: step >= 1 ? 1 : 0,
+                transition: "opacity 0.5s ease",
+              }}
+            >
+              <div
+                className="grid place-items-center rounded-full"
+                style={{
+                  width: 80,
+                  height: 80,
+                  background: C.surface,
+                  border: `1.5px solid ${active ? C.accent : C.border}`,
+                  transition: "border-color 0.3s ease",
+                }}
+              >
+                <Star c={active ? C.accent : C.dim} />
+              </div>
+            </div>
+
+            {/* hub label + status (below the circle) */}
+            <div
+              className="absolute flex flex-col items-center text-center"
+              style={{
+                left: cx,
+                top: cy + 52,
+                transform: "translateX(-50%)",
+                opacity: step >= 1 ? 1 : 0,
+                transition: "opacity 0.5s ease",
+              }}
+            >
+              <div style={{ fontSize: 16, fontWeight: 600, color: C.text, letterSpacing: "-0.01em" }}>Aqly</div>
+              <div className="mt-1 flex items-center gap-1.5" style={{ fontSize: 11, color: C.dim, whiteSpace: "nowrap" }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, display: "inline-block" }} />
+                {active
+                  ? `${NODES.find((n) => n.id === active)?.label} ${tr(lang, "подключён", "connected", "пайваст шуд")}`
+                  : `${NODES.length} ${tr(lang, "интеграций активно", "integrations active", "интегратсия фаъол")}`}
+              </div>
+            </div>
+
+            {/* integration nodes */}
+            {geo.map((g) => {
+              const on = active === g.id
+              const below = g.y < 20 // top node → tooltip below, else above
+              // CRM / Database sit directly over the hub → put their tooltip to
+              // the side (open space) instead of above, so it never covers Aqly.
+              const side = g.x > 40 && g.x < 60
+              const tx = g.x < 25 ? "-18%" : g.x > 75 ? "-82%" : "-50%"
+              const slide = on ? 0 : below ? -6 : 6
+              return (
+                <div
+                  key={g.id}
+                  className="absolute flex flex-col items-center"
+                  style={{
+                    left: g.nx,
+                    top: g.ny,
+                    transform: "translate(-50%, -50%)",
+                    opacity: step >= 3 ? 1 : 0,
+                    transition: "opacity 0.4s ease",
+                  }}
+                  onMouseEnter={() => setHovered(g.id)}
+                  onMouseLeave={() => setHovered(null)}
+                >
+                  {/* tooltip — pure CSS so transform stays under our control
+                      (Framer would override translateX and mis-place it) */}
+                  <div
+                    className="pointer-events-none absolute z-20"
+                    style={{
+                      width: 188,
+                      ...(side
+                        ? {
+                            left: "calc(100% + 8px)",
+                            top: "50%",
+                            transform: `translateY(-50%) translateX(${on ? 0 : -6}px)`,
+                          }
+                        : {
+                            left: "50%",
+                            [below ? "top" : "bottom"]: "calc(100% + 8px)",
+                            transform: `translateX(${tx}) translateY(${slide}px)`,
+                          }),
+                      opacity: on ? 1 : 0,
+                      visibility: on ? "visible" : "hidden",
+                      transition: reduce
+                        ? "none"
+                        : "opacity 0.25s ease, transform 0.25s ease, visibility 0.25s",
+                      background: "#2C2A26",
+                      border: `1px solid ${C.accent}`,
+                      borderRadius: 10,
+                      padding: "8px 10px",
+                      textAlign: "left",
+                      boxShadow: "0 10px 28px rgba(0,0,0,0.55)",
+                    }}
+                  >
+                    <div style={{ fontSize: 11, fontWeight: 600, color: C.accent }}>{g.label}</div>
+                    <div style={{ fontSize: 12, lineHeight: 1.35, color: C.dim, marginTop: 2 }}>{g.desc}</div>
+                  </div>
+
+                  {/* icon tile */}
+                  <div
+                    className="grid place-items-center"
+                    style={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: 14,
+                      background: C.surface,
+                      border: `1.5px solid ${on ? C.accent : C.border}`,
+                      transform: on ? "scale(1.08)" : "scale(1)",
+                      transition: "transform 0.3s ease, border-color 0.3s ease",
+                    }}
+                  >
+                    <g.Icon size={22} strokeWidth={1.5} style={{ color: on ? C.accent : C.dim, transition: "color 0.3s ease" }} />
+                  </div>
+                  <span
+                    style={{
+                      marginTop: 8,
+                      fontSize: 12,
+                      fontWeight: 500,
+                      color: on ? C.text : C.dim,
+                      transition: "color 0.3s ease",
+                    }}
+                  >
+                    {g.label}
+                  </span>
+                </div>
+              )
+            })}
+          </>
+        )}
       </div>
     </div>
   )
 }
 
-/* ════════════════ 6 · Design — animated cursor builds a brand ════════════════ */
+/* ════════════════ 6 · Design — cursor draws a brand, ends on a poster ════════════════ */
+
+// shared stroke-draw helpers: marks render as line-art that draws itself in
+const strokeP = (c: string) => ({
+  stroke: c,
+  strokeWidth: 6,
+  fill: "none" as const,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+})
+const drawT = (draw: boolean, delay = 0) => ({
+  initial: { pathLength: 0 } as const,
+  animate: { pathLength: draw ? 1 : 0 },
+  transition: { duration: 0.85, delay: draw ? delay : 0, ease: EASE },
+})
 
 type Brand = {
   name: string
+  tagline: string
   font: string
+  fontStyle?: "italic" | "normal"
   fontLabel: string
-  palette: string[]
-  Mark: ({ c }: { c: string }) => JSX.Element
+  ink: string // primary brand color
+  palette: string[] // solid chips
+  gradient: string // the "grade" — animated mesh
+  Mark: ({ c, draw }: { c: string; draw: boolean }) => JSX.Element
 }
 
 const BRANDS: Brand[] = [
   {
     name: "Lumio",
-    font: "var(--font-display), serif",
-    fontLabel: "Playfair Display",
-    palette: ["#0b0f14", "#2f6fb0", "#a9caf9", "#f3efe6"],
-    Mark: ({ c }) => (
-      <g stroke={c} strokeWidth="6" fill="none" strokeLinecap="round">
-        <circle cx="38" cy="50" r="22" />
-        <circle cx="62" cy="50" r="22" opacity="0.55" />
-      </g>
+    tagline: "Clarity, in focus.",
+    font: "var(--font-instrument), serif",
+    fontStyle: "italic",
+    fontLabel: "Instrument Serif",
+    ink: "#7fb2f0",
+    palette: ["#0b1c30", "#2f6fb0", "#a9caf9", "#f3efe6"],
+    gradient: "linear-gradient(120deg,#0b2a4a,#2f6fb0 45%,#a9caf9)",
+    Mark: ({ c, draw }) => (
+      <>
+        <motion.circle cx="38" cy="52" r="22" {...strokeP(c)} {...drawT(draw)} />
+        <motion.circle cx="62" cy="52" r="22" strokeOpacity={0.55} {...strokeP(c)} {...drawT(draw, 0.18)} />
+      </>
     ),
   },
   {
     name: "Volt",
-    font: "var(--font-mono), monospace",
-    fontLabel: "Geist Mono",
-    palette: ["#0b0f14", "#ff5b24", "#d17a00", "#f3efe6"],
-    Mark: ({ c }) => <path d="M56 18 32 54h16l-6 28 26-40H52l4-24Z" fill={c} />,
+    tagline: "Energy, delivered.",
+    font: "var(--font-bricolage), sans-serif",
+    fontLabel: "Bricolage Grotesque",
+    ink: "#ff7a3c",
+    palette: ["#2a1000", "#ff5b24", "#ffb061", "#f3efe6"],
+    gradient: "linear-gradient(120deg,#3a1500,#ff5b24 50%,#ffb061)",
+    Mark: ({ c, draw }) => (
+      <motion.path d="M58 12 30 56h18l-8 32 32-46H56l8-30Z" {...strokeP(c)} {...drawT(draw)} />
+    ),
   },
   {
     name: "Bloom",
+    tagline: "Grow in full colour.",
     font: "var(--font-sans), sans-serif",
     fontLabel: "Manrope",
-    palette: ["#0b0f14", "#d4a017", "#009639", "#f3efe6"],
-    Mark: ({ c }) => (
-      <g fill={c}>
+    ink: "#e6b51e",
+    palette: ["#1d2a00", "#d4a017", "#7bd389", "#f3efe6"],
+    gradient: "linear-gradient(120deg,#23330a,#d4a017 50%,#7bd389)",
+    Mark: ({ c, draw }) => (
+      <>
         {Array.from({ length: 6 }).map((_, i) => (
-          <ellipse key={i} cx="50" cy="50" rx="9" ry="24" transform={`rotate(${i * 60} 50 50)`} opacity={i % 2 ? 0.5 : 1} />
+          <motion.ellipse
+            key={i}
+            cx="50"
+            cy="50"
+            rx="9"
+            ry="24"
+            transform={`rotate(${i * 60} 50 50)`}
+            strokeOpacity={i % 2 ? 0.5 : 1}
+            {...strokeP(c)}
+            {...drawT(draw, i * 0.08)}
+          />
         ))}
-      </g>
+      </>
+    ),
+  },
+  {
+    name: "Helix",
+    tagline: "Systems, intertwined.",
+    font: "var(--font-mono), monospace",
+    fontLabel: "Geist Mono",
+    ink: "#3fd9cf",
+    palette: ["#06222b", "#0e9f9f", "#7c5cff", "#f3efe6"],
+    gradient: "linear-gradient(120deg,#06222b,#0e9f9f 48%,#7c5cff)",
+    Mark: ({ c, draw }) => (
+      <>
+        <motion.path d="M42 14 C 72 36, 28 50, 58 72 C 70 80, 70 80, 62 88" {...strokeP(c)} {...drawT(draw)} />
+        <motion.path d="M58 14 C 28 36, 72 50, 42 72 C 30 80, 30 80, 38 88" strokeOpacity={0.55} {...strokeP(c)} {...drawT(draw, 0.18)} />
+      </>
+    ),
+  },
+  {
+    name: "Atlas",
+    tagline: "Brands that travel.",
+    font: "var(--font-playfair), serif",
+    fontStyle: "italic",
+    fontLabel: "Playfair Display",
+    ink: "#ff8a5c",
+    palette: ["#2a0d08", "#ff5b24", "#f3c9a0", "#f3efe6"],
+    gradient: "linear-gradient(120deg,#2a0d08,#ff5b24 52%,#f3c9a0)",
+    Mark: ({ c, draw }) => (
+      <>
+        <motion.circle cx="50" cy="50" r="30" {...strokeP(c)} {...drawT(draw)} />
+        <motion.ellipse cx="50" cy="50" rx="13" ry="30" strokeOpacity={0.55} {...strokeP(c)} {...drawT(draw, 0.16)} />
+        <motion.path d="M20 50 H80" strokeOpacity={0.55} {...strokeP(c)} {...drawT(draw, 0.3)} />
+      </>
     ),
   },
 ]
 
 // targets in % of the artboard — cursor visits each, "clicks", element materialises
 const STEPS = [
-  { to: [27, 50] as const, key: "mark" },
-  { to: [70, 36] as const, key: "word" },
-  { to: [66, 74] as const, key: "palette" },
+  { to: [29, 27] as const, key: "mark" },
+  { to: [29, 56] as const, key: "type" },
+  { to: [29, 85] as const, key: "grade" },
+  { to: [76, 50] as const, key: "poster" },
 ]
 
 function DesignDemo({ color, reduce, started, lang }: Demo) {
@@ -870,120 +1353,235 @@ function DesignDemo({ color, reduce, started, lang }: Demo) {
       if (local < STEPS.length) {
         setP(local)
         setClick((k) => k + 1)
-      } else if (local >= STEPS.length + 1) {
-        // finished + held → rebuild with next brand
-        setBrand((b) => (b + 1) % BRANDS.length)
+      } else if (local >= STEPS.length + 2) {
+        // finished + held on the poster → rebuild with a fresh brand.
+        // +2 step keeps the cycle from repeating the same logo each time.
+        setBrand((bb) => (bb + 2) % BRANDS.length)
         local = -1
         setP(-1)
       }
-    }, 1300)
+    }, 1150)
     return () => clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduce, started, active])
 
   const b = BRANDS[brand]
-  const show = (key: string) => {
-    const idx = STEPS.findIndex((s) => s.key === key)
-    return p >= idx
-  }
+  const fam = { fontFamily: b.font, fontStyle: b.fontStyle ?? "normal" }
+  const show = (key: string) => p >= STEPS.findIndex((s) => s.key === key)
   const inBoard = p >= 0 && p < STEPS.length
-  const cursor = inBoard ? STEPS[p].to : ([8, 90] as const)
+  const cursor = inBoard ? STEPS[p].to : ([8, 92] as const)
+
+  const labels = [
+    tr(lang, "Рисую логотип", "Drawing the mark", "Расми лого"),
+    tr(lang, "Ставлю шрифт", "Setting the type", "Интихоби шрифт"),
+    tr(lang, "Подбираю цвета", "Grading colours", "Интихоби рангҳо"),
+    tr(lang, "Собираю постер", "Composing the poster", "Сохтани постер"),
+  ]
   const tagline = tr(lang, "Дизайн на ваших глазах", "Design, drawn live", "Дизайн дар пеши назар")
 
   return (
     <div className="absolute inset-0 grid place-items-center px-5 sm:px-10">
-      <div className="w-full max-w-[620px]">
+      <div className="w-full max-w-[640px]">
         <div className="mb-2.5 flex items-center justify-between">
           <span className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-cream-100/40">{tagline}</span>
-          <span className="font-mono text-[10.5px] text-cream-100/40" style={{ color }}>{b.fontLabel}</span>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={b.fontLabel}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.25 }}
+              className="font-mono text-[10.5px]"
+              style={{ color: b.ink }}
+            >
+              {b.fontLabel}
+            </motion.span>
+          </AnimatePresence>
         </div>
 
         {/* artboard */}
         <div
-          className="relative h-[210px] overflow-hidden rounded-2xl border border-white/10 sm:h-[250px]"
+          className="relative h-[218px] overflow-hidden rounded-2xl border border-white/10 sm:h-[258px]"
           style={{
-            background:
-              "radial-gradient(110% 90% at 20% 0%, rgba(255,255,255,0.05), transparent 60%), #0e1318",
+            background: "radial-gradient(120% 90% at 18% 0%, rgba(255,255,255,0.05), transparent 60%), #0e1318",
           }}
         >
-          {/* design-tool left rail (decorative) */}
-          <div className="absolute left-0 top-0 flex h-full w-9 flex-col items-center gap-3 border-r border-white/8 bg-white/[0.03] pt-4">
-            {[PenTool, Square, Type].map((Ic, k) => (
-              <Ic key={k} className="h-4 w-4" style={{ color: k === 0 ? color : "rgba(243,239,230,0.4)" }} strokeWidth={1.75} />
-            ))}
+          {/* tool rail — active icon follows the current step */}
+          <div className="absolute left-0 top-0 z-10 flex h-full w-9 flex-col items-center gap-3.5 border-r border-white/8 bg-white/[0.03] pt-4">
+            {[PenTool, Type, Square, Sparkles].map((Ic, k) => {
+              const on = p === k || (p >= STEPS.length && k === STEPS.length - 1)
+              return (
+                <motion.span key={k} animate={{ scale: on ? 1.18 : 1 }} transition={{ ease: EASE, duration: 0.3 }}>
+                  <Ic className="h-4 w-4" style={{ color: on ? b.ink : "rgba(243,239,230,0.35)" }} strokeWidth={1.75} />
+                </motion.span>
+              )
+            })}
           </div>
 
-          {/* === logo tile (key 'mark') === */}
-          <motion.div
-            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04]"
-            style={{ left: "27%", top: "50%", width: 116, height: 116 }}
-            animate={{ opacity: show("mark") ? 1 : 0, scale: show("mark") ? 1 : 0.9 }}
-            transition={{ duration: 0.45, ease: EASE }}
-          >
-            <svg viewBox="0 0 100 100" className="h-12 w-12">
-              <b.Mark c={b.palette[1]} />
-            </svg>
-            <span className="text-[16px] leading-none text-cream-50" style={{ fontFamily: b.font }}>{b.name}</span>
-          </motion.div>
+          {/* ── LEFT COLUMN: mark · type · grade ── */}
 
-          {/* === wordmark (key 'word') === */}
+          {/* logo tile (line-art mark draws itself) */}
           <motion.div
-            className="absolute -translate-y-1/2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3"
-            style={{ left: "48%", top: "36%", width: "44%" }}
-            animate={{ opacity: show("word") ? 1 : 0, y: show("word") ? "-50%" : "-42%" }}
+            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-white/[0.04]"
+            style={{ left: "29%", top: "27%", width: 116, height: 100 }}
+            animate={{ opacity: show("mark") ? 1 : 0, scale: show("mark") ? 1 : 0.92 }}
             transition={{ duration: 0.4, ease: EASE }}
           >
-            <div className="truncate text-[28px] leading-tight text-cream-50" style={{ fontFamily: b.font }}>
-              {b.name}<span style={{ color: b.palette[1] }}>.</span>
-            </div>
-            <div className="mt-0.5 font-mono text-[10px] text-cream-100/45">Aa Bb Cc 123</div>
+            <svg viewBox="0 0 100 100" className="h-11 w-11" key={`mark-${brand}`}>
+              <b.Mark c={b.ink} draw={show("mark")} />
+            </svg>
+            <span className="text-[15px] leading-none text-cream-50" style={fam}>{b.name}</span>
           </motion.div>
 
-          {/* === palette (key 'palette') === */}
-          <div className="absolute flex gap-2" style={{ left: "48%", top: "63%", width: "44%" }}>
-            {b.palette.map((sw, i) => (
+          {/* type specimen */}
+          <motion.div
+            className="absolute -translate-y-1/2 rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2.5"
+            style={{ left: "29%", top: "56%", width: "46%", maxWidth: 250 }}
+            animate={{ opacity: show("type") ? 1 : 0, x: show("type") ? "-50%" : "-46%" }}
+            transition={{ duration: 0.4, ease: EASE }}
+          >
+            <div className="truncate text-[30px] leading-none text-cream-50" style={fam}>
+              {b.name}
+              <span style={{ color: b.ink }}>.</span>
+            </div>
+            <div className="mt-1 flex items-center justify-between font-mono text-[9.5px] text-cream-100/45">
+              <span>Aa Gg Qq 123</span>
+              <span style={{ color: b.ink }}>{b.fontLabel}</span>
+            </div>
+          </motion.div>
+
+          {/* gradient grade bar + solid chips */}
+          <div className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: "29%", top: "85%", width: "46%", maxWidth: 250 }}>
+            <motion.div
+              className="h-7 w-full overflow-hidden rounded-lg border border-white/12"
+              animate={{ opacity: show("grade") ? 1 : 0, y: show("grade") ? 0 : 8 }}
+              transition={{ duration: 0.4, ease: EASE }}
+            >
               <motion.div
-                key={`${brand}-${i}`}
-                className="h-9 flex-1 rounded-lg border border-white/10"
-                style={{ background: sw }}
-                animate={{
-                  opacity: show("palette") ? 1 : 0,
-                  y: show("palette") ? 0 : 10,
-                }}
-                transition={{ duration: 0.35, delay: show("palette") ? i * 0.08 : 0, ease: EASE }}
+                key={`grade-${brand}`}
+                className="h-full w-full"
+                style={{ backgroundImage: b.gradient, backgroundSize: "240% 240%" }}
+                animate={reduce ? {} : { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
               />
-            ))}
+            </motion.div>
+            <div className="mt-1.5 flex gap-1.5">
+              {b.palette.map((sw, i) => (
+                <motion.div
+                  key={`${brand}-${i}`}
+                  className="h-3.5 flex-1 rounded-[5px] border border-white/10"
+                  style={{ background: sw }}
+                  animate={{ opacity: show("grade") ? 1 : 0, y: show("grade") ? 0 : 8 }}
+                  transition={{ duration: 0.3, delay: show("grade") ? 0.1 + i * 0.07 : 0, ease: EASE }}
+                />
+              ))}
+            </div>
           </div>
 
-          {/* === animated cursor + click ripple === */}
-          {!reduce && (
-            <>
+          {/* ── RIGHT: the poster — the payoff ── */}
+          <motion.div
+            className="absolute right-3 z-[5] overflow-hidden rounded-xl border border-white/15 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]"
+            style={{ top: "50%", width: "38%", maxWidth: 196, height: "82%" }}
+            animate={{
+              opacity: show("poster") ? 1 : 0,
+              y: show("poster") ? "-50%" : "-44%",
+              scale: show("poster") ? 1 : 0.94,
+              rotate: show("poster") ? 0 : -2,
+            }}
+            transition={{ duration: 0.55, ease: EASE }}
+          >
+            {/* animated gradient ground */}
+            <motion.div
+              key={`poster-${brand}`}
+              className="absolute inset-0"
+              style={{ backgroundImage: b.gradient, backgroundSize: "200% 200%" }}
+              animate={reduce ? {} : { backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
+              transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <div className="absolute inset-0 bg-black/20" />
+            {/* oversized mark watermark */}
+            <svg viewBox="0 0 100 100" className="absolute -right-5 -top-6 h-28 w-28 opacity-25" key={`wm-${brand}`}>
+              <b.Mark c="#ffffff" draw={show("poster")} />
+            </svg>
+            {/* poster type */}
+            <div className="absolute inset-0 flex flex-col justify-between p-3.5">
+              <div className="flex items-center justify-between font-mono text-[8.5px] uppercase tracking-[0.18em] text-white/75">
+                <span>Studio</span>
+                <span>’26</span>
+              </div>
+              <div>
+                <div className="leading-[0.92] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]" style={{ ...fam, fontSize: 38 }}>
+                  {b.name}
+                </div>
+                <div className="mt-1.5 max-w-[150px] text-[10px] leading-snug text-white/85" style={fam}>
+                  {b.tagline}
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                {b.palette.slice(1).map((sw, i) => (
+                  <span key={i} className="h-2 w-6 rounded-full border border-white/30" style={{ background: sw }} />
+                ))}
+              </div>
+            </div>
+            {/* gloss sweep on appear */}
+            {!reduce && show("poster") && (
               <motion.div
-                className="pointer-events-none absolute z-20"
-                initial={false}
-                animate={{ left: `${cursor[0]}%`, top: `${cursor[1]}%` }}
-                transition={{ duration: 0.7, ease: EASE }}
-                style={{ translateX: "-2px", translateY: "-2px" }}
-              >
-                {/* click ripple */}
-                <AnimatePresence>
-                  {inBoard && (
-                    <motion.span
-                      key={click}
-                      className="absolute -left-1 -top-1 rounded-full"
-                      style={{ width: 26, height: 26, border: `1.5px solid ${color}` }}
-                      initial={{ scale: 0.2, opacity: 0.8 }}
-                      animate={{ scale: 1.6, opacity: 0 }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                    />
-                  )}
-                </AnimatePresence>
-                {/* pointer */}
-                <svg width="20" height="20" viewBox="0 0 20 20" className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-                  <path d="M3 2l13 6.5-5.4 1.7-2.4 5.3z" fill="#fff" stroke="#0b0f14" strokeWidth="1.1" strokeLinejoin="round" />
-                </svg>
-              </motion.div>
-            </>
+                key={`gloss-${brand}`}
+                className="absolute inset-y-0 w-1/3"
+                style={{ background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent)" }}
+                initial={{ x: "-140%" }}
+                animate={{ x: "360%" }}
+                transition={{ duration: 1.1, ease: EASE, delay: 0.25 }}
+              />
+            )}
+          </motion.div>
+
+          {/* ── animated cursor + action label ── */}
+          {!reduce && (
+            <motion.div
+              className="pointer-events-none absolute z-20"
+              initial={false}
+              animate={{ left: `${cursor[0]}%`, top: `${cursor[1]}%` }}
+              transition={{ type: "spring", stiffness: 90, damping: 17, mass: 0.7 }}
+            >
+              <AnimatePresence>
+                {inBoard && (
+                  <motion.span
+                    key={click}
+                    className="absolute -left-1 -top-1 rounded-full"
+                    style={{ width: 26, height: 26, border: `1.5px solid ${b.ink}` }}
+                    initial={{ scale: 0.2, opacity: 0.85 }}
+                    animate={{ scale: 1.7, opacity: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                  />
+                )}
+              </AnimatePresence>
+              <svg width="20" height="22" viewBox="0 0 20 22" className="drop-shadow-[0_2px_5px_rgba(0,0,0,0.55)]">
+                <path
+                  d="M2 2 L2 18 L6.6 13.6 L10.6 20.4 L13.2 19.2 L9.4 12.4 L16 12 Z"
+                  fill="#fff"
+                  stroke="#0b0f14"
+                  strokeWidth="1.1"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              {/* tiny action pill trailing the cursor */}
+              <AnimatePresence mode="wait">
+                {inBoard && (
+                  <motion.span
+                    key={p}
+                    className="absolute left-4 top-4 whitespace-nowrap rounded-full px-2 py-0.5 font-mono text-[9px] text-ink"
+                    style={{ background: b.ink }}
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.85 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {labels[p]}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.div>
           )}
         </div>
       </div>

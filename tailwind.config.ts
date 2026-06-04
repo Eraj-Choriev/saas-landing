@@ -42,6 +42,9 @@ const config: Config = {
           gold: "#fce88d",
           coral: "#ff5b24",
         },
+        // Distinct from coral (which is reserved for primary CTAs / featured plan)
+        // so form validation errors read as "fix this", not "do this".
+        danger: "#e5484d",
         aqua: {
           50: "#E6FBF8",
           100: "#BFF4EC",
@@ -56,12 +59,14 @@ const config: Config = {
         accent: "#a9caf9",
       },
       fontFamily: {
-        display: ["var(--font-playfair)", "Georgia", "serif"],
+        display: ["var(--font-unbounded)", "var(--font-manrope)", "system-ui", "sans-serif"],
         sans: ["var(--font-manrope)", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
       },
       letterSpacing: {
-        tightest: "-0.045em",
+        // Tuned for Unbounded (wide geometric display) — Michroma wanted -0.045em
+        // but that collides on Unbounded's heavier, rounder glyphs.
+        tightest: "-0.03em",
       },
       transitionTimingFunction: {
         smooth: "cubic-bezier(0.16, 1, 0.3, 1)",

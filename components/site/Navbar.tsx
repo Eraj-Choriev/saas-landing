@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { Wordmark } from "@/components/ui/wordmark"
 import { Button } from "@/components/ui/button"
@@ -25,6 +24,7 @@ export function Navbar() {
     { href: "#about", label: t.nav.about },
     { href: "#services", label: t.nav.services },
     { href: "#approach", label: t.nav.approach },
+    { href: "#pricing", label: t.nav.pricing },
     { href: "#contact", label: t.nav.contact },
   ]
 
@@ -77,11 +77,18 @@ export function Navbar() {
               {t.nav.contact}
             </Button>
             <button
+              type="button"
+              data-open={open}
               className="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-full bg-brand-blue text-ink transition-transform active:scale-95"
               onClick={() => setOpen((v) => !v)}
               aria-label="Menu"
+              aria-expanded={open}
             >
-              {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              <span className="burger-box" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
             </button>
           </div>
         </nav>

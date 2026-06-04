@@ -103,7 +103,7 @@ export function Hero() {
               {t.hero.eyebrow}
             </motion.div>
 
-            <h1 className="mt-6 font-display text-[44px] leading-[0.95] tracking-tightest text-cream-50 sm:text-[64px] lg:text-[78px]">
+            <h1 className="mt-6 font-display text-[34px] leading-[1.0] tracking-tightest text-cream-50 sm:text-[54px] sm:leading-[0.96] lg:text-[72px]">
               {t.hero.title.map((line, i) => (
                 <motion.span
                   key={i}

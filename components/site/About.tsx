@@ -85,7 +85,7 @@ export function About() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, margin: "-80px" }}
-              className="mt-6 max-w-xl text-pretty text-[16px] leading-[1.6] text-cream-100/70 sm:text-[17px]"
+              className="mt-6 max-w-xl text-pretty text-[16px] leading-[1.6] text-cream-100/80 sm:text-[17px]"
             >
               {t.about.lead}
             </motion.p>
@@ -132,7 +132,7 @@ export function About() {
                   <h3 className="relative mt-5 font-display text-[21px] leading-tight tracking-tight text-cream-50">
                     {v.title}
                   </h3>
-                  <p className="relative mt-2.5 text-[14px] leading-[1.55] text-cream-100/65 text-pretty">
+                  <p className="relative mt-2.5 text-[14px] leading-[1.55] text-cream-100/78 text-pretty">
                     {v.body}
                   </p>
                 </motion.div>
