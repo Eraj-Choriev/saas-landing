@@ -14,6 +14,9 @@
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* kill iOS Safari's square grey/blue flash on tap — it ignores border-radius
+     and shows sharp corners on rounded cards/buttons when tapped */
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {

@@ -1119,12 +1119,16 @@ function IntegrationHub({ reduce, started, lang }: Demo) {
             {/* integration nodes */}
             {geo.map((g) => {
               const on = active === g.id
-              const below = g.y < 20 // top node → tooltip below, else above
-              // CRM / Database sit directly over the hub → put their tooltip to
-              // the side (open space) instead of above, so it never covers Aqly.
-              const side = g.x > 40 && g.x < 60
-              const tx = g.x < 25 ? "-18%" : g.x > 75 ? "-82%" : "-50%"
+              // Only top/bottom nodes get a vertical (above/below) tooltip; the
+              // left & right nodes open to the SIDE so the tooltip never spills
+              // off the top of the panel and gets clipped on small screens.
+              const isTop = g.y < 20
+              const isBottom = g.y > 80
+              const vertical = isTop || isBottom
+              const below = isTop // top node → tooltip below; bottom node → above
+              const toRight = g.x < 50 // left node opens right, right node opens left
               const slide = on ? 0 : below ? -6 : 6
+              const sideSlide = on ? 0 : toRight ? -6 : 6
               return (
                 <div
                   key={g.id}
@@ -1144,17 +1148,18 @@ function IntegrationHub({ reduce, started, lang }: Demo) {
                   <div
                     className="pointer-events-none absolute z-20"
                     style={{
-                      width: 188,
-                      ...(side
+                      width: 176,
+                      maxWidth: "62vw",
+                      ...(vertical
                         ? {
-                            left: "calc(100% + 8px)",
-                            top: "50%",
-                            transform: `translateY(-50%) translateX(${on ? 0 : -6}px)`,
-                          }
-                        : {
                             left: "50%",
                             [below ? "top" : "bottom"]: "calc(100% + 8px)",
-                            transform: `translateX(${tx}) translateY(${slide}px)`,
+                            transform: `translateX(-50%) translateY(${slide}px)`,
+                          }
+                        : {
+                            [toRight ? "left" : "right"]: "calc(100% + 8px)",
+                            top: "50%",
+                            transform: `translateY(-50%) translateX(${sideSlide}px)`,
                           }),
                       opacity: on ? 1 : 0,
                       visibility: on ? "visible" : "hidden",
