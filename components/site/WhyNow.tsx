@@ -110,10 +110,12 @@ export function WhyNow() {
                   style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}
                   aria-hidden
                 />
-                {/* corner glow */}
+                {/* corner wash — radial-gradient (no blur filter) so it clips
+                    cleanly to the rounded corner; a blurred circle here glitches
+                    to a sharp corner mid-transition under overflow-hidden */}
                 <div
-                  className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
-                  style={{ background: color }}
+                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  style={{ background: `radial-gradient(150px circle at 100% 0%, ${color}33, transparent 70%)` }}
                   aria-hidden
                 />
                 <div

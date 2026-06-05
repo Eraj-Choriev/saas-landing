@@ -104,10 +104,12 @@ export function Approach() {
                         className="group relative overflow-hidden rounded-3xl border border-ink/8 bg-cream-100 p-7 shadow-[0_24px_60px_-40px_rgba(10,14,19,0.25)] transition-shadow duration-300 sm:p-8"
                         style={{ ["--accent" as string]: color }}
                       >
-                        {/* accent corner glow on hover */}
+                        {/* accent corner wash — radial-gradient (no blur filter)
+                            so it clips cleanly to the rounded corner; a blurred
+                            circle glitches to a sharp corner mid-transition */}
                         <div
-                          className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                          style={{ background: color }}
+                          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                          style={{ background: `radial-gradient(170px circle at 100% 0%, ${color}26, transparent 70%)` }}
                         />
                         <div className="relative flex items-center justify-between gap-3">
                           <div className="flex items-center gap-3">
