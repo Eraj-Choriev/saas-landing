@@ -189,10 +189,8 @@ export function ContactForm() {
                 onChange={(v) => setForm((f) => ({ ...f, name: v }))}
                 placeholder={t.form.fields.name.placeholder}
               />
-              <Field
+              <PhoneField
                 label={t.form.fields.phone.label}
-                required
-                type="tel"
                 invalid={err("phone")}
                 errorText={t.form.required}
                 value={form.phone}
@@ -486,6 +484,92 @@ function FieldGroup({
       {children}
       {invalid && errorText && (
         <p className="mt-2 flex items-center gap-1.5 text-[12px] text-danger">
+          <AlertCircle className="h-3 w-3" />
+          {errorText}
+        </p>
+      )}
+    </div>
+  )
+}
+
+/* ── Tajikistan flag — red / white(+gold crown & stars) / green ── */
+function TajFlag() {
+  return (
+    <svg viewBox="0 0 21 15" className="h-3.5 w-[21px] shrink-0 rounded-[2px] ring-1 ring-ink/10" aria-hidden>
+      <rect width="21" height="15" fill="#ffffff" />
+      <rect width="21" height="4.3" fill="#cc0000" />
+      <rect y="10.7" width="21" height="4.3" fill="#006600" />
+      <g fill="#f8c300">
+        <rect x="8.4" y="7.7" width="4.2" height="0.5" />
+        <path d="M8.4 7.7 l0.5 -1.5 0.85 1 0.85 -1.2 0.85 1.2 0.85 -1 0.5 1.5 z" />
+        <circle cx="9" cy="5.0" r="0.34" />
+        <circle cx="10.5" cy="4.7" r="0.34" />
+        <circle cx="12" cy="5.0" r="0.34" />
+      </g>
+    </svg>
+  )
+}
+
+/** Format up to 9 local digits as "90 123 45 67". */
+function formatLocal(d: string) {
+  return [d.slice(0, 2), d.slice(2, 5), d.slice(5, 7), d.slice(7, 9)].filter(Boolean).join(" ")
+}
+
+/* ── styled phone field: locked +992 prefix with TJ flag + auto-format ── */
+function PhoneField({
+  label,
+  value,
+  onChange,
+  placeholder,
+  invalid,
+  errorText,
+}: {
+  label: string
+  value: string
+  onChange: (v: string) => void
+  placeholder?: string
+  invalid?: boolean
+  errorText?: string
+}) {
+  const digits = value.replace(/\D/g, "")
+  const local = digits.startsWith("992") ? digits.slice(3) : digits
+  const grouped = formatLocal(local)
+
+  const handle = (raw: string) => {
+    const d = raw.replace(/\D/g, "").slice(0, 9)
+    onChange("+992 " + formatLocal(d))
+  }
+
+  return (
+    <div data-invalid={invalid ? "true" : "false"} className={cn(invalid && "animate-shake")}>
+      <Label required invalid={invalid}>
+        {label}
+      </Label>
+      <div
+        className={cn(
+          "mt-3 flex items-center overflow-hidden rounded-2xl border bg-cream-100 transition-all focus-within:ring-4",
+          invalid
+            ? "border-danger bg-danger/[0.05] focus-within:border-danger focus-within:ring-danger/20"
+            : "border-ink/10 focus-within:border-brand-blue focus-within:ring-brand-blue/20"
+        )}
+      >
+        <span className="flex items-center gap-2 py-3 pl-3.5 pr-3 text-[14px] text-ink/80">
+          <TajFlag />
+          <span className="font-medium tracking-wide">+992</span>
+        </span>
+        <span className="my-2 h-5 w-px shrink-0 bg-ink/15" aria-hidden />
+        <input
+          type="tel"
+          inputMode="numeric"
+          value={grouped}
+          onChange={(e) => handle(e.target.value)}
+          placeholder={placeholder}
+          aria-invalid={invalid}
+          className="w-full flex-1 bg-transparent px-3 py-3 text-[14px] tracking-wide text-ink placeholder:text-ink/35 focus:outline-none"
+        />
+      </div>
+      {invalid && errorText && (
+        <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-danger">
           <AlertCircle className="h-3 w-3" />
           {errorText}
         </p>

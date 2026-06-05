@@ -480,7 +480,7 @@ const en = {
     progress: "Form Progress",
     fields: {
       name: { label: "Name", placeholder: "Your full name" },
-      phone: { label: "Phone", placeholder: "+992 90 123 45 67" },
+      phone: { label: "Phone", placeholder: "90 123 45 67" },
       website: { label: "Website URL (optional)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Services of Interest",
@@ -993,7 +993,7 @@ const ru: Dict = {
     progress: "Прогресс формы",
     fields: {
       name: { label: "Имя", placeholder: "Ваше полное имя" },
-      phone: { label: "Телефон", placeholder: "+992 90 123 45 67" },
+      phone: { label: "Телефон", placeholder: "90 123 45 67" },
       website: { label: "Сайт (необязательно)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Интересующие услуги",
@@ -1526,7 +1526,7 @@ const tj: Dict = {
     progress: "Пешрафти форма",
     fields: {
       name: { label: "Ном", placeholder: "Номи пурраи шумо" },
-      phone: { label: "Телефон", placeholder: "+992 90 123 45 67" },
+      phone: { label: "Телефон", placeholder: "90 123 45 67" },
       website: { label: "Суроғаи сайт (ихтиёрӣ)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Хидматҳои мавриди таваҷҷӯҳ",
