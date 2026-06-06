@@ -134,6 +134,16 @@ body {
   .hero-mesh { animation: none; }
 }
 
+/* gentle arrow nudge — draws the eye to the "learn more" pricing button */
+@keyframes nudge-x {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+.animate-nudge { animation: nudge-x 1.5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-nudge { animation: none; }
+}
+
 /* shake for invalid form fields */
 @keyframes field-shake {
   0%, 100% { transform: translateX(0); }

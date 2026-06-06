@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Check, Rocket, Sparkles, Bot, Building2, Clock, ShieldCheck, ArrowUpRight } from "lucide-react"
+import { Check, Rocket, Sparkles, Bot, Building2, Clock, ShieldCheck, ArrowUpRight, Info } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { PricingModal } from "./PricingModal"
 
@@ -163,19 +163,30 @@ export function Pricing() {
                     ))}
                   </ul>
 
-                  {/* learn more → opens detail modal */}
+                  {/* learn more → opens detail modal.
+                      Made into a full-width outlined button (clients missed the
+                      old subtle text link) with accent fill on hover + a gentle
+                      arrow nudge to draw the eye. */}
                   <button
                     type="button"
                     onClick={() => setOpenIndex(i)}
-                    className={`group/btn mt-6 inline-flex items-center gap-1.5 self-start text-[13px] font-medium transition-colors ${
-                      featured ? "text-brand-coral hover:text-white" : "text-cream-100/70 hover:text-cream-50"
-                    }`}
+                    className="group/btn relative mt-6 inline-flex items-center justify-center gap-2 self-stretch overflow-hidden rounded-xl border px-4 py-2.5 text-[13px] font-semibold transition-colors duration-300"
+                    style={{ borderColor: `${accent}5c`, color: accent, background: `${accent}14` }}
                   >
-                    {p.learnMore}
-                    <ArrowUpRight
-                      className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
-                      strokeWidth={2}
+                    {/* accent fill sweeps in on hover */}
+                    <span
+                      aria-hidden
+                      className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100"
+                      style={{ background: accent }}
                     />
+                    <span className="relative z-10 inline-flex items-center gap-2 transition-colors duration-300 group-hover/btn:text-ink">
+                      <Info className="h-4 w-4" strokeWidth={2} />
+                      {p.learnMore}
+                      <ArrowUpRight
+                        className="h-4 w-4 animate-nudge transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
+                        strokeWidth={2}
+                      />
+                    </span>
                   </button>
                 </div>
               </motion.div>

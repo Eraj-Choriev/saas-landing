@@ -155,19 +155,22 @@ export function PricingModal({
                           </ul>
                         </motion.div>
 
-                        {/* best for — accent tile */}
+                        {/* best for — dark accent tile (light tints blended into
+                            the cream modal, so text was barely legible; a dark
+                            surface makes the accent label + copy pop) */}
                         <motion.div
                           {...tile(2)}
-                          className="relative overflow-hidden rounded-2xl border p-5 sm:col-span-1 sm:p-6"
-                          style={{
-                            borderColor: `${color}33`,
-                            background: `linear-gradient(160deg, ${color}1a, ${color}08)`,
-                          }}
+                          className="relative overflow-hidden rounded-2xl border border-white/10 bg-ink p-5 sm:col-span-1 sm:p-6"
                         >
-                          <p className="font-mono text-[11px] uppercase tracking-[0.2em]" style={{ color }}>
+                          <div
+                            className="pointer-events-none absolute inset-0"
+                            style={{ background: `radial-gradient(130px circle at 100% 0%, ${color}2e, transparent 70%)` }}
+                            aria-hidden
+                          />
+                          <p className="relative font-mono text-[11px] uppercase tracking-[0.2em]" style={{ color }}>
                             {p.modalForWhom}
                           </p>
-                          <p className="mt-4 text-[14px] leading-[1.55] text-ink/80 text-pretty">
+                          <p className="relative mt-4 text-[14px] leading-[1.55] text-cream-100/85 text-pretty">
                             {modal.forWhom}
                           </p>
                         </motion.div>
