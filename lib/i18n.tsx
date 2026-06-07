@@ -529,7 +529,7 @@ const en = {
     ],
     socialTitle: "Connect",
     social: [
-      { label: "Telegram", href: "https://t.me/aqly", icon: "telegram" },
+      { label: "Telegram", href: "https://t.me/aqly_io", icon: "telegram" },
       { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
       { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
       { label: "Facebook", href: "https://facebook.com/aqly", icon: "facebook" },
@@ -1042,7 +1042,7 @@ const ru: Dict = {
     ],
     socialTitle: "Мы в соцсетях",
     social: [
-      { label: "Telegram", href: "https://t.me/aqly", icon: "telegram" },
+      { label: "Telegram", href: "https://t.me/aqly_io", icon: "telegram" },
       { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
       { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
       { label: "Facebook", href: "https://facebook.com/aqly", icon: "facebook" },
@@ -1575,7 +1575,7 @@ const tj: Dict = {
     ],
     socialTitle: "Дар шабакаҳо",
     social: [
-      { label: "Telegram", href: "https://t.me/aqly", icon: "telegram" },
+      { label: "Telegram", href: "https://t.me/aqly_io", icon: "telegram" },
       { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
       { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
       { label: "Facebook", href: "https://facebook.com/aqly", icon: "facebook" },
@@ -1590,11 +1590,22 @@ const dicts = { en, ru, tj }
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: Dict }
 const I18nCtx = createContext<Ctx>({ lang: "ru", setLang: () => {}, t: ru })
 
+const LANG_KEY = "aqly-lang"
+const isLang = (v: unknown): v is Lang => v === "ru" || v === "en" || v === "tj"
+
 export function I18nProvider({ children }: { children: ReactNode }) {
+  // Always start at the default so SSR/static markup matches first client render
+  // (no hydration mismatch); the stored choice is applied in an effect below.
   const [lang, setLangState] = useState<Lang>("ru")
   const [pulse, setPulse] = useState(false)
   const langRef = useRef(lang)
   langRef.current = lang
+
+  // Restore the visitor's saved language on mount.
+  useEffect(() => {
+    const saved = localStorage.getItem(LANG_KEY)
+    if (isLang(saved) && saved !== langRef.current) setLangState(saved)
+  }, [])
 
   // Switching language gives the content a brief opacity dip, masking the
   // instant text swap so it reads as a graceful settle rather than a flicker.
@@ -1603,6 +1614,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (l === langRef.current) return
     setPulse(true)
     setLangState(l)
+    try {
+      localStorage.setItem(LANG_KEY, l)
+    } catch {
+      // ignore (private mode / storage disabled)
+    }
   }, [])
 
   useEffect(() => {

@@ -11,7 +11,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev      # local dev server at http://localhost:3000
 npm run build    # static export → ./out (also what CI runs)
-npm run start    # serve a production build
+npm run preview  # build, then serve ./out under /saas-landing at :3000 (mimics prod basePath)
+npm run start    # serve an already-built ./out under /saas-landing at :3000
 npm run lint     # next lint
 ```
 
@@ -28,9 +29,9 @@ Critical: in production the site is served under `/saas-landing` (the `repo` con
 
 ## Architecture
 
-The whole site is one route. `app/page.tsx` composes section components from `components/site/` in render order: `Navbar → Hero → TechStack → About → WhatWeBuild → CaseStudies → Approach → ContactForm → FinalCTA → Footer`. To add/reorder a section, edit `app/page.tsx`.
+The whole site is one route. `app/page.tsx` composes section components from `components/site/` in render order: `Navbar → Hero → TechStack → About → WhatWeBuild → WhyNow → Approach → Pricing → FAQ → ContactForm → FinalCTA → Footer`. To add/reorder a section, edit `app/page.tsx`. (`CaseStudies` and `Stats` files exist but are **not** mounted in `page.tsx` — orphaned; don't assume they render.)
 
-- `app/layout.tsx` — root layout, fonts (Playfair Display display, Manrope sans, Geist Mono), metadata, wraps everything in `I18nProvider`.
+- `app/layout.tsx` — root layout, fonts, metadata; wraps children in `I18nProvider` and mounts `SmoothScroll` (anchor-scroll behavior) + `VoiceAgent` once. Loads many Google fonts: **Unbounded** (`--font-unbounded`, the display face via `font-display`), **Manrope** (`--font-manrope`, body via `font-sans`), Geist Mono (`font-mono`), plus Playfair / Bricolage Grotesque / Instrument Serif / DM Sans used **only inside Design/AI service demos** (`ServiceVisual`).
 - `components/site/` — one file per landing section. All are `"use client"` (interactive / use the i18n hook).
 - `components/ui/` — shadcn/Radix-style primitives (`button`, `wordmark`).
 - `lib/utils.ts` — `cn()` (clsx + tailwind-merge).
@@ -43,7 +44,7 @@ This is the content source of truth. Components read text via the `useI18n()` ho
 
 - `en` is the canonical dictionary; its shape defines the `Dict` type. `ru` and `tj` (Tajik) are typed `Dict`, so each must mirror `en`'s exact nested shape or TS fails to compile.
 - All three (`en`, `ru`, `tj`) are fully translated. When adding UI text, add the key to **all three** — do not hardcode strings in components. `LangToggle` cycles `ru / en / tj`.
-- Tajik uses Cyrillic-extended letters (ғ ӣ қ ӯ ҳ ҷ). Playfair Display has no `cyrillic-ext` Google subset (renders these via its `cyrillic` set / serif fallback); Manrope loads `cyrillic-ext`. Verified no tofu across display/body/mono.
+- Tajik uses Cyrillic-extended letters (ғ ӣ қ ӯ ҳ ҷ). Unbounded (display) ships a `cyrillic` subset so RU/TJ headings keep the display face, with Manrope (which loads `cyrillic-ext`) chained as fallback for any glyph it misses. Verified no tofu across display/body/mono.
 - Default language is `"ru"` (`I18nProvider` initial state).
 
 ### Service detail modals
@@ -56,8 +57,10 @@ This is the content source of truth. Components read text via the `useI18n()` ho
 
 ### Other sections
 
-- `CaseStudies` (`#cases`) — dark section, 3 result-driven case cards (`t.cases`).
-- `FinalCTA` — cream pre-footer conversion block, serif headline with italic coral accent (`t.finalCta`).
+- `WhyNow` (`#why`) — urgency/timing section (`t.whyNow`).
+- `Pricing` (`#pricing`) — plan cards; the featured plan uses `brand.coral`. A "details" button opens `PricingModal` (Radix Dialog) with per-plan breakdown.
+- `FAQ` (`#faq`) — accordion of common questions (`t.faq`).
+- `FinalCTA` — cream pre-footer conversion block, display headline with italic coral accent (`t.finalCta`).
 - `VoiceAgent` — global ElevenLabs Conversational-AI widget (custom element + CDN script), mounted once in `app/layout.tsx`. Gated by `NEXT_PUBLIC_ELEVENLABS_AGENT_ID` (public-safe; lock the agent to your domain in the ElevenLabs dashboard Security tab). Other components open it via the `window` event `aqly:open-voice` (the AI-voice service modal button dispatches it). Renders nothing if the env var is unset.
 
 ### Contact form
@@ -67,9 +70,9 @@ This is the content source of truth. Components read text via the `useI18n()` ho
 ## Styling
 
 Tailwind with a custom token set in `tailwind.config.ts`:
-- Colors: `cream-*`, `ink`/`ink-*`, `aqua-*`, `brand.{blue,amber,gold,coral}`, `accent`.
-- Fonts: `font-display` (Playfair Display), `font-sans` (Manrope), `font-mono` (Geist Mono).
-- Custom keyframes/animations: `animate-marquee`, `animate-shimmer`, `animate-fade-up`.
+- Colors: `cream-*`, `ink`/`ink-*`, `aqua-*`, `brand.{blue,amber,gold,coral}`, `accent`, `danger` (form errors — kept distinct from `coral`, which is reserved for primary CTAs / the featured plan).
+- Fonts: `font-display` (Unbounded), `font-sans` (Manrope), `font-mono` (Geist Mono).
+- Custom keyframes/animations: `animate-marquee`, `animate-shimmer`, `animate-fade-up`; `tracking-tightest` and the `ease-smooth` timing fn are tuned for Unbounded.
 - Base styles, aurora and grain effects in `app/globals.css`.
 
 Animations also use `framer-motion`. Icons from `lucide-react`.

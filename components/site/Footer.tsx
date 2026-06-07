@@ -3,7 +3,6 @@
 import { motion } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 import { Wordmark } from "@/components/ui/wordmark"
-import { LangToggle } from "./LangToggle"
 
 /* ── brand glyphs + accent colour per network ── */
 type SocialIcon = "telegram" | "whatsapp" | "instagram" | "facebook"
@@ -64,9 +63,6 @@ export function Footer() {
             >
               {t.footer.email}
             </a>
-            <div className="mt-6">
-              <LangToggle />
-            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">

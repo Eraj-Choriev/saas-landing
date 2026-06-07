@@ -156,13 +156,24 @@ export function ContactForm() {
 
             <div className="mt-7 border-t border-ink/10 pt-5">
               <p className="text-[13px] text-ink/55">{t.form.expect.email}</p>
-              <a
-                href={`mailto:${t.footer.email}`}
-                className="mt-1 inline-flex items-center gap-2 text-[14px] text-brand-amber hover:text-brand-coral transition-colors"
-              >
-                <Mail className="h-3.5 w-3.5" />
-                {t.footer.email}
-              </a>
+              <div className="mt-2 flex flex-col gap-1.5">
+                <a
+                  href={`mailto:${t.footer.email}`}
+                  className="inline-flex items-center gap-2 text-[14px] text-brand-amber hover:text-brand-coral transition-colors"
+                >
+                  <Mail className="h-3.5 w-3.5" />
+                  {t.footer.email}
+                </a>
+                <a
+                  href="https://t.me/aqly_io"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-[14px] text-brand-amber hover:text-brand-coral transition-colors"
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  @aqly_io
+                </a>
+              </div>
             </div>
           </aside>
 

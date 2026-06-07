@@ -2,9 +2,10 @@
 
 import * as React from "react"
 import { motion, useReducedMotion, useInView, animate } from "framer-motion"
-import { Sparkles, Send, Check } from "lucide-react"
+import { Send, Check } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
+import { DottedSurface } from "@/components/ui/dotted-surface"
 
 const reveal = {
   hidden: { opacity: 0, y: 18 },
@@ -50,17 +51,20 @@ export function Hero() {
 
   return (
     <section className="relative isolate flex min-h-screen items-center overflow-hidden">
-      {/* ── base: slow flowing warm gradient mesh (coral → dark → amber/cream) ── */}
-      <div className={`hero-mesh absolute inset-0 -z-30 ${reduce ? "hero-mesh--static" : ""}`} aria-hidden />
-
-      {/* ── Linear-style fine dot grid, crisp, fades toward edges ── */}
+      {/* ── base: static deep-ink gradient (keeps light hero text readable) ── */}
       <div
-        className="absolute inset-0 -z-20 opacity-[0.55] [mask-image:radial-gradient(115%_85%_at_50%_0%,#000_35%,transparent_88%)]"
-        style={{
-          backgroundImage: "radial-gradient(rgba(255,255,255,0.13) 1px, transparent 1.5px)",
-          backgroundSize: "22px 22px",
-        }}
+        className="absolute inset-0 -z-30 bg-[radial-gradient(130%_120%_at_50%_42%,#161D27_0%,#0A0E13_58%)]"
         aria-hidden
+      />
+
+      {/* ── animated 3D dotted wave surface — floor receding to the horizon.
+           Fade only at the very top (under navbar); dots stay crisp below. ── */}
+      <DottedSurface
+        className="absolute inset-0 -z-20 [mask-image:linear-gradient(to_bottom,transparent_0%,#000_16%,#000_100%)]"
+        dotColor="#FFFFFF"
+        opacity={1}
+        size={6}
+        fogColor="#0A0E13"
       />
 
       {/* ── cursor-following radial spotlight (warm) ── */}
@@ -74,13 +78,31 @@ export function Hero() {
         aria-hidden
       />
 
-      {/* readability scrim — keeps the headline crisp */}
+      {/* readability: darken the top (where the headline sits) without hiding
+          the symmetric dot-floor below */}
       <div
-        className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#0A0E13_0%,rgba(10,14,19,0.72)_28%,rgba(10,14,19,0.14)_58%,transparent_80%)]"
+        className="absolute inset-x-0 top-0 -z-10 h-[52%] bg-[linear-gradient(180deg,#0A0E13_0%,rgba(10,14,19,0.55)_45%,transparent_100%)]"
         aria-hidden
       />
+      {/* soft local pool behind the headline column for crisp text */}
       <div
-        className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-[linear-gradient(180deg,transparent,#0A0E13)]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(60%_55%_at_24%_40%,rgba(10,14,19,0.7),transparent_62%)]"
+        aria-hidden
+      />
+      {/* bottom fade — keeps buttons / tags legible where they meet the floor */}
+      <div
+        className="absolute inset-x-0 bottom-0 -z-10 h-56 bg-[linear-gradient(180deg,transparent,#0A0E13)]"
+        aria-hidden
+      />
+
+      {/* ── luminous horizon halo — sits above the scrims so the floor dissolves
+           into light (the wow). Below the content (text/chat stay on top). ── */}
+      <div
+        className="absolute inset-0 -z-[5]"
+        style={{
+          background:
+            "radial-gradient(48% 38% at 50% 54%, rgba(255,255,255,0.30), rgba(255,233,209,0.12) 40%, transparent 70%)",
+        }}
         aria-hidden
       />
       {/* top glow */}
@@ -92,18 +114,7 @@ export function Hero() {
       <div className="container relative grain w-full pt-32 pb-20 sm:pt-36 sm:pb-24 lg:pt-40 lg:pb-28">
         <div className="grid lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-16 items-center">
           <div>
-            <motion.div
-              variants={reveal}
-              custom={0}
-              initial="hidden"
-              animate="show"
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-[12px] font-mono uppercase tracking-[0.18em] text-cream-100/80"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-brand-gold" />
-              {t.hero.eyebrow}
-            </motion.div>
-
-            <h1 className="mt-6 font-display text-[34px] leading-[1.0] tracking-tightest text-cream-50 sm:text-[54px] sm:leading-[0.96] lg:text-[72px]">
+            <h1 className="font-display text-[34px] leading-[1.0] tracking-tightest text-cream-50 sm:text-[54px] sm:leading-[0.96] lg:text-[72px]">
               {t.hero.title.map((line, i) => (
                 <motion.span
                   key={i}
