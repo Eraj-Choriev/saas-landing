@@ -6,7 +6,7 @@ import { Check, Rocket, Sparkles, Bot, Building2, Clock, ShieldCheck, ArrowUpRig
 import { useI18n } from "@/lib/i18n"
 import { PricingModal } from "./PricingModal"
 
-const ease = [0.16, 1, 0.3, 1] as const
+const ease = [0.22, 1, 0.36, 1] as const
 
 const PLAN_ICONS = [Rocket, Sparkles, Bot, Building2] as const
 const PLAN_COLORS = ["#a9caf9", "#ff5b24", "#d17a00", "#fce88d"] as const
@@ -61,7 +61,7 @@ export function Pricing() {
                 initial={{ opacity: 0, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.6, delay: i * 0.1, ease }}
+                transition={{ duration: 1.0, delay: i * 0.14, ease }}
                 className={
                   featured
                     ? "lg:-my-3 lg:-mx-1" // lift the featured column slightly taller

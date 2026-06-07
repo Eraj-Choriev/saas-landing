@@ -34,19 +34,19 @@ export function Approach() {
       <div className="container relative py-20 sm:py-28">
         <div className="text-center max-w-2xl mx-auto">
           <motion.p
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.9 }}
             className="font-mono text-[12px] uppercase tracking-[0.22em] text-brand-amber"
           >
             {t.approach.kicker}
           </motion.p>
           <motion.h2
-            initial={{ opacity: 0, y: 14 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7, delay: 0.05 }}
+            transition={{ duration: 1.15, delay: 0.09 }}
             className="mt-4 font-display text-[34px] leading-[1.02] tracking-tightest text-ink sm:text-[48px] lg:text-[56px] text-balance"
           >
             {t.approach.title}

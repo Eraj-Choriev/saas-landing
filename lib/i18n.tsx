@@ -23,7 +23,7 @@ const en = {
     eyebrow: "AI AGENCY · ENGINEERING-FIRST",
     title: ["Turn AI Into", "Your Unfair", "Advantage."],
     subtitle:
-      "Aqly builds custom AI agents, Telegram bots, websites, connected tools and growth systems that save your team 10+ hours per week. From concept to deployment, we handle everything.",
+      "Aqly builds custom AI agents, Telegram bots, websites, AI automation and growth systems that save your team 10+ hours per week. From concept to deployment, we handle everything.",
     primary: "Book a consultation",
     secondary: "See our services",
     pill: "Telegram · Web · Automation · RAG · Growth",
@@ -54,7 +54,7 @@ const en = {
       turns: [
         { role: "user", text: "What services do you offer? 🤔", card: false },
         { role: "agent", text: "Hey — great to meet you 👋", card: false },
-        { role: "agent", text: "We build AI agents, Telegram bots, websites & connected tools — fully end to end ⚡", card: false },
+        { role: "agent", text: "We build AI agents, Telegram bots, websites & AI automation — fully end to end ⚡", card: false },
         { role: "user", text: "Could you build me a Telegram sales bot? 🤖", card: false },
         { role: "agent", text: "Absolutely. Let me put together a quick spec…", card: false },
         { role: "agent", text: "Done — here's your service card:", card: true },
@@ -69,7 +69,7 @@ const en = {
       quickReplies: ["How much does it cost?", "What do you do?", "Book a call"],
       replies: {
         price: "It depends on your project and goals. Leave a request — we'll get in touch and scope it with you ⚡",
-        services: "We build AI agents, Telegram bots, websites and connected tools — fully end to end 🚀",
+        services: "We build AI agents, Telegram bots, websites and AI automation — fully end to end 🚀",
         booking: "Of course! Grab a slot here 👉 aqly.io/call",
         fallback: "Great question — easiest to cover it on a quick call. Tap “Book a call” 👇",
       },
@@ -360,8 +360,8 @@ const en = {
         },
       },
       {
-        tag: "Connected Tools",
-        title: "Connected Tools",
+        tag: "AI Automation",
+        title: "AI Automation",
         body: "We link your apps into one chain — a lead comes in, it's logged to a sheet, the client gets a message and your team gets a ping. Nobody does it by hand.",
         details: {
           overview:
@@ -484,7 +484,7 @@ const en = {
       website: { label: "Website URL (optional)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Services of Interest",
-        options: ["Telegram Bots", "Websites", "AI Voice Assistants", "Connected Tools", "AI Integration", "Design"],
+        options: ["Telegram Bots", "Websites", "AI Voice Assistants", "AI Automation", "AI Integration", "Design"],
       },
       timeline: {
         label: "Project Timeline",
@@ -517,7 +517,7 @@ const en = {
         { label: "Telegram Bots", href: "#services" },
         { label: "Websites", href: "#services" },
         { label: "AI Voice Assistants", href: "#services" },
-        { label: "Connected Tools", href: "#services" },
+        { label: "AI Automation", href: "#services" },
         { label: "AI Integration", href: "#services" },
         { label: "Design", href: "#services" },
       ] },
@@ -556,15 +556,15 @@ const ru: Dict = {
     eyebrow: "AI-АГЕНТСТВО · ИНЖЕНЕРНЫЙ ПОДХОД",
     title: ["Превратите AI", "в своё нечестное", "преимущество."],
     subtitle:
-      "Aqly строит AI-агентов, Telegram-ботов, сайты, связки программ и системы роста — экономим вашей команде 10+ часов в неделю. От концепта до деплоя — закрываем всё.",
+      "Aqly строит AI-агентов, Telegram-ботов, сайты, ИИ-автоматизацию и системы роста — экономим вашей команде 10+ часов в неделю. От концепта до деплоя — закрываем всё.",
     primary: "Записаться на созвон",
     secondary: "Наши услуги",
-    pill: "Telegram · Веб · Связки · RAG · Дизайн",
+    pill: "Telegram · Веб · Автоматизация · RAG · Дизайн",
     trust: "47 проектов · 12 стран · 10+ часов экономии в неделю",
     tags: [
       { label: "Telegram", href: "#services" },
       { label: "Веб", href: "#services" },
-      { label: "Связки", href: "#services" },
+      { label: "Автоматизация", href: "#services" },
       { label: "RAG", href: "#services" },
       { label: "Дизайн", href: "#services" },
     ],
@@ -587,7 +587,7 @@ const ru: Dict = {
       turns: [
         { role: "user", text: "Какие у вас услуги? 🤔", card: false },
         { role: "agent", text: "Привет — рад знакомству 👋", card: false },
-        { role: "agent", text: "Мы строим AI-агентов, Telegram-ботов, сайты и связки программ — полностью под ключ ⚡", card: false },
+        { role: "agent", text: "Мы строим AI-агентов, Telegram-ботов, сайты и ИИ-автоматизацию — полностью под ключ ⚡", card: false },
         { role: "user", text: "Сможете собрать Telegram-бота для продаж? 🤖", card: false },
         { role: "agent", text: "Конечно. Сейчас набросаю краткую спеку…", card: false },
         { role: "agent", text: "Готово — вот карточка услуги:", card: true },
@@ -602,7 +602,7 @@ const ru: Dict = {
       quickReplies: ["Сколько стоит?", "Что вы делаете?", "Запишите на созвон"],
       replies: {
         price: "Зависит от вашего проекта и задач. Оставьте заявку — мы свяжемся и всё рассчитаем ⚡",
-        services: "Строим AI-агентов, Telegram-ботов, сайты и связки программ — полностью под ключ 🚀",
+        services: "Строим AI-агентов, Telegram-ботов, сайты и ИИ-автоматизацию — полностью под ключ 🚀",
         booking: "Конечно! Выберите слот здесь 👉 aqly.io/call",
         fallback: "Хороший вопрос — проще обсудить на коротком созвоне. Нажмите «Запишите на созвон» 👇",
       },
@@ -893,8 +893,8 @@ const ru: Dict = {
         },
       },
       {
-        tag: "Связка программ",
-        title: "Связка программ",
+        tag: "ИИ автоматизация",
+        title: "ИИ автоматизация",
         body: "Соединяем ваши программы в одну цепочку: пришла заявка — она сама попадает в таблицу, клиенту уходит сообщение, а вам — уведомление. Руками никто ничего не делает.",
         details: {
           overview:
@@ -997,7 +997,7 @@ const ru: Dict = {
       website: { label: "Сайт (необязательно)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Интересующие услуги",
-        options: ["Telegram-боты", "Веб-сайты", "AI-голосовые помощники", "Связка программ", "Интеграция AI", "Дизайн"],
+        options: ["Telegram-боты", "Веб-сайты", "AI-голосовые помощники", "ИИ автоматизация", "Интеграция AI", "Дизайн"],
       },
       timeline: {
         label: "Сроки проекта",
@@ -1030,7 +1030,7 @@ const ru: Dict = {
         { label: "Telegram-боты", href: "#services" },
         { label: "Веб-сайты", href: "#services" },
         { label: "AI-голосовые помощники", href: "#services" },
-        { label: "Связка программ", href: "#services" },
+        { label: "ИИ автоматизация", href: "#services" },
         { label: "Интеграция AI", href: "#services" },
         { label: "Дизайн", href: "#services" },
       ] },
@@ -1069,7 +1069,7 @@ const tj: Dict = {
     eyebrow: "AI-АГЕНТӢ · АВВАЛ МУҲАНДИСӢ",
     title: ["AI-ро ба", "бартарии беҳамтои", "худ табдил диҳед."],
     subtitle:
-      "Aqly агентҳои фармоишии AI, Telegram-ботҳо, сайтҳо, пайвасти барномаҳо ва системаҳои рушд месозад, ки ба дастаи шумо ҳафтае 10+ соат сарфа мекунад. Аз ғоя то ба кор андохтан — ҳама чизро ба ӯҳда мегирем.",
+      "Aqly агентҳои фармоишии AI, Telegram-ботҳо, сайтҳо, автоматизатсияи ИИ ва системаҳои рушд месозад, ки ба дастаи шумо ҳафтае 10+ соат сарфа мекунад. Аз ғоя то ба кор андохтан — ҳама чизро ба ӯҳда мегирем.",
     primary: "Сабт ба машварат",
     secondary: "Хидматҳои мо",
     pill: "Telegram · Веб · Автоматика · RAG · Рушд",
@@ -1100,7 +1100,7 @@ const tj: Dict = {
       turns: [
         { role: "user", text: "Шумо кадом хидматҳо доред? 🤔", card: false },
         { role: "agent", text: "Салом — аз шиносоӣ шодам 👋", card: false },
-        { role: "agent", text: "Мо агентҳои AI, Telegram-ботҳо, сайтҳо ва пайвасти барномаҳо месозем — пурра аз аввал то охир ⚡", card: false },
+        { role: "agent", text: "Мо агентҳои AI, Telegram-ботҳо, сайтҳо ва автоматизатсияи ИИ месозем — пурра аз аввал то охир ⚡", card: false },
         { role: "user", text: "Метавонед ба ман боти фурӯши Telegram созед? 🤖", card: false },
         { role: "agent", text: "Албатта. Ҳозир спецификацияи кӯтоҳ омода мекунам…", card: false },
         { role: "agent", text: "Тайёр — ин карти хидмати шумо:", card: true },
@@ -1115,7 +1115,7 @@ const tj: Dict = {
       quickReplies: ["Нархаш чанд аст?", "Шумо чӣ кор мекунед?", "Ба занг сабт кунед"],
       replies: {
         price: "Вобаста ба лоиҳа ва вазифаҳои шумо. Дархост гузоред — мо тамос мегирем ва ҳисоб мекунем ⚡",
-        services: "Мо агентҳои AI, Telegram-ботҳо, сайтҳо ва пайвасти барномаҳо месозем — пурра аз аввал то охир 🚀",
+        services: "Мо агентҳои AI, Telegram-ботҳо, сайтҳо ва автоматизатсияи ИИ месозем — пурра аз аввал то охир 🚀",
         booking: "Албатта! Вақтро ин ҷо интихоб кунед 👉 aqly.io/call",
         fallback: "Саволи хуб — беҳтараш дар занги кӯтоҳ муҳокима мекунем. «Ба занг сабт кунед»-ро пахш кунед 👇",
       },
@@ -1406,8 +1406,8 @@ const tj: Dict = {
         },
       },
       {
-        tag: "Пайвасти барномаҳо",
-        title: "Пайвасти барномаҳо",
+        tag: "Автоматизатсияи ИИ",
+        title: "Автоматизатсияи ИИ",
         body: "Мо барномаҳои шуморо ба як занҷир мепайвандем: лид меояд, ба ҷадвал сабт мешавад, ба муштарӣ паём меравад ва дастаи шумо огоҳ мешавад. Касе инро бо даст намекунад.",
         details: {
           overview:
@@ -1530,7 +1530,7 @@ const tj: Dict = {
       website: { label: "Суроғаи сайт (ихтиёрӣ)", placeholder: "https://yourcompany.com" },
       services: {
         label: "Хидматҳои мавриди таваҷҷӯҳ",
-        options: ["Telegram-ботҳо", "Сайтҳо", "Ёрдамчиёни овозии AI", "Пайвасти барномаҳо", "Интегратсияи AI", "Дизайн"],
+        options: ["Telegram-ботҳо", "Сайтҳо", "Ёрдамчиёни овозии AI", "Автоматизатсияи ИИ", "Интегратсияи AI", "Дизайн"],
       },
       timeline: {
         label: "Мӯҳлати лоиҳа",
@@ -1563,7 +1563,7 @@ const tj: Dict = {
         { label: "Telegram-ботҳо", href: "#services" },
         { label: "Сайтҳо", href: "#services" },
         { label: "Ёрдамчиёни овозии AI", href: "#services" },
-        { label: "Пайвасти барномаҳо", href: "#services" },
+        { label: "Автоматизатсияи ИИ", href: "#services" },
         { label: "Интегратсияи AI", href: "#services" },
         { label: "Дизайн", href: "#services" },
       ] },

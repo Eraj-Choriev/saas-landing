@@ -5,7 +5,7 @@ import { motion, useInView, animate, useReducedMotion } from "framer-motion"
 import { Globe, Send, Sparkles, ArrowUpRight, type LucideIcon } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
-const EASE = [0.16, 1, 0.3, 1] as const
+const EASE = [0.22, 1, 0.36, 1] as const
 
 const STAT_COLORS = ["#ff5b24", "#d17a00", "#a9caf9", "#fce88d"] as const
 const CARD_META: { Icon: LucideIcon; color: string }[] = [
@@ -61,28 +61,28 @@ export function WhyNow() {
         {/* header */}
         <div className="max-w-2xl">
           <motion.p
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.9 }}
             className="font-mono text-[12px] uppercase tracking-[0.2em] text-brand-coral"
           >
             {w.kicker}
           </motion.p>
           <motion.h2
-            initial={{ opacity: 0, y: 14 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7, delay: 0.05, ease: EASE }}
+            transition={{ duration: 1.15, delay: 0.09, ease: EASE }}
             className="mt-4 font-display text-[32px] leading-[1.04] tracking-tightest text-cream-50 sm:text-[46px] lg:text-[52px] text-balance"
           >
             {w.title}
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 22 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, delay: 0.12, ease: EASE }}
+            transition={{ duration: 1.0, delay: 0.2, ease: EASE }}
             className="mt-5 max-w-xl text-pretty text-[15.5px] leading-[1.6] text-cream-100/65 sm:text-[16.5px]"
           >
             {w.lead}
@@ -99,7 +99,7 @@ export function WhyNow() {
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: i * 0.08, ease: EASE }}
+                transition={{ duration: 1.0, delay: i * 0.13, ease: EASE }}
                 whileHover={{ y: -5 }}
                 className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-6 transition-colors duration-300 hover:border-white/20"
                 style={{ ["--c" as string]: color }}
@@ -155,7 +155,7 @@ export function WhyNow() {
                 initial={{ opacity: 0, y: 26 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: i * 0.1, ease: EASE }}
+                transition={{ duration: 1.0, delay: i * 0.14, ease: EASE }}
                 whileHover={{ y: -6 }}
                 className="group relative flex flex-col overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.035] p-7 transition-colors duration-300 hover:border-white/20"
                 style={{ ["--c" as string]: color }}

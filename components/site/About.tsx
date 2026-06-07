@@ -16,7 +16,7 @@ const reveal = {
   show: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 1.15, delay: i * 0.13, ease: [0.22, 1, 0.36, 1] },
   }),
 }
 

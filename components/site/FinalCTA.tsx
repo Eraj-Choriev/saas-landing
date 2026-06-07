@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
 
-const ease = [0.16, 1, 0.3, 1] as const
+const ease = [0.22, 1, 0.36, 1] as const
 
 export function FinalCTA() {
   const { t } = useI18n()
@@ -19,10 +19,10 @@ export function FinalCTA() {
       />
       <div className="container grain py-24 text-center sm:py-32">
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 22 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.5, ease }}
+          transition={{ duration: 0.9, ease }}
           className="font-mono text-[12px] uppercase tracking-[0.24em] text-brand-coral"
         >
           {c.kicker}
@@ -32,7 +32,7 @@ export function FinalCTA() {
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.7, delay: 0.06, ease }}
+          transition={{ duration: 1.15, delay: 0.1, ease }}
           className="mx-auto mt-5 max-w-3xl font-display text-[32px] leading-[1.05] tracking-tightest text-ink sm:text-[54px] sm:leading-[1.0] lg:text-[68px]"
         >
           {c.title[0]}{" "}
@@ -40,20 +40,20 @@ export function FinalCTA() {
         </motion.h2>
 
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 22 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.6, delay: 0.12, ease }}
+          transition={{ duration: 1.0, delay: 0.2, ease }}
           className="mx-auto mt-5 max-w-md text-pretty text-[16px] leading-[1.55] text-ink/60 sm:text-[17px]"
         >
           {c.sub}
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 22 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.6, delay: 0.18, ease }}
+          transition={{ duration: 1.0, delay: 0.18, ease }}
           className="mt-9 flex flex-col items-center gap-4"
         >
           <Button href="#contact" variant="primary" size="lg">
