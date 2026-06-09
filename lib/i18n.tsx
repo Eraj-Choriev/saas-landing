@@ -9,7 +9,7 @@ type Dict = typeof en
 const en = {
   banner: {
     label: "NEW · 2026 PLAYBOOK",
-    text: "How modern teams ship AI in 30 days — not 9 months",
+    text: "How modern teams ship working AI in days, not months",
     cta: "Read the guide",
   },
   nav: {
@@ -447,7 +447,7 @@ const en = {
     values: [
       {
         title: "Speed",
-        body: "We ship production AI in ~30 days, not 9 months. Tight loops, weekly demos, no bureaucracy.",
+        body: "Timelines fit the project — a site in 1–4 days, a bot in 5–10. We ship fast, no dragged-out months. Tight loops, weekly demos, no bureaucracy.",
       },
       {
         title: "Engineering-first",
@@ -542,7 +542,7 @@ const en = {
 const ru: Dict = {
   banner: {
     label: "НОВОЕ · ПЛЕЙБУК 2026",
-    text: "Как современные команды запускают AI за 30 дней — а не за 9 месяцев",
+    text: "Как современные команды запускают рабочий AI за дни, а не месяцы",
     cta: "Открыть гайд",
   },
   nav: {
@@ -960,7 +960,7 @@ const ru: Dict = {
     values: [
       {
         title: "Скорость",
-        body: "Запускаем рабочий AI за ~30 дней, а не за 9 месяцев. Короткие итерации, еженедельные демо, без бюрократии.",
+        body: "Сроки зависят от проекта: сайт — 1–4 дня, бот — 5–10. Запускаем быстро, без растянутых месяцев. Короткие итерации, демо каждую неделю, без бюрократии.",
       },
       {
         title: "Инженерия",
@@ -1055,7 +1055,7 @@ const ru: Dict = {
 const tj: Dict = {
   banner: {
     label: "НАВ · ПЛЕЙБУКИ 2026",
-    text: "Чӣ тавр дастаҳои муосир AI-ро дар 30 рӯз ба кор меандозанд — на 9 моҳ",
+    text: "Чӣ тавр дастаҳои муосир AI-и кориро дар рӯзҳо ба кор меандозанд, на моҳҳо",
     cta: "Хондани роҳнамо",
   },
   nav: {
@@ -1493,7 +1493,7 @@ const tj: Dict = {
     values: [
       {
         title: "Суръат",
-        body: "AI-и тайёрро дар ~30 рӯз ба кор меандозем, на 9 моҳ. Давраҳои кӯтоҳ, демои ҳафтагӣ, бе бюрократия.",
+        body: "Мӯҳлат вобаста ба лоиҳа: сайт — 1–4 рӯз, бот — 5–10. Зуд ба кор меандозем, бе моҳҳои кашолёфта. Давраҳои кӯтоҳ, демои ҳафтагӣ, бе бюрократия.",
       },
       {
         title: "Аввал муҳандисӣ",
