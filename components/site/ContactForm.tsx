@@ -341,7 +341,7 @@ export function ContactForm() {
               {/* light sweep across the button on hover */}
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/35 to-transparent transition-transform duration-[800ms] ease-smooth group-hover:translate-x-full"
+                className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/35 to-transparent transition-transform [transition-duration:800ms] ease-smooth group-hover:translate-x-full"
               />
               {/* fine top highlight */}
               <span
@@ -443,10 +443,7 @@ function SuccessCard({ t }: { t: ReturnType<typeof useI18n>["t"] }) {
         transition={{ delay: 0.5, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="relative mt-7 flex items-center gap-2 rounded-full border border-ink/10 bg-cream-100 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-ink/55"
       >
-        <span className="relative grid place-items-center">
-          <span className="absolute h-2.5 w-2.5 animate-ping rounded-full bg-emerald-400/50" />
-          <span className="h-2 w-2 rounded-full bg-emerald-400" />
-        </span>
+        <Check className="h-3.5 w-3.5 text-brand-coral" strokeWidth={3} />
         {t.form.successTag}
       </motion.div>
     </motion.div>

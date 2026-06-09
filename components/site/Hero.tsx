@@ -18,36 +18,6 @@ const reveal = {
 
 export function Hero() {
   const { t } = useI18n()
-  const reduce = useReducedMotion()
-  const spotRef = React.useRef<HTMLDivElement>(null)
-
-  // cursor-following spotlight — drives CSS vars via rAF, no React re-render,
-  // listener scoped to the hero <section> so it never costs anything elsewhere
-  React.useEffect(() => {
-    if (reduce) return
-    const el = spotRef.current
-    const sec = el?.parentElement
-    if (!el || !sec) return
-    let raf = 0
-    const onMove = (e: PointerEvent) => {
-      if (e.pointerType === "touch") return
-      cancelAnimationFrame(raf)
-      raf = requestAnimationFrame(() => {
-        const r = sec.getBoundingClientRect()
-        el.style.setProperty("--hx", `${((e.clientX - r.left) / r.width) * 100}%`)
-        el.style.setProperty("--hy", `${((e.clientY - r.top) / r.height) * 100}%`)
-        el.style.opacity = "1"
-      })
-    }
-    const onLeave = () => { el.style.opacity = "0" }
-    sec.addEventListener("pointermove", onMove, { passive: true })
-    sec.addEventListener("pointerleave", onLeave)
-    return () => {
-      cancelAnimationFrame(raf)
-      sec.removeEventListener("pointermove", onMove)
-      sec.removeEventListener("pointerleave", onLeave)
-    }
-  }, [reduce])
 
   return (
     <section className="relative isolate flex min-h-screen items-center overflow-hidden">
@@ -65,17 +35,6 @@ export function Hero() {
         opacity={1}
         size={6}
         fogColor="#0A0E13"
-      />
-
-      {/* ── cursor-following radial spotlight (warm) ── */}
-      <div
-        ref={spotRef}
-        className="pointer-events-none absolute inset-0 -z-20 opacity-0 transition-opacity duration-500"
-        style={{
-          background:
-            "radial-gradient(440px circle at var(--hx,50%) var(--hy,40%), rgba(255,91,36,0.20), rgba(209,122,0,0.08) 40%, transparent 62%)",
-        }}
-        aria-hidden
       />
 
       {/* readability: darken the top (where the headline sits) without hiding

@@ -1,14 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Check, Rocket, Sparkles, Bot, Building2, Clock, ShieldCheck, ArrowUpRight, Info } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { motion, useInView, animate, useReducedMotion } from "framer-motion"
+import { Check, Rocket, TrendingUp, Bot, Building2, Clock, ShieldCheck, ArrowUpRight, Info, Sparkles } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { PricingModal } from "./PricingModal"
 
 const ease = [0.22, 1, 0.36, 1] as const
 
-const PLAN_ICONS = [Rocket, Sparkles, Bot, Building2] as const
+const PLAN_ICONS = [Rocket, TrendingUp, Bot, Building2] as const
 const PLAN_COLORS = ["#a9caf9", "#ff5b24", "#d17a00", "#fce88d"] as const
 
 export function Pricing() {
@@ -94,10 +94,18 @@ export function Pricing() {
                     aria-hidden
                   />
 
+                  {/* per-plan accent crown on the top edge — brightens on hover */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-x-7 top-0 h-px opacity-50 transition-opacity duration-500 group-hover:opacity-100"
+                    style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }}
+                  />
+
                   {/* most-popular badge — seated on the top edge so it reads as
                       part of the card, not a sticker slapped in the corner */}
                   {featured && (
-                    <span className="absolute left-1/2 top-3 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-brand-coral px-4 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-white shadow-[0_6px_18px_-4px_rgba(255,91,36,0.8)]">
+                    <span className="absolute left-1/2 top-3.5 z-10 inline-flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-brand-coral px-5 py-1.5 font-mono text-[11.5px] font-bold uppercase tracking-[0.18em] text-white shadow-[0_8px_24px_-4px_rgba(255,91,36,0.9)] ring-1 ring-white/20">
+                      <Sparkles className="h-3.5 w-3.5" strokeWidth={2.5} />
                       {p.popular}
                     </span>
                   )}
@@ -119,11 +127,10 @@ export function Pricing() {
                   </h3>
                   <p className="mt-2 text-[13.5px] leading-snug text-cream-100/60">{plan.tagline}</p>
 
-                  {/* price + delivery time */}
-                  <div className="mt-6">
-                    <span className="font-display text-[28px] font-medium leading-none tracking-tight text-cream-50 sm:text-[32px]">
-                      {plan.price}
-                    </span>
+                  {/* price + delivery time — number is the hero, currency muted,
+                      count-up on scroll, min-height keeps CTAs aligned across cards */}
+                  <div className="mt-6 min-h-[4.6rem]">
+                    <PriceNumber value={plan.price} />
                     {plan.time && (
                       <div className="mt-3 flex items-center gap-1.5 text-[12.5px] text-cream-100/55">
                         <Clock className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
@@ -138,23 +145,22 @@ export function Pricing() {
                     className={`mt-7 inline-flex items-center justify-center rounded-xl px-5 py-3 text-[14px] font-semibold transition-all duration-300 ${
                       featured
                         ? "bg-brand-coral text-white shadow-[0_10px_30px_-8px_rgba(255,91,36,0.6)] hover:brightness-110 hover:shadow-[0_14px_38px_-8px_rgba(255,91,36,0.75)]"
-                        : "border border-white/15 bg-white/[0.02] text-cream-50 hover:border-white/30 hover:bg-white/[0.06]"
+                        : "border border-white/15 bg-white/[0.05] text-cream-50 hover:border-white/30 hover:bg-white/[0.09]"
                     }`}
                   >
                     {plan.cta}
                   </a>
 
-                  {/* divider */}
-                  <div className="mt-7 border-t border-dashed border-white/12" />
+                  {/* divider — soft gradient hairline */}
+                  <div className="mt-7 h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
                   {/* features */}
                   <ul className="mt-6 space-y-3.5 text-[14px]">
                     {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2.5 text-cream-100/80">
+                      <li key={f} className="flex items-start gap-2.5 text-cream-100/85">
                         <span
-                          className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full ${
-                            featured ? "bg-brand-coral/20 text-brand-coral" : "bg-white/[0.06] text-cream-100/70"
-                          }`}
+                          className="mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full"
+                          style={{ background: `${accent}26`, color: accent }}
                         >
                           <Check className="h-3 w-3" strokeWidth={2.5} />
                         </span>
@@ -219,5 +225,67 @@ export function Pricing() {
         />
       )}
     </section>
+  )
+}
+
+const groupThousands = (n: number) =>
+  String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+
+/** Price line: number counts up on scroll-in, prefix ("от") + currency ("TJS")
+ *  rendered muted/smaller. Non-numeric prices (e.g. "Индивидуально") stay static. */
+function PriceNumber({ value }: { value: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: "-40px" })
+  const reduce = useReducedMotion()
+
+  const m = value.match(/^(\D*?)([\d][\d\s]*\d|\d)(\D*)$/)
+  const hasNumber = m !== null
+  const target = m ? parseInt(m[2].replace(/\D/g, ""), 10) : 0
+  const [n, setN] = useState(reduce ? target : 0)
+
+  useEffect(() => {
+    if (!hasNumber || !inView) return
+    if (reduce) {
+      setN(target)
+      return
+    }
+    const c = animate(0, target, {
+      duration: 1.1,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (v) => setN(Math.round(v)),
+    })
+    return () => c.stop()
+    // hasNumber/target are primitives derived from `value`; intentionally
+    // excluding the freshly-created regex match array to avoid restart loops.
+  }, [inView, target, reduce, hasNumber])
+
+  const base =
+    "font-display text-[27px] font-semibold leading-[1.06] tracking-tight text-cream-50 [font-variant-numeric:tabular-nums] [overflow-wrap:anywhere] sm:text-[31px]"
+
+  if (!m) {
+    return (
+      <div ref={ref} className={base}>
+        {value}
+      </div>
+    )
+  }
+
+  const prefix = m[1].trim()
+  const suffix = m[3].trim()
+
+  return (
+    <div ref={ref} className={base}>
+      {prefix && (
+        <span className="mr-1.5 align-baseline text-[18px] font-medium text-cream-100/55">
+          {prefix}
+        </span>
+      )}
+      {groupThousands(n)}
+      {suffix && (
+        <span className="ml-1.5 align-baseline text-[15px] font-medium tracking-normal text-cream-100/45">
+          {suffix}
+        </span>
+      )}
+    </div>
   )
 }

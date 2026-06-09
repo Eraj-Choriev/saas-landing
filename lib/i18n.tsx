@@ -17,6 +17,7 @@ const en = {
     services: "Services",
     approach: "Approach",
     pricing: "Pricing",
+    faq: "FAQ",
     contact: "Contact us",
   },
   hero: {
@@ -550,6 +551,7 @@ const ru: Dict = {
     services: "Услуги",
     approach: "Подход",
     pricing: "Тарифы",
+    faq: "Вопросы",
     contact: "Связаться",
   },
   hero: {
@@ -1063,6 +1065,7 @@ const tj: Dict = {
     services: "Хидматҳо",
     approach: "Равиш",
     pricing: "Тарифҳо",
+    faq: "Саволҳо",
     contact: "Тамос",
   },
   hero: {

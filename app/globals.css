@@ -26,6 +26,10 @@ html {
   scroll-behavior: auto;
   /* offset for native jumps not handled by JS — on-load #hash, back/forward */
   scroll-padding-top: 96px;
+  /* non-static so framer-motion's useScroll (Approach timeline) can measure
+     target offsets against the scroll container correctly. Does not create a
+     containing block for fixed descendants, so the fixed navbar is unaffected. */
+  position: relative;
 }
 
 html,

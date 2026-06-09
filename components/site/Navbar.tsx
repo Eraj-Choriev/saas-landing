@@ -25,6 +25,7 @@ export function Navbar() {
     { href: "#services", label: t.nav.services },
     { href: "#approach", label: t.nav.approach },
     { href: "#pricing", label: t.nav.pricing },
+    { href: "#faq", label: t.nav.faq },
     { href: "#contact", label: t.nav.contact },
   ]
 
@@ -40,17 +41,22 @@ export function Navbar() {
       >
         <nav
           className={cn(
-            "mx-auto flex items-center justify-between rounded-full border px-3 py-2 transition-all duration-500",
+            "relative mx-auto flex items-center justify-between overflow-hidden rounded-full border px-3 py-2 transition-all duration-500",
             scrolled
-              ? "border-white/12 bg-ink/70 backdrop-blur-xl shadow-[0_18px_50px_-20px_rgba(0,0,0,0.65)]"
-              : "border-white/8 bg-ink/35 backdrop-blur-md shadow-[0_8px_30px_-16px_rgba(0,0,0,0.5)]"
+              ? "border-white/15 bg-ink/55 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_18px_50px_-20px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.18)]"
+              : "border-white/20 bg-white/[0.06] backdrop-blur-2xl backdrop-saturate-[1.8] shadow-[0_8px_40px_-12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.30),inset_0_-10px_28px_-14px_rgba(255,255,255,0.07)]"
           )}
         >
-          <a href="#" className="pl-3 shrink-0">
+          {/* liquid-glass specular sheen — bright band along the top edge */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.02)_38%,transparent_60%)]"
+          />
+          <a href="#" className="relative pl-3 shrink-0">
             <Wordmark tone="cream" />
           </a>
 
-          <ul className="hidden lg:flex items-center gap-1 text-[14px]">
+          <ul className="relative hidden lg:flex items-center gap-1 text-[14px]">
             {links.map((l) => (
               <li key={l.href}>
                 <a
@@ -64,7 +70,7 @@ export function Navbar() {
             ))}
           </ul>
 
-          <div className="flex items-center gap-2 pr-1">
+          <div className="relative flex items-center gap-2 pr-1">
             <div className="hidden sm:block">
               <LangToggle tone="cream" />
             </div>
