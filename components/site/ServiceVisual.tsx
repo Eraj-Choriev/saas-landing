@@ -18,6 +18,11 @@ import {
   PenTool,
   Square,
   Type,
+  Workflow,
+  Zap,
+  Puzzle,
+  Check,
+  Table,
   type LucideIcon,
 } from "lucide-react"
 import { useI18n, type Lang } from "@/lib/i18n"
@@ -833,72 +838,79 @@ function VoiceDemo({ color, reduce, lang }: Demo) {
 type App = { label: string; Icon: LucideIcon; brand: string }
 
 function FlowDemo({ color, reduce, started, lang }: Demo) {
-  const scenarios: { name: string; apps: App[]; labels: string[] }[] = [
+  type FlowApp = App & { event: string }
+  type Scenario = { name: string; platform: App; trigger: FlowApp; dests: FlowApp[] }
+
+  // real orchestrators people actually wire automations with — the platform
+  // rotates with the scenario: n8n → Make → Zapier
+  const scenarios: Scenario[] = [
     {
       name: "E-commerce",
-      apps: [
-        { label: "Tilda", Icon: Globe, brand: "#ff5b24" },
-        { label: "Notion", Icon: FileText, brand: "#e6e6e6" },
-        { label: "Telegram", Icon: Send, brand: "#229ED9" },
-        { label: "AmoCRM", Icon: Users, brand: "#2a9df4" },
-      ],
-      labels: [
-        tr(lang, "Заявка", "Order", "Дархост"),
-        tr(lang, "Запись", "Saved", "Сабт"),
-        tr(lang, "Алерт", "Alert", "Огоҳӣ"),
-        tr(lang, "Лид", "Lead", "Лид"),
+      platform: { label: "n8n", Icon: Workflow, brand: "#EA4B71" },
+      trigger: { label: "Tilda", Icon: Globe, brand: "#ff5b24", event: tr(lang, "Заявка", "Order", "Дархост") },
+      dests: [
+        { label: "Sheets", Icon: Table, brand: "#34a853", event: tr(lang, "Запись", "Row", "Сабт") },
+        { label: "Telegram", Icon: Send, brand: "#229ED9", event: tr(lang, "Алерт", "Alert", "Огоҳӣ") },
+        { label: "AmoCRM", Icon: Users, brand: "#2a9df4", event: tr(lang, "Лид", "Lead", "Лид") },
       ],
     },
     {
       name: "SaaS",
-      apps: [
-        { label: "Webflow", Icon: Globe, brand: "#4353ff" },
-        { label: "Stripe", Icon: CreditCard, brand: "#8b7bff" },
-        { label: "Slack", Icon: MessageSquare, brand: "#ecb22e" },
-        { label: "HubSpot", Icon: Users, brand: "#ff7a59" },
-      ],
-      labels: [
-        tr(lang, "Регистрация", "Sign-up", "Бақайдгирӣ"),
-        tr(lang, "Оплата", "Payment", "Пардохт"),
-        tr(lang, "Алерт", "Notify", "Огоҳӣ"),
-        tr(lang, "Контакт", "Contact", "Тамос"),
+      platform: { label: "Make", Icon: Puzzle, brand: "#a259ff" },
+      trigger: { label: "Stripe", Icon: CreditCard, brand: "#8b7bff", event: tr(lang, "Оплата", "Payment", "Пардохт") },
+      dests: [
+        { label: "Slack", Icon: MessageSquare, brand: "#ecb22e", event: tr(lang, "Нотиф", "Notify", "Огоҳӣ") },
+        { label: "Notion", Icon: FileText, brand: "#e6e6e6", event: tr(lang, "Запись", "Page", "Сабт") },
+        { label: "Gmail", Icon: Mail, brand: "#ea4335", event: tr(lang, "Чек", "Receipt", "Чек") },
       ],
     },
     {
       name: "Lead-gen",
-      apps: [
-        { label: "Meta Ads", Icon: Megaphone, brand: "#1877f2" },
-        { label: "Airtable", Icon: Database, brand: "#fcb400" },
-        { label: "Email", Icon: Mail, brand: "#ff7a59" },
-        { label: "Bitrix24", Icon: Users, brand: "#2fc7f7" },
-      ],
-      labels: [
-        tr(lang, "Клик", "Click", "Клик"),
-        tr(lang, "Захват", "Capture", "Захира"),
-        tr(lang, "Письмо", "Email", "Мактуб"),
-        tr(lang, "Воронка", "Funnel", "Воронка"),
+      platform: { label: "Zapier", Icon: Zap, brand: "#FF4F00" },
+      trigger: { label: "Meta Ads", Icon: Megaphone, brand: "#1877f2", event: tr(lang, "Лид", "Lead", "Лид") },
+      dests: [
+        { label: "Airtable", Icon: Database, brand: "#fcb400", event: tr(lang, "Захват", "Capture", "Захира") },
+        { label: "Email", Icon: Mail, brand: "#ff7a59", event: tr(lang, "Письмо", "Email", "Мактуб") },
+        { label: "Bitrix24", Icon: Users, brand: "#2fc7f7", event: tr(lang, "Сделка", "Deal", "Муомила") },
       ],
     },
   ]
 
-  // single ticker drives both the travelling packet (step) and scenario rotation
-  const CYCLE = 6 // 0..3 connect, 4..5 hold then switch
+  /* tick machine: 0 trigger fires · 1 packet → hub · 2/3/4 hub → dest 0/1/2 ·
+     5–6 hold on the finished run, then the next scenario rebuilds the canvas */
+  const CYCLE = 7
   const [tick, setTick] = React.useState(0)
   const active = useActive()
   React.useEffect(() => {
     if (reduce || !started || !active) return
-    const id = setInterval(() => setTick((t) => t + 1), 1100)
+    const id = setInterval(() => setTick((t) => t + 1), 1050)
     return () => clearInterval(id)
   }, [reduce, started, active])
 
   const tab = reduce ? 0 : Math.floor(tick / CYCLE) % scenarios.length
-  const step = reduce ? 3 : Math.min(tick % CYCLE, 3)
+  const step = reduce ? 4 : Math.min(tick % CYCLE, 5)
+  const runs = 1047 + Math.floor(tick / CYCLE)
   const sc = scenarios[tab]
 
+  // canvas coordinates (600 × 240): trigger left, hub centre, dests fan right.
+  // Wire ends tuck under the node boxes — nodes paint on top of the svg.
+  const WIRES = [
+    "M 100 120 C 170 120, 200 120, 268 120",
+    "M 332 120 C 410 120, 420 42, 505 42",
+    "M 332 120 C 400 120, 430 120, 505 120",
+    "M 332 120 C 410 120, 420 198, 505 198",
+  ]
+  const hubBusy = !reduce && step >= 1 && step <= 4
+  const packetWire = step >= 1 && step <= 4 ? step - 1 : -1 // which wire carries a packet now
+  const wireLit = (w: number) => (reduce ? true : w === 0 ? step >= 1 : step >= w + 1)
+  const destOn = (i: number) => (reduce ? true : step >= i + 2)
+
+  const packetColor = packetWire === 0 ? sc.trigger.brand : packetWire > 0 ? sc.dests[packetWire - 1].brand : color
+
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-5 sm:px-10">
-      {/* auto-rotating scenario label */}
-      <div className="flex items-center gap-2">
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-5 sm:px-10">
+      {/* header: scenario pill · platform badge · live run counter */}
+      <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1">
         <span className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-cream-100/40">
           {tr(lang, "Сценарий", "Scenario", "Сенария")}
         </span>
@@ -915,60 +927,197 @@ function FlowDemo({ color, reduce, started, lang }: Demo) {
             {sc.name}
           </motion.span>
         </AnimatePresence>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={`run-${tab}`}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={reduce ? undefined : { opacity: 0 }}
+            className="font-mono text-[10px] tabular-nums text-cream-100/40"
+          >
+            {tr(lang, "запуск", "run", "иҷро")} #{runs}
+          </motion.span>
+        </AnimatePresence>
       </div>
 
-      {/* nodes */}
-      <div className="flex w-full max-w-[600px] items-start justify-between">
-        {sc.apps.map((app, i) => {
-          const on = step >= i
-          return (
-            <React.Fragment key={`${tab}-${app.label}`}>
-              <div className="flex flex-col items-center gap-2" style={{ width: 92 }}>
-                <motion.div
-                  className="relative grid h-16 w-16 place-items-center rounded-2xl border"
-                  animate={{
-                    borderColor: on ? `${app.brand}` : "rgba(255,255,255,0.12)",
-                    boxShadow: on ? `0 0 26px -6px ${app.brand}` : "0 0 0 0 transparent",
-                    scale: step === i ? 1.06 : 1,
-                  }}
-                  transition={{ duration: 0.35, ease: EASE }}
-                  style={{ background: "#11161c" }}
-                >
-                  <app.Icon
-                    className="h-6 w-6 transition-colors duration-300"
-                    style={{ color: on ? app.brand : "rgba(243,239,230,0.5)" }}
-                    strokeWidth={1.75}
-                  />
-                </motion.div>
-                <span className="text-center font-mono text-[10.5px] leading-tight text-cream-100/55">{app.label}</span>
-                <AnimatePresence>
-                  {on && (
-                    <motion.span
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="text-center text-[10.5px] font-medium leading-tight"
-                      style={{ color }}
-                    >
-                      {sc.labels[i]}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </div>
-              {i < sc.apps.length - 1 && (
-                <div className="relative mt-8 h-px flex-1" style={{ background: "rgba(255,255,255,0.12)" }}>
-                  <motion.div
-                    className="absolute -top-[3px] h-2 w-2 rounded-full"
-                    style={{ background: color, boxShadow: `0 0 10px ${color}` }}
-                    animate={{
-                      left: step === i ? ["0%", "100%"] : step > i ? "100%" : "0%",
-                      opacity: step >= i ? 1 : 0,
-                    }}
-                    transition={{ duration: 0.9, ease: "easeInOut" }}
-                  />
-                </div>
+      {/* node canvas — wires behind, nodes on top */}
+      <div className="relative w-full max-w-[620px]" style={{ aspectRatio: "600/240" }}>
+        <svg viewBox="0 0 600 240" className="absolute inset-0 h-full w-full" fill="none" aria-hidden>
+          {WIRES.map((d, w) => (
+            <g key={`${tab}-${w}`}>
+              {/* base wire draws itself when the scenario mounts */}
+              <motion.path
+                d={d}
+                stroke="rgba(255,255,255,0.13)"
+                strokeWidth="1.5"
+                initial={reduce ? false : { pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.55, delay: w * 0.1, ease: EASE }}
+              />
+              {/* lit overlay once data has flowed through */}
+              <motion.path
+                d={d}
+                stroke={w === 0 ? sc.trigger.brand : sc.dests[w - 1].brand}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                initial={false}
+                animate={{ pathLength: wireLit(w) ? 1 : 0, opacity: wireLit(w) ? 0.55 : 0 }}
+                transition={{ duration: 0.7, ease: "easeInOut" }}
+              />
+              {/* travelling packet — native SMIL motion along the bezier,
+                  remounts (and so restarts) on every step change */}
+              {!reduce && packetWire === w && (
+                <circle key={`pkt-${tab}-${step}`} r="3.5" fill={packetColor} opacity="0.95">
+                  <animateMotion dur="0.8s" repeatCount="1" fill="freeze" path={d} />
+                </circle>
               )}
-            </React.Fragment>
+            </g>
+          ))}
+        </svg>
+
+        {/* trigger node */}
+        <div className="absolute flex w-[88px] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5" style={{ left: "13.3%", top: "50%" }}>
+          <AnimatePresence>
+            {(reduce || step >= 0) && (
+              <motion.span
+                key={`tev-${tab}`}
+                initial={reduce ? false : { opacity: 0, y: 6, scale: 0.85 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={SPRING}
+                className="whitespace-nowrap rounded-full px-2 py-0.5 font-mono text-[9px]"
+                style={{ background: `${sc.trigger.brand}22`, color: sc.trigger.brand, border: `1px solid ${sc.trigger.brand}44` }}
+              >
+                {sc.trigger.event}
+              </motion.span>
+            )}
+          </AnimatePresence>
+          <motion.div
+            key={`tn-${tab}`}
+            className="relative grid h-14 w-14 place-items-center rounded-2xl border"
+            style={{ background: "#11161c" }}
+            initial={reduce ? false : { scale: 0.7, opacity: 0 }}
+            animate={{
+              scale: step === 0 && !reduce ? [1, 1.1, 1] : 1,
+              opacity: 1,
+              borderColor: sc.trigger.brand,
+              boxShadow: `0 0 22px -6px ${sc.trigger.brand}`,
+            }}
+            transition={step === 0 && !reduce ? { duration: 0.6, times: [0, 0.4, 1] } : SPRING}
+          >
+            <sc.trigger.Icon className="h-5 w-5" style={{ color: sc.trigger.brand }} strokeWidth={1.75} />
+            {/* firing ping */}
+            {!reduce && step === 0 && (
+              <motion.span
+                key={`ping-${tab}-${tick}`}
+                className="absolute inset-0 rounded-2xl"
+                style={{ border: `1.5px solid ${sc.trigger.brand}` }}
+                initial={{ scale: 1, opacity: 0.8 }}
+                animate={{ scale: 1.45, opacity: 0 }}
+                transition={{ duration: 0.7, ease: "easeOut" }}
+              />
+            )}
+          </motion.div>
+          <span className="font-mono text-[10px] leading-tight text-cream-100/55">{sc.trigger.label}</span>
+        </div>
+
+        {/* hub node — the orchestrator platform */}
+        <div className="absolute flex w-[110px] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5" style={{ left: "50%", top: "50%" }}>
+          <motion.div
+            key={`hub-${tab}`}
+            className="relative grid h-[68px] w-[68px] place-items-center rounded-2xl border-2"
+            style={{ background: "#11161c" }}
+            initial={reduce ? false : { scale: 0.7, opacity: 0, rotate: -8 }}
+            animate={{
+              scale: 1,
+              opacity: 1,
+              rotate: 0,
+              borderColor: sc.platform.brand,
+              boxShadow: hubBusy
+                ? `0 0 34px -4px ${sc.platform.brand}, inset 0 0 18px -8px ${sc.platform.brand}`
+                : `0 0 22px -8px ${sc.platform.brand}`,
+            }}
+            transition={SPRING}
+          >
+            {/* the engine spins while executing */}
+            <motion.span
+              className="grid place-items-center"
+              animate={hubBusy ? { rotate: 360 } : { rotate: 0 }}
+              transition={hubBusy ? { duration: 2.4, repeat: Infinity, ease: "linear" } : { duration: 0.4 }}
+            >
+              <sc.platform.Icon className="h-7 w-7" style={{ color: sc.platform.brand }} strokeWidth={1.75} />
+            </motion.span>
+            {/* busy ring */}
+            {hubBusy && (
+              <motion.span
+                className="absolute inset-0 rounded-2xl"
+                style={{ border: `1.5px solid ${sc.platform.brand}` }}
+                animate={{ scale: [1, 1.3], opacity: [0.7, 0] }}
+                transition={{ duration: 1.1, repeat: Infinity, ease: "easeOut" }}
+              />
+            )}
+          </motion.div>
+          <span className="font-mono text-[11px] font-semibold leading-tight" style={{ color: sc.platform.brand }}>
+            {sc.platform.label}
+          </span>
+        </div>
+
+        {/* destination nodes */}
+        {sc.dests.map((d, i) => {
+          const on = destOn(i)
+          const top = ["17.5%", "50%", "82.5%"][i]
+          return (
+            <div key={`${tab}-d${i}`} className="absolute flex w-[120px] -translate-y-1/2 flex-col gap-1" style={{ left: "86%", top }}>
+              <div className="flex items-center gap-2">
+                <motion.div
+                  className="relative grid h-11 w-11 shrink-0 place-items-center rounded-xl border"
+                  style={{ background: "#11161c" }}
+                  initial={reduce ? false : { scale: 0.7, opacity: 0 }}
+                  animate={{
+                    scale: 1,
+                    opacity: 1,
+                    borderColor: on ? d.brand : "rgba(255,255,255,0.12)",
+                    boxShadow: on ? `0 0 18px -6px ${d.brand}` : "0 0 0 0 transparent",
+                  }}
+                  transition={{ ...SPRING, delay: reduce ? 0 : 0.15 + i * 0.08 }}
+                >
+                  <d.Icon className="h-4.5 w-4.5 transition-colors duration-300" style={{ color: on ? d.brand : "rgba(243,239,230,0.45)", height: 18, width: 18 }} strokeWidth={1.75} />
+                  {/* delivered tick */}
+                  <AnimatePresence>
+                    {on && (
+                      <motion.span
+                        key={`ok-${tab}-${i}`}
+                        className="absolute -right-1.5 -top-1.5 grid h-4 w-4 place-items-center rounded-full bg-emerald-400 text-ink"
+                        initial={reduce ? false : { scale: 0, rotate: -90 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        exit={{ scale: 0 }}
+                        transition={SPRING}
+                      >
+                        <Check className="h-2.5 w-2.5" strokeWidth={3.5} />
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+                <div className="min-w-0 leading-tight">
+                  <div className="truncate font-mono text-[10px] text-cream-100/55">{d.label}</div>
+                  <AnimatePresence>
+                    {on && (
+                      <motion.div
+                        key={`dev-${tab}-${i}`}
+                        initial={reduce ? false : { opacity: 0, x: -6 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3, ease: EASE }}
+                        className="truncate text-[10.5px] font-medium"
+                        style={{ color: d.brand }}
+                      >
+                        {d.event}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
           )
         })}
       </div>
