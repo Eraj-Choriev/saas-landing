@@ -4,7 +4,7 @@ const repo = "saas-landing"
 
 const nextConfig = {
   reactStrictMode: true,
-  devIndicators: { appIsrStatus: false }, // hide dev-only "Static route" overlay badge
+  devIndicators: false, // hide the dev-only Next.js devtools button (bottom-left "N")
   output: "export", // static HTML export for GitHub Pages
   images: { unoptimized: true },
   trailingSlash: true,
