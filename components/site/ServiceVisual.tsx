@@ -940,8 +940,19 @@ function FlowDemo({ color, reduce, started, lang }: Demo) {
         </AnimatePresence>
       </div>
 
-      {/* node canvas — wires behind, nodes on top */}
-      <div className="relative w-full max-w-[620px]" style={{ aspectRatio: "600/240" }}>
+      {/* node canvas — wires behind, nodes on top. The whole canvas crossfades
+          between scenarios so the rebuild never flashes (the old version
+          remounted everything cold — read as flicker, especially on mobile) */}
+      <div className="relative w-full max-w-[620px]" style={{ aspectRatio: "600/250" }}>
+        <AnimatePresence mode="wait">
+        <motion.div
+          key={`canvas-${tab}`}
+          className="absolute inset-0"
+          initial={reduce ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={reduce ? undefined : { opacity: 0, transition: { duration: 0.28, ease: "easeIn" } }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        >
         <svg viewBox="0 0 600 240" className="absolute inset-0 h-full w-full" fill="none" aria-hidden>
           {WIRES.map((d, w) => (
             <g key={`${tab}-${w}`}>
@@ -977,21 +988,15 @@ function FlowDemo({ color, reduce, started, lang }: Demo) {
 
         {/* trigger node */}
         <div className="absolute flex w-[88px] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5" style={{ left: "13.3%", top: "50%" }}>
-          <AnimatePresence>
-            {(reduce || step >= 0) && (
-              <motion.span
-                key={`tev-${tab}`}
-                initial={reduce ? false : { opacity: 0, y: 6, scale: 0.85 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={SPRING}
-                className="whitespace-nowrap rounded-full px-2 py-0.5 font-mono text-[9px]"
-                style={{ background: `${sc.trigger.brand}22`, color: sc.trigger.brand, border: `1px solid ${sc.trigger.brand}44` }}
-              >
-                {sc.trigger.event}
-              </motion.span>
-            )}
-          </AnimatePresence>
+          <motion.span
+            initial={reduce ? false : { opacity: 0, y: 6, scale: 0.85 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ ...SPRING, delay: 0.15 }}
+            className="whitespace-nowrap rounded-full px-2 py-0.5 font-mono text-[9px]"
+            style={{ background: `${sc.trigger.brand}22`, color: sc.trigger.brand, border: `1px solid ${sc.trigger.brand}44` }}
+          >
+            {sc.trigger.event}
+          </motion.span>
           <motion.div
             key={`tn-${tab}`}
             className="relative grid h-14 w-14 place-items-center rounded-2xl border"
@@ -1006,10 +1011,11 @@ function FlowDemo({ color, reduce, started, lang }: Demo) {
             transition={step === 0 && !reduce ? { duration: 0.6, times: [0, 0.4, 1] } : SPRING}
           >
             <sc.trigger.Icon className="h-5 w-5" style={{ color: sc.trigger.brand }} strokeWidth={1.75} />
-            {/* firing ping */}
+            {/* firing ping — keyed per scenario (not per tick) so it fires once,
+                no re-mount strobing */}
             {!reduce && step === 0 && (
               <motion.span
-                key={`ping-${tab}-${tick}`}
+                key={`ping-${tab}`}
                 className="absolute inset-0 rounded-2xl"
                 style={{ border: `1.5px solid ${sc.trigger.brand}` }}
                 initial={{ scale: 1, opacity: 0.8 }}
@@ -1062,64 +1068,64 @@ function FlowDemo({ color, reduce, started, lang }: Demo) {
           </span>
         </div>
 
-        {/* destination nodes */}
+        {/* destination nodes — stacked label under the icon so nothing clips
+            at the right edge on narrow screens */}
         {sc.dests.map((d, i) => {
           const on = destOn(i)
           const top = ["17.5%", "50%", "82.5%"][i]
           return (
-            <div key={`${tab}-d${i}`} className="absolute flex w-[120px] -translate-y-1/2 flex-col gap-1" style={{ left: "86%", top }}>
-              <div className="flex items-center gap-2">
+            <div
+              key={`${tab}-d${i}`}
+              className="absolute flex w-[88px] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-[3px] text-center"
+              style={{ left: "88%", top }}
+            >
+              <motion.div
+                className="relative grid h-11 w-11 shrink-0 place-items-center rounded-xl border"
+                style={{ background: "#11161c" }}
+                initial={reduce ? false : { scale: 0.85, opacity: 0 }}
+                animate={{
+                  scale: 1,
+                  opacity: 1,
+                  borderColor: on ? d.brand : "rgba(255,255,255,0.12)",
+                  boxShadow: on ? `0 0 18px -6px ${d.brand}` : "0 0 0 0 transparent",
+                }}
+                transition={{ ...SPRING, delay: reduce ? 0 : 0.1 + i * 0.07 }}
+              >
+                <d.Icon className="transition-colors duration-300" style={{ color: on ? d.brand : "rgba(243,239,230,0.45)", height: 18, width: 18 }} strokeWidth={1.75} />
+                {/* delivered tick */}
+                <AnimatePresence>
+                  {on && (
+                    <motion.span
+                      key={`ok-${tab}-${i}`}
+                      className="absolute -right-1.5 -top-1.5 grid h-4 w-4 place-items-center rounded-full bg-emerald-400 text-ink"
+                      initial={reduce ? false : { scale: 0, rotate: -90 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      exit={{ scale: 0 }}
+                      transition={SPRING}
+                    >
+                      <Check className="h-2.5 w-2.5" strokeWidth={3.5} />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+              <div className="w-full truncate font-mono text-[9.5px] leading-tight text-cream-100/55">{d.label}</div>
+              {/* fixed-height slot — event fades in without shifting layout */}
+              <div className="h-[14px] w-full">
                 <motion.div
-                  className="relative grid h-11 w-11 shrink-0 place-items-center rounded-xl border"
-                  style={{ background: "#11161c" }}
-                  initial={reduce ? false : { scale: 0.7, opacity: 0 }}
-                  animate={{
-                    scale: 1,
-                    opacity: 1,
-                    borderColor: on ? d.brand : "rgba(255,255,255,0.12)",
-                    boxShadow: on ? `0 0 18px -6px ${d.brand}` : "0 0 0 0 transparent",
-                  }}
-                  transition={{ ...SPRING, delay: reduce ? 0 : 0.15 + i * 0.08 }}
+                  initial={false}
+                  animate={{ opacity: on ? 1 : 0, y: on ? 0 : 4 }}
+                  transition={{ duration: 0.3, ease: EASE }}
+                  className="truncate text-[10px] font-medium leading-tight"
+                  style={{ color: d.brand }}
                 >
-                  <d.Icon className="h-4.5 w-4.5 transition-colors duration-300" style={{ color: on ? d.brand : "rgba(243,239,230,0.45)", height: 18, width: 18 }} strokeWidth={1.75} />
-                  {/* delivered tick */}
-                  <AnimatePresence>
-                    {on && (
-                      <motion.span
-                        key={`ok-${tab}-${i}`}
-                        className="absolute -right-1.5 -top-1.5 grid h-4 w-4 place-items-center rounded-full bg-emerald-400 text-ink"
-                        initial={reduce ? false : { scale: 0, rotate: -90 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        exit={{ scale: 0 }}
-                        transition={SPRING}
-                      >
-                        <Check className="h-2.5 w-2.5" strokeWidth={3.5} />
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
+                  {d.event}
                 </motion.div>
-                <div className="min-w-0 leading-tight">
-                  <div className="truncate font-mono text-[10px] text-cream-100/55">{d.label}</div>
-                  <AnimatePresence>
-                    {on && (
-                      <motion.div
-                        key={`dev-${tab}-${i}`}
-                        initial={reduce ? false : { opacity: 0, x: -6 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3, ease: EASE }}
-                        className="truncate text-[10.5px] font-medium"
-                        style={{ color: d.brand }}
-                      >
-                        {d.event}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
               </div>
             </div>
           )
         })}
+        </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   )

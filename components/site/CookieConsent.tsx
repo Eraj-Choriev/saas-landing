@@ -49,12 +49,14 @@ export function CookieConsent() {
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           role="dialog"
           aria-label={t.cookie.kicker}
-          className="fixed bottom-4 left-4 z-[60] w-[calc(100vw-2rem)] max-w-[380px] overflow-hidden rounded-2xl border border-white/15 bg-ink/80 shadow-[0_24px_60px_-18px_rgba(0,0,0,0.7)] backdrop-blur-2xl backdrop-saturate-150"
+          // `isolate` forces a stacking context — iOS Safari otherwise paints the
+          // backdrop-filter layer with square corners (sharp top-left artifact)
+          className="fixed bottom-4 left-4 z-[60] w-[calc(100vw-2rem)] max-w-[380px] isolate overflow-hidden rounded-2xl border border-white/15 bg-ink/80 shadow-[0_24px_60px_-18px_rgba(0,0,0,0.7)] backdrop-blur-2xl backdrop-saturate-150"
         >
           {/* specular sheen along the top edge — same glass language as the navbar */}
           <span
             aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-2xl bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.02)_40%,transparent_62%)]"
+            className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.02)_40%,transparent_62%)]"
           />
           {/* warm coral pool behind the icon corner */}
           <span
