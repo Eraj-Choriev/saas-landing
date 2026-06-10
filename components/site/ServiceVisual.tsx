@@ -1339,6 +1339,98 @@ const STEPS = [
   { to: [76, 50] as const, key: "poster" },
 ]
 
+/** Per-character staggered reveal — the "type being set" moment. */
+function Chars({ text, delay = 0, reduce }: { text: string; delay?: number; reduce: boolean }) {
+  if (reduce) return <>{text}</>
+  return (
+    <>
+      {text.split("").map((ch, i) => (
+        <motion.span
+          key={i}
+          className="inline-block"
+          initial={{ opacity: 0, y: 12, filter: "blur(5px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.38, delay: delay + i * 0.05, ease: EASE }}
+        >
+          {ch}
+        </motion.span>
+      ))}
+    </>
+  )
+}
+
+/** Figma-style selection: dashed marquee + four corner handles. Shown only
+ *  while its element is the one being placed, like a live editor. */
+function SelBox({ active, c }: { active: boolean; c: string }) {
+  return (
+    <AnimatePresence>
+      {active && (
+        <motion.span
+          className="pointer-events-none absolute -inset-2 z-10 rounded-lg"
+          style={{ border: `1px dashed ${c}AA` }}
+          initial={{ opacity: 0, scale: 1.08 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.25 } }}
+          transition={{ duration: 0.32, ease: EASE }}
+          aria-hidden
+        >
+          {(["-left-[3px] -top-[3px]", "-right-[3px] -top-[3px]", "-left-[3px] -bottom-[3px]", "-right-[3px] -bottom-[3px]"] as const).map((pos) => (
+            <span
+              key={pos}
+              className={`absolute h-[7px] w-[7px] rounded-[2px] bg-white ${pos}`}
+              style={{ boxShadow: `0 0 0 1.5px ${c}` }}
+            />
+          ))}
+        </motion.span>
+      )}
+    </AnimatePresence>
+  )
+}
+
+/** Snap guides — a crosshair of brand-tinted rules flashes through the spot
+ *  where the current element just landed. */
+function SnapGuides({ x, y, show, c }: { x: string; y: string; show: boolean; c: string }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.span
+          className="pointer-events-none absolute inset-0 z-[1]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          aria-hidden
+        >
+          <span
+            className="absolute inset-y-0 w-px"
+            style={{ left: x, background: `linear-gradient(180deg,transparent,${c}55 30%,${c}55 70%,transparent)` }}
+          />
+          <span
+            className="absolute left-9 right-0 h-px"
+            style={{ top: y, background: `linear-gradient(90deg,transparent,${c}55 30%,${c}55 70%,transparent)` }}
+          />
+        </motion.span>
+      )}
+    </AnimatePresence>
+  )
+}
+
+/** Ghost wireframe — dashed placeholder hinting where the next element will
+ *  land, so the artboard reads as a planned layout, not dead space. */
+function Ghost({ shown, style, rounded = "rounded-2xl" }: { shown: boolean; style: React.CSSProperties; rounded?: string }) {
+  return (
+    <motion.span
+      className={`pointer-events-none absolute border border-dashed border-white/10 ${rounded}`}
+      style={style}
+      animate={{ opacity: shown ? 0 : 1 }}
+      transition={{ duration: 0.3 }}
+      aria-hidden
+    />
+  )
+}
+
+const SPRING = { type: "spring", stiffness: 320, damping: 22, mass: 0.7 } as const
+
 function DesignDemo({ color, reduce, started, lang }: Demo) {
   const [brand, setBrand] = React.useState(0)
   const [p, setP] = React.useState(reduce ? STEPS.length - 1 : -1)
@@ -1408,46 +1500,94 @@ function DesignDemo({ color, reduce, started, lang }: Demo) {
         <div
           className="relative h-[218px] overflow-hidden rounded-2xl border border-white/10 sm:h-[258px]"
           style={{
-            background: "radial-gradient(120% 90% at 18% 0%, rgba(255,255,255,0.05), transparent 60%), #0e1318",
+            background:
+              "radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px) 0 0 / 18px 18px, radial-gradient(120% 90% at 18% 0%, rgba(255,255,255,0.05), transparent 60%), #0e1318",
           }}
         >
-          {/* tool rail — active icon follows the current step */}
-          <div className="absolute left-0 top-0 z-10 flex h-full w-9 flex-col items-center gap-3.5 border-r border-white/8 bg-white/[0.03] pt-4">
+          {/* artboard caption — sells the "real canvas" */}
+          <span className="absolute right-2.5 top-2 z-[2] font-mono text-[8.5px] tracking-[0.14em] text-cream-100/25">
+            1080 × 1350 · 100%
+          </span>
+
+          {/* tool rail — ink-tinted glow slides between tools (shared element) */}
+          <div className="absolute left-0 top-0 z-10 flex h-full w-9 flex-col items-center gap-2 border-r border-white/8 bg-white/[0.03] pt-3">
             {[PenTool, Type, Square, Sparkles].map((Ic, k) => {
               const on = p === k || (p >= STEPS.length && k === STEPS.length - 1)
               return (
-                <motion.span key={k} animate={{ scale: on ? 1.18 : 1 }} transition={{ ease: EASE, duration: 0.3 }}>
-                  <Ic className="h-4 w-4" style={{ color: on ? b.ink : "rgba(243,239,230,0.35)" }} strokeWidth={1.75} />
-                </motion.span>
+                <span key={k} className="relative grid h-7 w-7 place-items-center">
+                  {on && (
+                    <motion.span
+                      layoutId="design-tool-glow"
+                      className="absolute inset-0 rounded-lg"
+                      style={{ background: `${b.ink}26`, boxShadow: `inset 0 0 0 1px ${b.ink}44` }}
+                      transition={SPRING}
+                    />
+                  )}
+                  <motion.span animate={{ scale: on ? 1.12 : 1 }} transition={SPRING} className="relative">
+                    <Ic className="h-4 w-4" style={{ color: on ? b.ink : "rgba(243,239,230,0.35)" }} strokeWidth={1.75} />
+                  </motion.span>
+                </span>
               )
             })}
           </div>
 
+          {/* ghost wireframes — the planned layout, fading out as real elements land */}
+          {!reduce && (
+            <>
+              <Ghost shown={show("mark")} style={{ left: "29%", top: "27%", width: 116, height: 100, transform: "translate(-50%,-50%)" }} />
+              <Ghost shown={show("type")} rounded="rounded-xl" style={{ left: "29%", top: "56%", width: "46%", maxWidth: 250, height: 58, transform: "translate(-50%,-50%)" }} />
+              <Ghost shown={show("grade")} rounded="rounded-lg" style={{ left: "29%", top: "85%", width: "46%", maxWidth: 250, height: 48, transform: "translate(-50%,-50%)" }} />
+              <Ghost shown={show("poster")} rounded="rounded-xl" style={{ right: 12, top: "50%", width: "38%", maxWidth: 196, height: "82%", transform: "translateY(-50%)" }} />
+            </>
+          )}
+
+          {/* snap guides flash where the current element lands */}
+          {!reduce && inBoard && (
+            <SnapGuides x={`${STEPS[p].to[0]}%`} y={`${STEPS[p].to[1]}%`} show c={b.ink} />
+          )}
+
           {/* ── LEFT COLUMN: mark · type · grade ── */}
 
-          {/* logo tile (line-art mark draws itself) */}
+          {/* logo tile — springs in, line-art mark draws itself, marquee while active */}
           <motion.div
-            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-white/[0.04]"
-            style={{ left: "29%", top: "27%", width: 116, height: 100 }}
-            animate={{ opacity: show("mark") ? 1 : 0, scale: show("mark") ? 1 : 0.92 }}
-            transition={{ duration: 0.4, ease: EASE }}
+            className="absolute flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-white/[0.04]"
+            style={{ left: "29%", top: "27%", width: 116, height: 100, x: "-50%", y: "-50%" }}
+            animate={{ opacity: show("mark") ? 1 : 0, scale: show("mark") ? 1 : 0.8 }}
+            transition={show("mark") ? SPRING : { duration: 0.3, ease: EASE }}
           >
+            <SelBox active={!reduce && inBoard && STEPS[p].key === "mark"} c={b.ink} />
             <svg viewBox="0 0 100 100" className="h-11 w-11" key={`mark-${brand}`}>
               <b.Mark c={b.ink} draw={show("mark")} />
             </svg>
-            <span className="text-[15px] leading-none text-cream-50" style={fam}>{b.name}</span>
+            <span className="text-[15px] leading-none text-cream-50" style={fam}>
+              {show("mark") && <Chars key={`mn-${brand}`} text={b.name} delay={0.5} reduce={reduce} />}
+            </span>
           </motion.div>
 
-          {/* type specimen */}
+          {/* type specimen — the name sets itself letter by letter */}
           <motion.div
-            className="absolute -translate-y-1/2 rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2.5"
-            style={{ left: "29%", top: "56%", width: "46%", maxWidth: 250 }}
-            animate={{ opacity: show("type") ? 1 : 0, x: show("type") ? "-50%" : "-46%" }}
-            transition={{ duration: 0.4, ease: EASE }}
+            className="absolute rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2.5"
+            style={{ left: "29%", top: "56%", width: "46%", maxWidth: 250, x: "-50%", y: "-50%" }}
+            animate={{ opacity: show("type") ? 1 : 0, scale: show("type") ? 1 : 0.92 }}
+            transition={show("type") ? SPRING : { duration: 0.3, ease: EASE }}
           >
+            <SelBox active={!reduce && inBoard && STEPS[p].key === "type"} c={b.ink} />
             <div className="truncate text-[30px] leading-none text-cream-50" style={fam}>
-              {b.name}
-              <span style={{ color: b.ink }}>.</span>
+              {show("type") && (
+                <>
+                  <Chars key={`tn-${brand}`} text={b.name} delay={0.15} reduce={reduce} />
+                  <motion.span
+                    key={`dot-${brand}`}
+                    style={{ color: b.ink }}
+                    initial={reduce ? false : { opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ ...SPRING, delay: 0.15 + b.name.length * 0.05 + 0.1 }}
+                    className="inline-block"
+                  >
+                    .
+                  </motion.span>
+                </>
+              )}
             </div>
             <div className="mt-1 flex items-center justify-between font-mono text-[9.5px] text-cream-100/45">
               <span>Aa Gg Qq 123</span>
@@ -1455,12 +1595,14 @@ function DesignDemo({ color, reduce, started, lang }: Demo) {
             </div>
           </motion.div>
 
-          {/* gradient grade bar + solid chips */}
+          {/* grade bar wipes in; swatches drop like paint chips */}
           <div className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: "29%", top: "85%", width: "46%", maxWidth: 250 }}>
+            <SelBox active={!reduce && inBoard && STEPS[p].key === "grade"} c={b.ink} />
             <motion.div
               className="h-7 w-full overflow-hidden rounded-lg border border-white/12"
-              animate={{ opacity: show("grade") ? 1 : 0, y: show("grade") ? 0 : 8 }}
-              transition={{ duration: 0.4, ease: EASE }}
+              style={{ transformOrigin: "left center" }}
+              animate={{ opacity: show("grade") ? 1 : 0, scaleX: show("grade") ? 1 : 0.2 }}
+              transition={show("grade") ? SPRING : { duration: 0.3, ease: EASE }}
             >
               <motion.div
                 key={`grade-${brand}`}
@@ -1476,25 +1618,36 @@ function DesignDemo({ color, reduce, started, lang }: Demo) {
                   key={`${brand}-${i}`}
                   className="h-3.5 flex-1 rounded-[5px] border border-white/10"
                   style={{ background: sw }}
-                  animate={{ opacity: show("grade") ? 1 : 0, y: show("grade") ? 0 : 8 }}
-                  transition={{ duration: 0.3, delay: show("grade") ? 0.1 + i * 0.07 : 0, ease: EASE }}
+                  animate={
+                    show("grade")
+                      ? { opacity: 1, y: 0, scale: 1, rotate: 0 }
+                      : { opacity: 0, y: 10, scale: 0.6, rotate: -8 }
+                  }
+                  transition={show("grade") ? { ...SPRING, delay: 0.12 + i * 0.07 } : { duration: 0.25, ease: EASE }}
                 />
               ))}
             </div>
           </div>
 
-          {/* ── RIGHT: the poster — the payoff ── */}
+          {/* ── RIGHT: the poster — composes layer by layer, the payoff ── */}
           <motion.div
-            className="absolute right-3 z-[5] overflow-hidden rounded-xl border border-white/15 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]"
-            style={{ top: "50%", width: "38%", maxWidth: 196, height: "82%" }}
+            className="absolute right-3 z-[5] overflow-hidden rounded-xl border border-white/15"
+            style={{
+              top: "50%",
+              width: "38%",
+              maxWidth: 196,
+              height: "82%",
+              boxShadow: `0 24px 60px -24px rgba(0,0,0,0.8), 0 12px 48px -18px ${b.ink}55`,
+            }}
             animate={{
               opacity: show("poster") ? 1 : 0,
-              y: show("poster") ? "-50%" : "-44%",
-              scale: show("poster") ? 1 : 0.94,
-              rotate: show("poster") ? 0 : -2,
+              y: show("poster") ? "-50%" : "-42%",
+              scale: show("poster") ? 1 : 0.9,
+              rotate: show("poster") ? 0 : -4,
             }}
-            transition={{ duration: 0.55, ease: EASE }}
+            transition={show("poster") ? { type: "spring", stiffness: 200, damping: 20, mass: 0.9 } : { duration: 0.35, ease: EASE }}
           >
+            <SelBox active={!reduce && inBoard && STEPS[p].key === "poster"} c="#ffffff" />
             {/* animated gradient ground */}
             <motion.div
               key={`poster-${brand}`}
@@ -1508,27 +1661,56 @@ function DesignDemo({ color, reduce, started, lang }: Demo) {
             <svg viewBox="0 0 100 100" className="absolute -right-5 -top-6 h-28 w-28 opacity-25" key={`wm-${brand}`}>
               <b.Mark c="#ffffff" draw={show("poster")} />
             </svg>
-            {/* poster type */}
-            <div className="absolute inset-0 flex flex-col justify-between p-3.5">
-              <div className="flex items-center justify-between font-mono text-[8.5px] uppercase tracking-[0.18em] text-white/75">
-                <span>Studio</span>
-                <span>’26</span>
-              </div>
-              <div>
-                <div className="leading-[0.92] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]" style={{ ...fam, fontSize: 38 }}>
-                  {b.name}
+            {/* poster content — staggered layer assembly, keyed so each brand re-runs */}
+            {show("poster") && (
+              <div key={`pc-${brand}`} className="absolute inset-0 flex flex-col justify-between p-3.5">
+                <motion.div
+                  className="flex items-center justify-between font-mono text-[8.5px] uppercase tracking-[0.18em] text-white/75"
+                  initial={reduce ? false : { opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: 0.1, ease: EASE }}
+                >
+                  <span>Studio</span>
+                  <span>’26</span>
+                </motion.div>
+                <div>
+                  {/* headline rises from under a mask — print-reveal moment */}
+                  <div className="overflow-hidden">
+                    <motion.div
+                      className="leading-[0.92] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
+                      style={{ ...fam, fontSize: 38 }}
+                      initial={reduce ? false : { y: "112%" }}
+                      animate={{ y: "0%" }}
+                      transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
+                    >
+                      {b.name}
+                    </motion.div>
+                  </div>
+                  <motion.div
+                    className="mt-1.5 max-w-[150px] text-[10px] leading-snug text-white/85"
+                    style={fam}
+                    initial={reduce ? false : { opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.42, ease: EASE }}
+                  >
+                    {b.tagline}
+                  </motion.div>
                 </div>
-                <div className="mt-1.5 max-w-[150px] text-[10px] leading-snug text-white/85" style={fam}>
-                  {b.tagline}
+                <div className="flex items-center gap-1">
+                  {b.palette.slice(1).map((sw, i) => (
+                    <motion.span
+                      key={i}
+                      className="h-2 w-6 rounded-full border border-white/30"
+                      style={{ background: sw }}
+                      initial={reduce ? false : { opacity: 0, scale: 0.4 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ ...SPRING, delay: 0.55 + i * 0.08 }}
+                    />
+                  ))}
                 </div>
               </div>
-              <div className="flex items-center gap-1">
-                {b.palette.slice(1).map((sw, i) => (
-                  <span key={i} className="h-2 w-6 rounded-full border border-white/30" style={{ background: sw }} />
-                ))}
-              </div>
-            </div>
-            {/* gloss sweep on appear */}
+            )}
+            {/* gloss sweep once assembled */}
             {!reduce && show("poster") && (
               <motion.div
                 key={`gloss-${brand}`}
@@ -1536,7 +1718,7 @@ function DesignDemo({ color, reduce, started, lang }: Demo) {
                 style={{ background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent)" }}
                 initial={{ x: "-140%" }}
                 animate={{ x: "360%" }}
-                transition={{ duration: 1.1, ease: EASE, delay: 0.25 }}
+                transition={{ duration: 1.1, ease: EASE, delay: 0.75 }}
               />
             )}
           </motion.div>
@@ -1561,15 +1743,24 @@ function DesignDemo({ color, reduce, started, lang }: Demo) {
                   />
                 )}
               </AnimatePresence>
-              <svg width="20" height="22" viewBox="0 0 20 22" className="drop-shadow-[0_2px_5px_rgba(0,0,0,0.55)]">
-                <path
-                  d="M2 2 L2 18 L6.6 13.6 L10.6 20.4 L13.2 19.2 L9.4 12.4 L16 12 Z"
-                  fill="#fff"
-                  stroke="#0b0f14"
-                  strokeWidth="1.1"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              {/* cursor presses down on each click */}
+              <motion.span
+                key={`press-${click}`}
+                className="block"
+                initial={{ scale: 1 }}
+                animate={{ scale: [1, 0.78, 1] }}
+                transition={{ duration: 0.3, times: [0, 0.4, 1], ease: "easeOut" }}
+              >
+                <svg width="20" height="22" viewBox="0 0 20 22" className="drop-shadow-[0_2px_5px_rgba(0,0,0,0.55)]">
+                  <path
+                    d="M2 2 L2 18 L6.6 13.6 L10.6 20.4 L13.2 19.2 L9.4 12.4 L16 12 Z"
+                    fill="#fff"
+                    stroke="#0b0f14"
+                    strokeWidth="1.1"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </motion.span>
               {/* tiny action pill trailing the cursor */}
               <AnimatePresence mode="wait">
                 {inBoard && (
