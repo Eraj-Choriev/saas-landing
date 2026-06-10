@@ -57,7 +57,10 @@ export function DottedSurface({
 	} | null>(null)
 
 	useEffect(() => {
-		if (!containerRef.current) return
+		// capture the node: React nulls containerRef.current before this effect's
+		// cleanup runs on unmount, so cleanup must use this closure variable
+		const container = containerRef.current
+		if (!container) return
 
 		const SEPARATION = 100
 		const AMOUNTX = 100
@@ -95,7 +98,7 @@ export function DottedSurface({
 		renderer.setSize(window.innerWidth, window.innerHeight)
 		renderer.setClearColor(0x000000, 0) // transparent — show the cream page through
 
-		containerRef.current.appendChild(renderer.domElement)
+		container.appendChild(renderer.domElement)
 
 		// Build the grid of points
 		const positions: number[] = []
@@ -151,23 +154,47 @@ export function DottedSurface({
 
 		let count = 0
 		let animationId: number | null = null
+		let disposed = false
+		let visible = true
 
 		const renderFrame = () => {
 			applyWave(count)
 			renderer.render(scene, camera)
 		}
 
+		const animate = () => {
+			if (disposed || !visible) {
+				animationId = null
+				return
+			}
+			animationId = requestAnimationFrame(animate)
+			renderFrame()
+			count += 0.1
+		}
+
 		if (reduceMotion) {
 			// Static final frame — no rAF loop
 			renderFrame()
 		} else {
-			const animate = () => {
-				animationId = requestAnimationFrame(animate)
-				renderFrame()
-				count += 0.1
-			}
 			animate()
 		}
+
+		// pause the loop while the surface is off-screen (scrolled past the hero)
+		// or the tab is hidden — WebGL at 60fps is the most expensive thing on the
+		// page, no reason to pay for it when nobody can see it
+		const io = new IntersectionObserver(([entry]) => {
+			visible = entry.isIntersecting
+			if (visible && !reduceMotion && animationId === null && !disposed) {
+				animate()
+			}
+		})
+		io.observe(container)
+
+		const onVisibility = () => {
+			if (document.hidden) return // rAF already throttles; flag handles resume
+			if (!reduceMotion && animationId === null && !disposed && visible) animate()
+		}
+		document.addEventListener("visibilitychange", onVisibility)
 
 		const handleResize = () => {
 			camera.aspect = window.innerWidth / window.innerHeight
@@ -179,13 +206,16 @@ export function DottedSurface({
 		sceneRef.current = { scene, camera, renderer, points, animationId }
 
 		return () => {
+			// `animationId` is read from the closure — it holds the CURRENT frame's
+			// id. (The old code cancelled a stale first-frame id snapshotted into
+			// sceneRef, leaking the loop on every remount.)
+			disposed = true
+			if (animationId !== null) cancelAnimationFrame(animationId)
+			io.disconnect()
+			document.removeEventListener("visibilitychange", onVisibility)
 			window.removeEventListener("resize", handleResize)
-			const s = sceneRef.current
-			if (!s) return
 
-			if (s.animationId !== null) cancelAnimationFrame(s.animationId)
-
-			s.scene.traverse((object) => {
+			scene.traverse((object) => {
 				if (object instanceof THREE.Points) {
 					object.geometry.dispose()
 					if (Array.isArray(object.material)) {
@@ -196,9 +226,11 @@ export function DottedSurface({
 				}
 			})
 
-			s.renderer.dispose()
-			if (containerRef.current && s.renderer.domElement.parentNode === containerRef.current) {
-				containerRef.current.removeChild(s.renderer.domElement)
+			renderer.dispose()
+			// `container` from the closure — containerRef.current is already null
+			// here on unmount, which used to leave a dead <canvas> in the DOM
+			if (renderer.domElement.parentNode === container) {
+				container.removeChild(renderer.domElement)
 			}
 			sceneRef.current = null
 		}
