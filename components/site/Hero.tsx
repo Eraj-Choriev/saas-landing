@@ -5,7 +5,14 @@ import { motion, useReducedMotion, useInView, animate } from "framer-motion"
 import { Send, Check } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
-import { DottedSurface } from "@/components/ui/dotted-surface"
+import dynamic from "next/dynamic"
+
+// three.js is ~340K minified — load it async so it never blocks first paint
+// or hydration; the dot-field is a background, the hero reads fine without it
+const DottedSurface = dynamic(
+  () => import("@/components/ui/dotted-surface").then((m) => m.DottedSurface),
+  { ssr: false }
+)
 
 const reveal = {
   hidden: { opacity: 0, y: 18 },
