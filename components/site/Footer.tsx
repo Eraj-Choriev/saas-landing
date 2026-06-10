@@ -5,7 +5,7 @@ import { useI18n } from "@/lib/i18n"
 import { Wordmark } from "@/components/ui/wordmark"
 
 /* ── brand glyphs + accent colour per network ── */
-type SocialIcon = "telegram" | "whatsapp" | "instagram" | "facebook"
+type SocialIcon = "telegram" | "whatsapp" | "instagram" | "linkedin"
 
 const SOCIAL_META: Record<SocialIcon, { color: string; Glyph: () => JSX.Element }> = {
   telegram: {
@@ -34,11 +34,11 @@ const SOCIAL_META: Record<SocialIcon, { color: string; Glyph: () => JSX.Element 
       </svg>
     ),
   },
-  facebook: {
-    color: "#1877F2",
+  linkedin: {
+    color: "#0A66C2",
     Glyph: () => (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
-        <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.49-3.91 3.78-3.91 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.44 2.91h-2.34V22c4.78-.76 8.44-4.92 8.44-9.94Z" />
+        <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0Z" />
       </svg>
     ),
   },

@@ -293,7 +293,7 @@ const en = {
     title: "Questions, answered.",
     lead: "The real things clients ask us before they start.",
     items: [
-      { q: "How much will my project cost, and how do I pay?", a: "A landing page starts at 1 500 TJS, a Telegram bot at 2 500 TJS. After a free call we send a fixed quote — no surprises. Work begins on a 50% prepayment and a signed contract; the rest is due on delivery." },
+      { q: "Why do I need a website if I already have Instagram?", a: "Instagram is rented space — the algorithm decides who sees you, and an account can be blocked overnight. A website is an asset you own: it ranks on Google, looks serious to corporate clients and banks, takes payments, and works with a bot 24/7. The strongest setup is both — Instagram brings attention, the site converts it into orders." },
       { q: "How long will it take?", a: "A landing page is 2–6 days, a Telegram bot 5–10 days depending on features. For larger custom systems we set the timeline together after the discovery call." },
       { q: "I don't have ready text or photos — can you help?", a: "Yes. We can work with whatever you have and write or polish the copy and source visuals as a small add-on. Just tell us on the call and we'll include it in the quote." },
       { q: "What if I don't like the result? How many revisions?", a: "You review the work before launch. The Start plan includes one round of edits; on larger projects we work in stages and refine together until you're happy." },
@@ -533,10 +533,16 @@ const en = {
       { label: "Telegram", href: "https://t.me/aqly_io", icon: "telegram" },
       { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
       { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
-      { label: "Facebook", href: "https://facebook.com/aqly", icon: "facebook" },
+      { label: "LinkedIn", href: "https://linkedin.com/company/aqly", icon: "linkedin" },
     ],
     rights: "© 2026 Aqly.io · All rights reserved",
     nav: ["Privacy Policy", "Terms of Service"],
+  },
+  cookie: {
+    kicker: "Cookies",
+    text: "We use cookies to keep the site fast and remember your language. No ad trackers — promise.",
+    accept: "Got it",
+    decline: "Decline",
   },
 }
 
@@ -827,7 +833,7 @@ const ru: Dict = {
     title: "Отвечаем на главное.",
     lead: "Реальные вопросы, которые клиенты задают перед стартом.",
     items: [
-      { q: "Сколько будет стоить проект и как оплачивать?", a: "Лендинг — от 1 500 TJS, Telegram-бот — от 2 500 TJS. После бесплатного созвона присылаем фиксированную смету, без сюрпризов. Старт работ — предоплата 50% и договор, остаток — по факту сдачи." },
+      { q: "Зачем мне сайт, если у меня есть Instagram?", a: "Instagram — арендованная площадка: алгоритм сам решает, кто вас увидит, а аккаунт могут заблокировать за ночь. Сайт — ваш актив: он находится в Google, выглядит серьёзно для корпоративных клиентов и банков, принимает оплату и работает с ботом 24/7. Сильнее всего связка: Instagram приводит внимание, сайт превращает его в заказы." },
       { q: "Сколько времени займёт?", a: "Лендинг — 2–6 дней, Telegram-бот — 5–10 дней в зависимости от функций. Для крупных систем сроки определяем вместе на созвоне." },
       { q: "У меня нет готовых текстов и фото — поможете?", a: "Да. Работаем с тем, что есть, а написание и редактуру текстов и подбор изображений добавляем как небольшую доп. услугу. Скажите на созвоне — включим в смету." },
       { q: "Что если мне не понравится результат? Сколько правок?", a: "Вы принимаете работу до запуска. В тариф «Старт» входит один круг правок; на крупных проектах работаем поэтапно и дорабатываем, пока не будет идеально." },
@@ -1047,10 +1053,16 @@ const ru: Dict = {
       { label: "Telegram", href: "https://t.me/aqly_io", icon: "telegram" },
       { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
       { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
-      { label: "Facebook", href: "https://facebook.com/aqly", icon: "facebook" },
+      { label: "LinkedIn", href: "https://linkedin.com/company/aqly", icon: "linkedin" },
     ],
     rights: "© 2026 Aqly.io · Все права защищены",
     nav: ["Политика приватности", "Условия"],
+  },
+  cookie: {
+    kicker: "Cookies",
+    text: "Используем cookie, чтобы сайт работал быстро и помнил ваш язык. Без рекламных трекеров — обещаем.",
+    accept: "Хорошо",
+    decline: "Отклонить",
   },
 }
 
@@ -1341,7 +1353,7 @@ const tj: Dict = {
     title: "Ҷавоб ба саволҳои асосӣ.",
     lead: "Саволҳои воқеӣ, ки мизоҷон пеш аз оғоз медиҳанд.",
     items: [
-      { q: "Лоиҳа чанд пул меарзад ва чӣ тавр пардохт мекунам?", a: "Лендинг — аз 1 500 TJS, боти Telegram — аз 2 500 TJS. Пас аз занги ройгон ҳисоби муайян мефиристем, бе ногаҳонӣ. Оғози кор — пешпардохти 50% ва шартнома, бақия — ҳангоми супоридан." },
+      { q: "Агар Instagram дошта бошам, чаро сайт лозим аст?", a: "Instagram майдони иҷоравӣ аст: алгоритм худаш ҳал мекунад, ки кӣ шуморо мебинад, ва аккаунтро як шаба баста метавонанд. Сайт дороии шумост: дар Google ёфт мешавад, барои мизоҷони корпоративӣ ва бонкҳо ҷиддӣ менамояд, пардохт қабул мекунад ва бо бот 24/7 кор мекунад. Якҷоягӣ аз ҳама пурқувват аст: Instagram таваҷҷӯҳ меорад, сайт онро ба фармоиш табдил медиҳад." },
       { q: "Чӣ қадар вақт мегирад?", a: "Лендинг — 2–6 рӯз, боти Telegram — 5–10 рӯз вобаста ба функсияҳо. Барои системаҳои калон мӯҳлатро якҷоя дар занг муайян мекунем." },
       { q: "Ман матн ва расми тайёр надорам — кӯмак мекунед?", a: "Бале. Бо он чи доред кор мекунем, навиштан ва таҳрири матн ва интихоби расмҳоро ҳамчун хидмати иловагии хурд илова мекунем. Дар занг бигӯед — ба ҳисоб дохил мекунем." },
       { q: "Агар натиҷа ба ман маъқул нашавад? Чанд маротиба ислоҳ?", a: "Шумо корро пеш аз оғоз қабул мекунед. Ба тарифи «Оғоз» як даври ислоҳ дохил аст; дар лоиҳаҳои калон марҳила ба марҳила кор карда, то идеал такмил медиҳем." },
@@ -1581,10 +1593,16 @@ const tj: Dict = {
       { label: "Telegram", href: "https://t.me/aqly_io", icon: "telegram" },
       { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
       { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
-      { label: "Facebook", href: "https://facebook.com/aqly", icon: "facebook" },
+      { label: "LinkedIn", href: "https://linkedin.com/company/aqly", icon: "linkedin" },
     ],
     rights: "© 2026 Aqly.io · Ҳамаи ҳуқуқҳо ҳифз шудаанд",
     nav: ["Сиёсати махфият", "Шартҳои хидмат"],
+  },
+  cookie: {
+    kicker: "Cookies",
+    text: "Барои зуд кор кардани сайт ва дар ёд доштани забонатон cookie истифода мебарем. Бе трекерҳои реклама — ваъда медиҳем.",
+    accept: "Хуб",
+    decline: "Рад кардан",
   },
 }
 

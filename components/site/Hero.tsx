@@ -139,15 +139,28 @@ export function Hero() {
               animate="show"
               className="mt-7 flex flex-wrap items-center gap-2"
             >
-              {t.hero.tags.map((tag) => (
-                <a
-                  key={tag.label}
-                  href={tag.href}
-                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-1 font-mono text-[11.5px] uppercase tracking-[0.14em] text-cream-100/55 transition-colors duration-200 hover:border-brand-blue/40 hover:bg-brand-blue/10 hover:text-cream-50"
-                >
-                  {tag.label}
-                </a>
-              ))}
+              {t.hero.tags.map((tag, i) => {
+                // brand palette cycles across the chips — each service keeps
+                // its accent on the dot and reveals it fully on hover
+                const accent = ["#a9caf9", "#ff5b24", "#d17a00", "#fce88d", "#a9caf9"][i % 5]
+                return (
+                  <a
+                    key={tag.label}
+                    href={tag.href}
+                    className="group/tag inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.04] px-3.5 py-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-cream-100/55 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.08] hover:text-cream-50"
+                    style={{ ["--tag" as string]: accent }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${accent}66`; e.currentTarget.style.boxShadow = `0 6px 18px -8px ${accent}99` }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.boxShadow = "" }}
+                  >
+                    <span
+                      aria-hidden
+                      className="h-1.5 w-1.5 rounded-full opacity-70 transition-all duration-300 group-hover/tag:opacity-100 group-hover/tag:shadow-[0_0_8px_var(--tag)]"
+                      style={{ background: accent }}
+                    />
+                    {tag.label}
+                  </a>
+                )
+              })}
             </motion.div>
           </div>
 

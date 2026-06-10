@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono"
 import { I18nProvider } from "@/lib/i18n"
 import { SmoothScroll } from "@/components/site/SmoothScroll"
 import { VoiceAgent } from "@/components/site/VoiceAgent"
+import { CookieConsent } from "@/components/site/CookieConsent"
 import "./globals.css"
 
 // Display headings — Unbounded: geometric techno display with real character.
@@ -82,6 +83,7 @@ export default function RootLayout({
           <SmoothScroll />
           {children}
           <VoiceAgent />
+          <CookieConsent />
         </I18nProvider>
       </body>
     </html>
