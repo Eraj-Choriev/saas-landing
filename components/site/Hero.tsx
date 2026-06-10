@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { motion, useReducedMotion, useInView, animate } from "framer-motion"
-import { Send, Check } from "lucide-react"
+import { motion, useReducedMotion } from "framer-motion"
+import { Send } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
 import dynamic from "next/dynamic"
@@ -131,37 +131,6 @@ export function Hero() {
               </Button>
             </motion.div>
 
-            {/* clickable topic tags → jump to services */}
-            <motion.div
-              variants={reveal}
-              custom={8}
-              initial="hidden"
-              animate="show"
-              className="mt-7 flex flex-wrap items-center gap-2"
-            >
-              {t.hero.tags.map((tag, i) => {
-                // brand palette cycles across the chips — each service keeps
-                // its accent on the dot and reveals it fully on hover
-                const accent = ["#a9caf9", "#ff5b24", "#d17a00", "#fce88d", "#a9caf9"][i % 5]
-                return (
-                  <a
-                    key={tag.label}
-                    href={tag.href}
-                    className="group/tag inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.04] px-3.5 py-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-cream-100/55 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.08] hover:text-cream-50"
-                    style={{ ["--tag" as string]: accent }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${accent}66`; e.currentTarget.style.boxShadow = `0 6px 18px -8px ${accent}99` }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.boxShadow = "" }}
-                  >
-                    <span
-                      aria-hidden
-                      className="h-1.5 w-1.5 rounded-full opacity-70 transition-all duration-300 group-hover/tag:opacity-100 group-hover/tag:shadow-[0_0_8px_var(--tag)]"
-                      style={{ background: accent }}
-                    />
-                    {tag.label}
-                  </a>
-                )
-              })}
-            </motion.div>
           </div>
 
           <HeroChat />
@@ -378,7 +347,6 @@ function HeroChat() {
         </div>
       </div>
 
-      <LiveCounter template={chat.counter} target={1247} reduce={!!reduce} />
     </motion.div>
   )
 }
@@ -436,37 +404,3 @@ function ServiceCard({ title, body, tag }: { title: string; body: string; tag: s
   )
 }
 
-function LiveCounter({ template, target, reduce }: { template: string; target: number; reduce: boolean }) {
-  const ref = React.useRef<HTMLParagraphElement>(null)
-  const inView = useInView(ref, { once: true, margin: "-60px" })
-  const [n, setN] = React.useState(0)
-
-  React.useEffect(() => {
-    if (!inView) return
-    if (reduce) {
-      setN(target)
-      return
-    }
-    const controls = animate(0, target, {
-      duration: 1.6,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (v) => setN(Math.round(v)),
-    })
-    return () => controls.stop()
-  }, [inView, target, reduce])
-
-  const [before, after] = template.split("%n")
-  return (
-    <p
-      ref={ref}
-      className="mt-4 flex items-center justify-center gap-1.5 text-center text-[12.5px] text-cream-100/55"
-    >
-      <Check className="h-3.5 w-3.5 text-emerald-400" strokeWidth={2.5} />
-      <span>
-        {before}
-        <span className="font-mono font-medium text-cream-50">{n.toLocaleString("en-US")}</span>
-        {after}
-      </span>
-    </p>
-  )
-}
