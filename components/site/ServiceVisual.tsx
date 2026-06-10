@@ -116,7 +116,7 @@ type Demo = { color: string; reduce: boolean; started: boolean; lang: Lang }
 
 /* ════════════════ 1 · Telegram — interactive chat ════════════════ */
 
-type Msg = { id: number; from: "bot" | "user"; text: string; tw?: boolean }
+type Msg = { id: number; from: "bot" | "user"; text: string; tw?: boolean; time?: string }
 
 function ChatDemo({ color, reduce, started, lang }: Demo) {
   const greeting = tr(
@@ -182,32 +182,99 @@ function ChatDemo({ color, reduce, started, lang }: Demo) {
   const [quick, setQuick] = React.useState<string[]>([])
   const [typing, setTyping] = React.useState(false)
   const [draft, setDraft] = React.useState("")
+  // autoplay drives the thread until the visitor takes over
+  const [autoOn, setAutoOn] = React.useState(true)
+  const active = useActive()
   const idRef = React.useRef(0)
   const threadRef = React.useRef<HTMLDivElement>(null)
-  const next = (m: Omit<Msg, "id">): Msg => { idRef.current += 1; return { ...m, id: idRef.current } }
+  const next = (m: Omit<Msg, "id" | "time">): Msg => {
+    idRef.current += 1
+    // fake telegram clock — a minute ticks by every couple of messages
+    return { ...m, id: idRef.current, time: `12:${String(4 + Math.floor(idRef.current / 2)).padStart(2, "0")}` }
+  }
 
   React.useEffect(() => {
-    if (reduce) {
-      setMsgs([
-        next({ from: "bot", text: greeting }),
-        next({ from: "user", text: NODE.price.q }),
-        next({ from: "bot", text: NODE.price.a }),
-      ])
-      setQuick(["booking", "abilities"])
-      return
+    if (!reduce) return
+    setMsgs([
+      next({ from: "bot", text: greeting }),
+      next({ from: "user", text: NODE.price.q }),
+      next({ from: "bot", text: NODE.price.a }),
+    ])
+    setQuick(["booking", "abilities"])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce, lang])
+
+  /* scripted conversation — plays on loop until the visitor interacts:
+     greet → abilities → price → book a call → pick a slot → confirmed →
+     hold → wipe → replay. Paused while the tab/section is idle (useActive). */
+  React.useEffect(() => {
+    if (reduce || !started || !active || !autoOn) return
+    let cancelled = false
+    const timers: ReturnType<typeof setTimeout>[] = []
+    const later = (fn: () => void, ms: number) => {
+      if (cancelled) return
+      timers.push(setTimeout(() => { if (!cancelled) fn() }, ms))
     }
+
+    const SCRIPT: Array<{ from: "bot" | "user"; text: string; quick?: string[] }> = [
+      { from: "bot", text: greeting, quick: ["abilities", "price", "booking"] },
+      { from: "user", text: NODE.abilities.q },
+      { from: "bot", text: NODE.abilities.a, quick: NODE.abilities.next },
+      { from: "user", text: NODE.price.q },
+      { from: "bot", text: NODE.price.a, quick: NODE.price.next },
+      { from: "user", text: NODE.booking.q },
+      { from: "bot", text: NODE.booking.a, quick: ["s1", "s2", "s3"] },
+      { from: "user", text: NODE.s2.q },
+      { from: "bot", text: confirm },
+    ]
+
+    let i = 0
     setMsgs([])
     setQuick([])
-    if (!started) return
-    setTyping(true)
-    const t = setTimeout(() => {
-      setTyping(false)
-      setMsgs([next({ from: "bot", text: greeting, tw: true })])
-      setQuick(["abilities", "price", "booking"])
-    }, 500)
-    return () => clearTimeout(t)
+    setTyping(false)
+    idRef.current = 0
+
+    const step = () => {
+      if (cancelled) return
+      if (i >= SCRIPT.length) {
+        // hold on the confirmation, then wipe and replay — the loop
+        later(() => {
+          setMsgs([])
+          setQuick([])
+          idRef.current = 0
+          i = 0
+          later(step, 700)
+        }, 3400)
+        return
+      }
+      const s = SCRIPT[i]
+      i += 1
+      if (s.from === "bot") {
+        setQuick([])
+        setTyping(true)
+        later(() => {
+          setTyping(false)
+          setMsgs((m) => [...m, next({ from: "bot", text: s.text, tw: true })])
+          if (s.quick) later(() => setQuick(s.quick!), 500)
+          // wait out the typewriter plus a beat to read
+          later(step, 900 + s.text.length * 16)
+        }, 800)
+      } else {
+        later(() => {
+          setQuick([])
+          setMsgs((m) => [...m, next({ from: "user", text: s.text })])
+          later(step, 600)
+        }, 1000)
+      }
+    }
+    later(step, 400)
+
+    return () => {
+      cancelled = true
+      timers.forEach(clearTimeout)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [started, reduce, lang])
+  }, [reduce, started, active, autoOn, lang])
 
   React.useEffect(() => {
     const el = threadRef.current
@@ -217,6 +284,7 @@ function ChatDemo({ color, reduce, started, lang }: Demo) {
   const busy = React.useRef(false)
   function pick(id: string) {
     if (busy.current) return
+    setAutoOn(false) // visitor takes over — stop the scripted loop
     const node = NODE[id]
     busy.current = true
     setQuick([])
@@ -241,6 +309,7 @@ function ChatDemo({ color, reduce, started, lang }: Demo) {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (busy.current || !draft.trim()) return
+    setAutoOn(false) // visitor takes over — stop the scripted loop
     const text = draft.trim()
     setDraft("")
     busy.current = true
@@ -266,8 +335,14 @@ function ChatDemo({ color, reduce, started, lang }: Demo) {
       </div>
 
       <div ref={threadRef} className="flex-1 space-y-1.5 overflow-y-auto scrollbar-hide pr-1">
+        {/* telegram-style day chip */}
+        <div className="sticky top-0 z-[1] flex justify-center pb-1">
+          <span className="rounded-full bg-white/[0.07] px-2.5 py-0.5 font-mono text-[9.5px] text-cream-100/45 backdrop-blur-sm">
+            {tr(lang, "Сегодня", "Today", "Имрӯз")}
+          </span>
+        </div>
         {msgs.map((m) => (
-          <Bubble key={m.id} side={m.from} color={color}>
+          <Bubble key={m.id} side={m.from} color={color} time={m.time}>
             {m.tw ? <Typewriter text={m.text} /> : m.text}
           </Bubble>
         ))}
@@ -308,7 +383,7 @@ function ChatDemo({ color, reduce, started, lang }: Demo) {
   )
 }
 
-function Bubble({ side, color, children }: { side: "bot" | "user"; color: string; children: React.ReactNode }) {
+function Bubble({ side, color, time, children }: { side: "bot" | "user"; color: string; time?: string; children: React.ReactNode }) {
   const isUser = side === "user"
   return (
     <motion.div initial={{ opacity: 0, y: 6, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -316,6 +391,18 @@ function Bubble({ side, color, children }: { side: "bot" | "user"; color: string
       <div className={`max-w-[82%] px-3 py-1.5 text-[12.5px] leading-[1.4] ${isUser ? "rounded-2xl rounded-br-md text-white" : "rounded-2xl rounded-bl-md border border-white/10 bg-white/[0.07] text-cream-50"}`}
         style={isUser ? { background: "#229ED9" } : undefined}>
         {children}
+        {time && (
+          <span className={`ml-1.5 inline-flex translate-y-[2px] items-center gap-[3px] whitespace-nowrap text-[9px] leading-none ${isUser ? "text-white/65" : "text-cream-100/35"}`}>
+            {time}
+            {isUser && (
+              // double tick — "read", the telegram tell
+              <svg width="13" height="8" viewBox="0 0 14 8" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M1 4.2 3.4 6.8 8 1.4" />
+                <path d="M6 4.2 8.4 6.8 13 1.4" />
+              </svg>
+            )}
+          </span>
+        )}
       </div>
     </motion.div>
   )
