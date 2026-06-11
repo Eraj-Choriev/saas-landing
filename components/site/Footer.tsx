@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 import { Wordmark } from "@/components/ui/wordmark"
@@ -137,10 +138,17 @@ export function Footer() {
           <p className="text-[12.5px] text-ink/50">{t.footer.rights}</p>
           <ul className="flex flex-wrap gap-5 text-[12.5px] text-ink/55">
             {t.footer.nav.map((n) => (
-              <li key={n}>
-                <a href="#" className="link-underline hover:text-ink">
-                  {n}
-                </a>
+              <li key={n.label}>
+                {n.href.startsWith("/") ? (
+                  // internal route — Link applies the prod basePath (/saas-landing)
+                  <Link href={n.href} className="link-underline hover:text-ink">
+                    {n.label}
+                  </Link>
+                ) : (
+                  <a href={n.href} className="link-underline hover:text-ink">
+                    {n.label}
+                  </a>
+                )}
               </li>
             ))}
           </ul>

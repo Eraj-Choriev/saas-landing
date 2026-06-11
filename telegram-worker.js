@@ -109,6 +109,14 @@ export default {
       return json({ ok: false, error: "invalid" }, 422, cors)
     }
 
+    // personal-data consent is required — the form can't submit without it,
+    // so a missing flag here means a forged/scripted request
+    if (data.consent !== true) {
+      return json({ ok: false, error: "consent required" }, 422, cors)
+    }
+    // when the consent was given (browser clock, informational only)
+    const consentAt = esc(data.consentAt).slice(0, 30)
+
     // localize the message to the site language the visitor used
     const L =
       lang === "ru"
@@ -119,6 +127,8 @@ export default {
             site: "Сайт",
             services: "Услуги",
             project: "Проект",
+            consent: "Согласие на обработку ПДн",
+            approved: "одобрено",
           }
         : {
             title: "New lead — Aqly",
@@ -127,6 +137,8 @@ export default {
             site: "Site",
             services: "Services",
             project: "Project",
+            consent: "Personal data consent",
+            approved: "approved",
           }
 
     const text =
@@ -135,6 +147,9 @@ export default {
       `📞 <b>${L.phone}:</b> ${phone}\n` +
       (website ? `🌐 <b>${L.site}:</b> ${website}\n` : "") +
       (services ? `🧩 <b>${L.services}:</b> ${services}\n` : "") +
+      `✅ <b>${L.consent}:</b> ${L.approved}` +
+      (consentAt ? ` (${consentAt})` : "") +
+      "\n" +
       (challenge ? `\n💬 <b>${L.project}:</b>\n${challenge}` : "")
 
     const tg = await fetch(

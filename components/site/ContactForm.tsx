@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo, useRef } from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Check, Mail, Send, AlertCircle, Loader2 } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
@@ -32,6 +33,9 @@ export function ContactForm() {
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState(false)
   const [company, setCompany] = useState("") // honeypot — humans never fill this
+  // 152-ФЗ-style explicit consent: unchecked by default, gates submission.
+  // Kept out of FormState so the progress bar tracks content, not legal gates.
+  const [consent, setConsent] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
 
   // per-field validity — drives the red highlighting
@@ -68,7 +72,7 @@ export function ContactForm() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!allValid) {
+    if (!allValid || !consent) {
       // incomplete → flag errors + jump to first invalid field
       setAttempted(true)
       const firstInvalid = formRef.current?.querySelector("[data-invalid='true']")
@@ -84,7 +88,15 @@ export function ContactForm() {
         const res = await fetch(LEAD_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...form, company, lang }),
+          // consent + timestamp = proof of the user's explicit opt-in,
+          // forwarded to Telegram by the worker
+          body: JSON.stringify({
+            ...form,
+            company,
+            lang,
+            consent,
+            consentAt: new Date().toISOString(),
+          }),
         })
         if (!res.ok) throw new Error("send failed")
       }
@@ -92,6 +104,7 @@ export function ContactForm() {
       // show success card, then reset back to a fresh empty form
       window.setTimeout(() => {
         setForm(initial)
+        setConsent(false)
         setAttempted(false)
         setSubmitted(false)
       }, 5000)
@@ -293,6 +306,64 @@ export function ContactForm() {
               onChange={(e) => setCompany(e.target.value)}
               className="absolute left-[-9999px] h-0 w-0 opacity-0"
             />
+
+            {/* personal-data consent — explicit opt-in, unchecked by default */}
+            <div
+              data-invalid={attempted && !consent ? "true" : "false"}
+              className={cn(attempted && !consent && "animate-shake")}
+            >
+              <label
+                className={cn(
+                  "flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3.5 transition-all",
+                  consent
+                    ? "border-brand-blue/50 bg-brand-blue/[0.06]"
+                    : attempted && !consent
+                      ? "border-danger/60 bg-danger/[0.05] hover:border-danger"
+                      : "border-ink/10 bg-cream-100 hover:border-ink/25"
+                )}
+              >
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  aria-invalid={attempted && !consent}
+                  className="peer sr-only"
+                />
+                <span
+                  aria-hidden
+                  className={cn(
+                    "mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md border transition-all peer-focus-visible:ring-4 peer-focus-visible:ring-brand-blue/25",
+                    consent
+                      ? "border-brand-blue bg-brand-blue text-ink"
+                      : attempted && !consent
+                        ? "border-danger/70"
+                        : "border-ink/25"
+                  )}
+                >
+                  {consent && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+                </span>
+                <span className="text-[13.5px] leading-[1.5] text-ink/70">
+                  {t.form.consent.prefix}
+                  {/* new tab so an in-progress form isn't lost */}
+                  <Link
+                    href="/privacy/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="underline decoration-ink/30 underline-offset-2 transition-colors hover:text-ink hover:decoration-ink/60"
+                  >
+                    {t.form.consent.link}
+                  </Link>
+                  {t.form.consent.suffix}
+                </span>
+              </label>
+              {attempted && !consent && (
+                <p className="mt-2 flex items-center gap-1.5 text-[12px] text-danger">
+                  <AlertCircle className="h-3 w-3" />
+                  {t.form.consent.error}
+                </p>
+              )}
+            </div>
 
             {/* global error hint */}
             <AnimatePresence>

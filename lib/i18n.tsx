@@ -509,6 +509,12 @@ const en = {
     successTag: "We'll be in touch shortly",
     errorHint: "Please fill in the highlighted fields first.",
     required: "This field is required",
+    consent: {
+      prefix: "I consent to the ",
+      link: "processing of my personal data",
+      suffix: "",
+      error: "We need your consent to process the data before sending",
+    },
   },
   footer: {
     tagline: "Custom AI solutions that save your business 10+ hours per week.",
@@ -536,7 +542,57 @@ const en = {
       { label: "LinkedIn", href: "https://linkedin.com/company/aqly", icon: "linkedin" },
     ],
     rights: "© 2026 Aqly.io · All rights reserved",
-    nav: ["Privacy Policy", "Terms of Service"],
+    nav: [
+      { label: "Privacy Policy", href: "/privacy/" },
+      { label: "Terms of Service", href: "#" },
+    ],
+  },
+  privacy: {
+    title: "Privacy Policy",
+    updated: "Last updated: June 11, 2026",
+    intro:
+      "This policy describes how Aqly.io (“we”) processes the personal data you submit through this website. By sending the contact form you give explicit consent to the processing described below.",
+    sections: [
+      {
+        title: "1. What data we collect",
+        body: [
+          "When you submit the contact form we receive the data you enter: your name, phone number, your company's website address and a description of your project or request.",
+          "Beyond the form, the site stores only your language preference in your browser's localStorage. We do not use analytics or advertising trackers and set no ad cookies.",
+        ],
+      },
+      {
+        title: "2. Why we process it",
+        body: [
+          "We use this data for one purpose: to respond to your request — to contact you, clarify the task and prepare a proposal. We do not use it for marketing mailings and do not sell or share it with third parties for their own purposes.",
+        ],
+      },
+      {
+        title: "3. Legal basis",
+        body: [
+          "Processing is based on your explicit consent, given by ticking the consent checkbox and submitting the form. You may withdraw consent at any time (see section 5).",
+        ],
+      },
+      {
+        title: "4. Storage and transfer",
+        body: [
+          "The submitted form is delivered to our team chat via the Telegram Bot API through a Cloudflare Worker, so the data transits Cloudflare's and Telegram's infrastructure as delivery channels.",
+          "We keep your request only as long as needed to handle it and the conversation that follows, after which it is deleted.",
+        ],
+      },
+      {
+        title: "5. Your rights",
+        body: [
+          "You may at any time request a copy, correction or deletion of your data, or withdraw your consent, by emailing hello@aqly.io. We will respond and act on the request without undue delay.",
+        ],
+      },
+      {
+        title: "6. Contact",
+        body: [
+          "The operator of this website and of the contact-form data is Aqly.io. For any privacy questions, write to hello@aqly.io.",
+        ],
+      },
+    ],
+    backHome: "Back to home",
   },
   cookie: {
     kicker: "Cookies",
@@ -1029,6 +1085,12 @@ const ru: Dict = {
     successTag: "Скоро свяжемся с вами",
     errorHint: "Сначала заполните выделенные поля.",
     required: "Это поле обязательно",
+    consent: {
+      prefix: "Я даю согласие на ",
+      link: "обработку персональных данных",
+      suffix: "",
+      error: "Для отправки заявки нужно согласие на обработку данных",
+    },
   },
   footer: {
     tagline: "Кастомные AI-системы, экономящие команде 10+ часов в неделю.",
@@ -1056,7 +1118,57 @@ const ru: Dict = {
       { label: "LinkedIn", href: "https://linkedin.com/company/aqly", icon: "linkedin" },
     ],
     rights: "© 2026 Aqly.io · Все права защищены",
-    nav: ["Политика приватности", "Условия"],
+    nav: [
+      { label: "Политика приватности", href: "/privacy/" },
+      { label: "Условия", href: "#" },
+    ],
+  },
+  privacy: {
+    title: "Политика обработки персональных данных",
+    updated: "Обновлено: 11 июня 2026",
+    intro:
+      "Настоящая политика описывает, как Aqly.io («мы») обрабатывает персональные данные, которые вы оставляете на этом сайте. Отправляя контактную форму, вы даёте явное согласие на обработку, описанную ниже.",
+    sections: [
+      {
+        title: "1. Какие данные мы собираем",
+        body: [
+          "При отправке контактной формы мы получаем данные, которые вы указали: имя, номер телефона, адрес сайта вашей компании и описание проекта или задачи.",
+          "Помимо формы сайт хранит только выбранный язык в localStorage вашего браузера. Мы не используем аналитические и рекламные трекеры и не ставим рекламные cookie.",
+        ],
+      },
+      {
+        title: "2. Цель обработки",
+        body: [
+          "Данные используются с одной целью — ответить на вашу заявку: связаться с вами, уточнить задачу и подготовить предложение. Мы не используем их для рекламных рассылок и не передаём третьим лицам для их собственных целей.",
+        ],
+      },
+      {
+        title: "3. Правовое основание",
+        body: [
+          "Обработка ведётся на основании вашего явного согласия — отметки в чекбоксе и отправки формы. Согласие можно отозвать в любой момент (см. раздел 5).",
+        ],
+      },
+      {
+        title: "4. Хранение и передача",
+        body: [
+          "Отправленная форма доставляется в рабочий чат команды через Telegram Bot API при помощи Cloudflare Worker, поэтому данные проходят через инфраструктуру Cloudflare и Telegram как каналы доставки.",
+          "Мы храним заявку только столько, сколько нужно для её обработки и последующего общения, после чего удаляем.",
+        ],
+      },
+      {
+        title: "5. Ваши права",
+        body: [
+          "Вы можете в любой момент запросить копию, исправление или удаление своих данных либо отозвать согласие, написав на hello@aqly.io. Мы ответим и выполним запрос без неоправданной задержки.",
+        ],
+      },
+      {
+        title: "6. Контакты",
+        body: [
+          "Оператор сайта и данных контактной формы — Aqly.io. По любым вопросам о персональных данных пишите на hello@aqly.io.",
+        ],
+      },
+    ],
+    backHome: "На главную",
   },
   cookie: {
     kicker: "Cookies",
@@ -1569,6 +1681,12 @@ const tj: Dict = {
     successTag: "Ба зудӣ дар тамос мешавем",
     errorHint: "Аввал майдонҳои ҷудошударо пур кунед.",
     required: "Ин майдон ҳатмист",
+    consent: {
+      prefix: "Ман ба ",
+      link: "коркарди маълумоти шахсӣ",
+      suffix: " розигӣ медиҳам",
+      error: "Барои фиристодани дархост розигӣ ба коркарди маълумот лозим аст",
+    },
   },
   footer: {
     tagline: "Ҳалли фармоишии AI, ки ба тиҷорати шумо ҳафтае 10+ соат сарфа мекунад.",
@@ -1596,7 +1714,57 @@ const tj: Dict = {
       { label: "LinkedIn", href: "https://linkedin.com/company/aqly", icon: "linkedin" },
     ],
     rights: "© 2026 Aqly.io · Ҳамаи ҳуқуқҳо ҳифз шудаанд",
-    nav: ["Сиёсати махфият", "Шартҳои хидмат"],
+    nav: [
+      { label: "Сиёсати махфият", href: "/privacy/" },
+      { label: "Шартҳои хидмат", href: "#" },
+    ],
+  },
+  privacy: {
+    title: "Сиёсати коркарди маълумоти шахсӣ",
+    updated: "Навсозӣ: 11 июни 2026",
+    intro:
+      "Ин сиёсат тавсиф мекунад, ки Aqly.io («мо») маълумоти шахсиеро, ки шумо дар ин сайт мегузоред, чӣ гуна коркард мекунад. Бо фиристодани шакли тамос шумо ба коркарди дар зер тавсифшуда розигии возеҳ медиҳед.",
+    sections: [
+      {
+        title: "1. Кадом маълумотро ҷамъ мекунем",
+        body: [
+          "Ҳангоми фиристодани шакли тамос мо маълумоти воридкардаи шуморо мегирем: ном, рақами телефон, суроғаи сайти ширкат ва тавсифи лоиҳа ё дархост.",
+          "Ғайр аз шакл, сайт танҳо забони интихобшударо дар localStorage-и браузери шумо нигоҳ медорад. Мо трекерҳои таҳлилӣ ва рекламавӣ истифода намебарем ва cookie-и рекламавӣ намегузорем.",
+        ],
+      },
+      {
+        title: "2. Мақсади коркард",
+        body: [
+          "Маълумот танҳо бо як мақсад истифода мешавад — ҷавоб додан ба дархости шумо: тамос гирифтан, аниқ кардани вазифа ва омода кардани пешниҳод. Мо онро барои фиристодани реклама истифода намебарем ва ба шахсони сеюм барои мақсадҳои худашон намедиҳем.",
+        ],
+      },
+      {
+        title: "3. Асоси ҳуқуқӣ",
+        body: [
+          "Коркард дар асоси розигии возеҳи шумо сурат мегирад — қайд дар чекбокс ва фиристодани шакл. Розигиро дар ҳар лаҳза бозпас гирифтан мумкин аст (ниг. банди 5).",
+        ],
+      },
+      {
+        title: "4. Нигоҳдорӣ ва интиқол",
+        body: [
+          "Шакли фиристодашуда тавассути Telegram Bot API бо ёрии Cloudflare Worker ба чати кории даста мерасад, бинобар ин маълумот аз инфрасохтори Cloudflare ва Telegram ҳамчун каналҳои интиқол мегузарад.",
+          "Мо дархостро танҳо то даме нигоҳ медорем, ки барои коркард ва муоширати минбаъда лозим аст, баъд нест мекунем.",
+        ],
+      },
+      {
+        title: "5. Ҳуқуқҳои шумо",
+        body: [
+          "Шумо метавонед дар ҳар лаҳза нусха, ислоҳ ё несткунии маълумоти худро дархост кунед ё розигиро бозпас гиред — ба hello@aqly.io нависед. Мо бе таъхири беасос ҷавоб медиҳем ва дархостро иҷро мекунем.",
+        ],
+      },
+      {
+        title: "6. Тамос",
+        body: [
+          "Оператори сайт ва маълумоти шакли тамос — Aqly.io. Барои ҳар гуна савол дар бораи маълумоти шахсӣ ба hello@aqly.io нависед.",
+        ],
+      },
+    ],
+    backHome: "Ба саҳифаи асосӣ",
   },
   cookie: {
     kicker: "Cookies",
