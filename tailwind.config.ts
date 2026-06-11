@@ -59,14 +59,14 @@ const config: Config = {
         accent: "#a9caf9",
       },
       fontFamily: {
-        display: ["var(--font-unbounded)", "var(--font-manrope)", "system-ui", "sans-serif"],
-        sans: ["var(--font-manrope)", "system-ui", "sans-serif"],
+        display: ["var(--font-geologica)", "var(--font-onest)", "system-ui", "sans-serif"],
+        sans: ["var(--font-onest)", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
       },
       letterSpacing: {
-        // Tuned for Unbounded (wide geometric display) — Michroma wanted -0.045em
-        // but that collides on Unbounded's heavier, rounder glyphs.
-        tightest: "-0.03em",
+        // Tuned for Geologica — a narrower grotesque than the old Unbounded,
+        // so it takes slightly tighter tracking before glyphs collide.
+        tightest: "-0.035em",
       },
       transitionTimingFunction: {
         smooth: "cubic-bezier(0.16, 1, 0.3, 1)",

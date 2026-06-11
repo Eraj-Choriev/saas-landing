@@ -1144,7 +1144,7 @@ function IntegrationHub({ reduce, started, lang }: Demo) {
     dim: "#7A7772",
     success: "#4ADE80",
   }
-  const font = "var(--font-dmsans), var(--font-manrope), ui-sans-serif, system-ui, sans-serif"
+  const font = "var(--font-dmsans), var(--font-onest), ui-sans-serif, system-ui, sans-serif"
 
   const NODES: { id: string; Icon: LucideIcon; label: string; x: number; y: number; desc: string }[] = [
     { id: "crm", Icon: Users, label: "CRM", x: 50, y: 11,
