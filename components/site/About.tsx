@@ -69,7 +69,7 @@ export function About() {
                   className="block"
                 >
                   {i === 1 ? (
-                    <span className="italic font-light text-brand-gold">
+                    <span className="font-medium text-brand-gold">
                       {line}
                     </span>
                   ) : (

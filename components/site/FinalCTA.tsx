@@ -36,7 +36,7 @@ export function FinalCTA() {
           className="mx-auto mt-5 max-w-3xl font-display text-[32px] leading-[1.05] tracking-tightest text-ink sm:text-[54px] sm:leading-[1.0] lg:text-[68px]"
         >
           {c.title[0]}{" "}
-          <span className="italic font-light text-brand-coral">{c.title[1]}</span>
+          <span className="font-medium text-brand-coral">{c.title[1]}</span>
         </motion.h2>
 
         <motion.p

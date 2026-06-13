@@ -40,7 +40,7 @@ export function Pricing() {
           </p>
           <h2 className="mt-5 font-display text-[34px] leading-[1.18] tracking-tightest text-cream-50 sm:text-[52px] sm:leading-[1.15]">
             {p.title}{" "}
-            <span className="bg-gradient-to-r from-brand-coral via-brand-amber to-brand-gold bg-clip-text italic text-transparent">
+            <span className="bg-gradient-to-r from-brand-coral via-brand-amber to-brand-gold bg-clip-text font-medium text-transparent">
               {p.titleAccent}
             </span>
           </h2>

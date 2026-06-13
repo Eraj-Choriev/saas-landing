@@ -91,7 +91,7 @@ export function Hero() {
                   className="block"
                 >
                   {i === 1 ? (
-                    <span className="italic text-brand-gold font-light">
+                    <span className="text-brand-gold font-medium">
                       {line}
                     </span>
                   ) : (
