@@ -117,6 +117,15 @@ export default {
     // when the consent was given (browser clock, informational only)
     const consentAt = esc(data.consentAt).slice(0, 30)
 
+    // lead attribution — where the visitor came from (source/medium/campaign/
+    // landing/device). Lets you qualify + prioritise before replying.
+    const attr = data.attribution && typeof data.attribution === "object" ? data.attribution : {}
+    const aSource = esc(attr.source).slice(0, 80)
+    const aMedium = esc(attr.medium).slice(0, 80)
+    const aCampaign = esc(attr.campaign).slice(0, 120)
+    const aLanding = esc(attr.landing).slice(0, 200)
+    const aDevice = esc(attr.device).slice(0, 20)
+
     // localize the message to the site language the visitor used
     const L =
       lang === "ru"
@@ -129,6 +138,10 @@ export default {
             project: "Проект",
             consent: "Согласие на обработку ПДн",
             approved: "одобрено",
+            source: "Источник",
+            device: "Устройство",
+            writeWa: "💬 Написать в WhatsApp",
+            
           }
         : {
             title: "New lead — Aqly",
@@ -139,7 +152,17 @@ export default {
             project: "Project",
             consent: "Personal data consent",
             approved: "approved",
+            source: "Source",
+            device: "Device",
+            writeWa: "💬 Message on WhatsApp",
+            
           }
+
+    // compose the source line: "google / cpc · summer" or just "direct"
+    const sourceLine =
+      aSource +
+      (aMedium ? ` / ${aMedium}` : "") +
+      (aCampaign ? ` · ${aCampaign}` : "")
 
     const text =
       `🟢 <b>${L.title}</b>\n\n` +
@@ -147,10 +170,21 @@ export default {
       `📞 <b>${L.phone}:</b> ${phone}\n` +
       (website ? `🌐 <b>${L.site}:</b> ${website}\n` : "") +
       (services ? `🧩 <b>${L.services}:</b> ${services}\n` : "") +
+      (sourceLine ? `📈 <b>${L.source}:</b> ${sourceLine}\n` : "") +
+      (aDevice ? `📱 <b>${L.device}:</b> ${aDevice}\n` : "") +
       `✅ <b>${L.consent}:</b> ${L.approved}` +
       (consentAt ? ` (${consentAt})` : "") +
       "\n" +
       (challenge ? `\n💬 <b>${L.project}:</b>\n${challenge}` : "")
+
+    // one-tap reply button under the lead. Telegram inline buttons only accept
+    // http(s)/tg:// — NOT tel: (it would 400 the whole sendMessage and lose the
+    // lead), so we surface WhatsApp (wa.me, https) and leave calling to the
+    // phone number printed in the message body.
+    const waUrl = `https://wa.me/${phoneDigits}`
+    const reply_markup = {
+      inline_keyboard: [[{ text: L.writeWa, url: waUrl }]],
+    }
 
     const tg = await fetch(
       `https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`,
@@ -162,6 +196,7 @@ export default {
           text,
           parse_mode: "HTML",
           disable_web_page_preview: true,
+          reply_markup,
         }),
       }
     )

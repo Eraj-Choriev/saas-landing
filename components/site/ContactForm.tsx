@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useRef } from "react"
+import { useState, useMemo, useRef, useEffect } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Check, Mail, Send, Phone, AlertCircle, Loader2 } from "lucide-react"
@@ -25,6 +25,55 @@ const initial: FormState = {
 
 const LEAD_ENDPOINT = process.env.NEXT_PUBLIC_LEAD_ENDPOINT
 
+// Lead attribution — where this visitor came from. Captured once on first load
+// and stashed in sessionStorage so it survives in-page navigation; sent with
+// the lead so the Telegram message tells you the source/landing/device and you
+// can qualify + prioritise before you even reply.
+type Attribution = {
+  source: string
+  medium: string
+  campaign: string
+  referrer: string
+  landing: string
+  device: string
+}
+
+const ATTR_KEY = "aqly-attr"
+
+function captureAttribution(): Attribution {
+  try {
+    const cached = sessionStorage.getItem(ATTR_KEY)
+    if (cached) return JSON.parse(cached)
+  } catch {
+    /* storage blocked */
+  }
+  const p = new URLSearchParams(window.location.search)
+  const ref = document.referrer || ""
+  // first-touch source: explicit utm_source → else the referring host → "direct"
+  let source = p.get("utm_source") || ""
+  if (!source && ref) {
+    try {
+      source = new URL(ref).hostname.replace(/^www\./, "")
+    } catch {
+      /* malformed referrer */
+    }
+  }
+  const attr: Attribution = {
+    source: source || "direct",
+    medium: p.get("utm_medium") || "",
+    campaign: p.get("utm_campaign") || "",
+    referrer: ref,
+    landing: window.location.pathname + window.location.search,
+    device: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobile" : "desktop",
+  }
+  try {
+    sessionStorage.setItem(ATTR_KEY, JSON.stringify(attr))
+  } catch {
+    /* storage blocked */
+  }
+  return attr
+}
+
 export function ContactForm() {
   const { t, lang } = useI18n()
   const [form, setForm] = useState<FormState>(initial)
@@ -36,7 +85,13 @@ export function ContactForm() {
   // 152-ФЗ-style explicit consent: unchecked by default, gates submission.
   // Kept out of FormState so the progress bar tracks content, not legal gates.
   const [consent, setConsent] = useState(false)
+  const attrRef = useRef<Attribution | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
+
+  // capture attribution once, on mount (needs window — client only)
+  useEffect(() => {
+    attrRef.current = captureAttribution()
+  }, [])
 
   // per-field validity — drives the red highlighting
   const valid = useMemo(
@@ -96,6 +151,7 @@ export function ContactForm() {
             lang,
             consent,
             consentAt: new Date().toISOString(),
+            attribution: attrRef.current,
           }),
         })
         if (!res.ok) throw new Error("send failed")
