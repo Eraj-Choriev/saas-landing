@@ -32,9 +32,16 @@ export function Navbar() {
   // One consistent dark frosted pill across hero AND cream sections.
   // Scrolling only deepens the glass — no jarring light/dark tone swap.
   // The mobile dropdown shares the same recipe so it reads as one surface.
+  // backdrop-filter is IDENTICAL in both states on purpose: animating blur or
+  // saturate forces a full re-blur every transition frame — the main source of
+  // scroll jank on mobile. Only paint-cheap props (bg, border, shadow) change.
   const glass = scrolled
     ? "border-white/15 bg-ink/55 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_18px_50px_-20px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.18)]"
-    : "border-white/20 bg-white/[0.06] backdrop-blur-2xl backdrop-saturate-[1.8] shadow-[0_8px_40px_-12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.30),inset_0_-10px_28px_-14px_rgba(255,255,255,0.07)]"
+    : "border-white/20 bg-white/[0.06] backdrop-blur-2xl backdrop-saturate-150 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.30),inset_0_-10px_28px_-14px_rgba(255,255,255,0.07)]"
+  // NOT transition-all: framer animates opacity/transform on the dropdown every
+  // frame, and a CSS `all` transition re-interpolates those frames 500ms behind
+  // → the menu visibly stutters and "pops". Transition only the glass props.
+  const glassTransition = "transition-[background-color,border-color,box-shadow] duration-500"
 
   return (
     <div className="fixed inset-x-0 top-0 z-50 w-full">
@@ -46,7 +53,8 @@ export function Navbar() {
       >
         <nav
           className={cn(
-            "relative mx-auto flex items-center justify-between overflow-hidden rounded-full border px-3 py-2 transition-all duration-500",
+            "relative mx-auto flex items-center justify-between overflow-hidden rounded-full border px-3 py-2",
+            glassTransition,
             glass
           )}
         >
@@ -105,14 +113,15 @@ export function Navbar() {
         <AnimatePresence>
           {open && (
             <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.98 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
               // `isolate` — same iOS Safari fix as CookieConsent: backdrop-filter
               // otherwise paints square corners without its own stacking context
               className={cn(
-                "lg:hidden relative isolate mt-2 overflow-hidden rounded-3xl border p-2 transition-all duration-500",
+                "lg:hidden relative isolate mt-2 overflow-hidden rounded-3xl border p-2",
+                glassTransition,
                 glass
               )}
             >
