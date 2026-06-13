@@ -1,7 +1,6 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from "react"
-import { flushSync } from "react-dom"
 
 export type Lang = "ru" | "en" | "tj"
 
@@ -1797,30 +1796,20 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [])
 
   // Language switch crossfades via the View Transitions API: the browser
-  // snapshots the old frame and fades the new one in ON TOP of it, so dark
-  // sections never blend toward the light <body> background. (The previous
-  // approach — dipping the whole page to opacity .78 — let the body show
-  // through and read as a white flash.) No support / reduced motion → the
-  // text just swaps instantly, which is flash-free by definition.
+  // Plain instant swap — the dictionary changes in place, which is flash-free
+  // by definition. (Two earlier attempts each had a side effect: an opacity dip
+  // let the light body show through dark sections — white flash; a View
+  // Transitions crossfade snapshotted the fixed backdrop-blur navbar, which VT
+  // can't capture, leaving a dark band that flickered for ~200ms. Both also
+  // behaved differently per browser — Firefox has no VT at all. Instant is the
+  // one behaviour that's identical and bug-free everywhere.)
   const setLang = useCallback((l: Lang) => {
     if (l === langRef.current) return
-    const apply = () => {
-      setLangState(l)
-      try {
-        localStorage.setItem(LANG_KEY, l)
-      } catch {
-        // ignore (private mode / storage disabled)
-      }
-    }
-    const startVT = (
-      document as Document & { startViewTransition?: (cb: () => void) => void }
-    ).startViewTransition?.bind(document)
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-    if (startVT && !reduce) {
-      // flushSync so the DOM is fully re-rendered inside the transition callback
-      startVT(() => flushSync(apply))
-    } else {
-      apply()
+    setLangState(l)
+    try {
+      localStorage.setItem(LANG_KEY, l)
+    } catch {
+      // ignore (private mode / storage disabled)
     }
   }, [])
 

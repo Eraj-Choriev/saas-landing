@@ -44,13 +44,6 @@ body {
   color: #fff;
 }
 
-/* Language-switch crossfade (View Transitions API). The browser stacks the
-   old frame's snapshot over the new one and fades — nothing shows through. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 200ms;
-  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
-}
 
 .font-display {
   font-optical-sizing: auto;
