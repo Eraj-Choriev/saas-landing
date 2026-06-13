@@ -1141,103 +1141,134 @@ function IntegrationHub({ reduce, started, lang }: Demo) {
     line: "#333130",
     accent: "#C4704B",
     text: "#E8E6E2",
-    dim: "#7A7772",
+    dim: "#9C9890",
     success: "#4ADE80",
   }
   const font = "var(--font-dmsans), var(--font-onest), ui-sans-serif, system-ui, sans-serif"
 
-  const NODES: { id: string; Icon: LucideIcon; label: string; x: number; y: number; desc: string }[] = [
-    { id: "crm", Icon: Users, label: "CRM", x: 50, y: 11,
-      desc: tr(lang, "Синхронизация контактов, сделок и воронки продаж", "Sync contacts, deals and the sales pipeline", "Ҳамоҳангсозии контактҳо, муомилаҳо ва воронкаи фурӯш") },
-    { id: "calendar", Icon: Calendar, label: "Calendar", x: 13, y: 31,
-      desc: tr(lang, "Автоматическое планирование встреч и напоминаний", "Automatic meeting scheduling and reminders", "Банақшагирии худкори вохӯриҳо ва ёдоварӣ") },
-    { id: "stripe", Icon: CreditCard, label: "Stripe", x: 87, y: 31,
-      desc: tr(lang, "Обработка платежей, подписок и выставление счетов", "Payments, subscriptions and invoicing", "Коркарди пардохтҳо, обунаҳо ва ҳисобнома") },
-    { id: "email", Icon: Mail, label: "Email", x: 13, y: 65,
-      desc: tr(lang, "Умная маршрутизация писем и автоответы", "Smart email routing and auto-replies", "Идоракунии оқилонаи мактубҳо ва ҷавобҳои худкор") },
-    { id: "slack", Icon: MessageSquare, label: "Slack", x: 87, y: 65,
-      desc: tr(lang, "Уведомления и команды прямо из чата", "Notifications and commands right from chat", "Огоҳиҳо ва фармонҳо рост аз чат") },
-    { id: "data", Icon: Database, label: "Database", x: 50, y: 85,
-      desc: tr(lang, "Миграция, трансформация и резервное копирование данных", "Data migration, transformation and backups", "Муҳоҷират, табдил ва нусхабардории додаҳо") },
+  // Three business moments, one shape: task in → AI core → result out.
+  // Far simpler than the old radial node map — reads as a story, not a diagram.
+  const SCENARIOS = [
+    {
+      label: tr(lang, "Чат-поддержка 24/7", "Chat support 24/7", "Дастгирии чат 24/7"),
+      InIcon: MessageSquare,
+      inTitle: tr(lang, "«Где мой заказ?»", "“Where is my order?”", "«Фармоиши ман куҷост?»"),
+      inSub: tr(lang, "клиент · 02:14 ночи", "customer · 2:14 am", "мизоҷ · 02:14 шаб"),
+      OutIcon: Check,
+      outTitle: tr(lang, "Ответ отправлен", "Reply sent", "Ҷавоб фиристода шуд"),
+      outSub: tr(lang, "за 3 секунды", "in 3 seconds", "дар 3 сония"),
+    },
+    {
+      label: tr(lang, "Генерация контента", "Content generation", "Тавлиди контент"),
+      InIcon: Database,
+      inTitle: tr(lang, "Товар без описания", "Product missing copy", "Маҳсулот бе тавсиф"),
+      inSub: tr(lang, "каталог · 38 позиций", "catalog · 38 items", "феҳрист · 38 мавқеъ"),
+      OutIcon: FileText,
+      outTitle: tr(lang, "Описания готовы", "Copy generated", "Тавсифҳо тайёр"),
+      outSub: tr(lang, "SEO-тексты для всех", "SEO copy for all", "матнҳои SEO барои ҳама"),
+    },
+    {
+      label: tr(lang, "AI-копайлот для команды", "AI copilot for the team", "AI-ёрдамчӣ барои даста"),
+      InIcon: Users,
+      inTitle: tr(lang, "«Продажи за июнь?»", "“Sales for June?”", "«Фурӯши июн чӣ қадар?»"),
+      inSub: tr(lang, "вопрос менеджера", "manager’s question", "саволи менеҷер"),
+      OutIcon: Table,
+      outTitle: tr(lang, "Отчёт собран", "Report ready", "Ҳисобот тайёр"),
+      outSub: tr(lang, "цифры и динамика", "numbers and trends", "рақамҳо ва динамика"),
+    },
   ]
 
-  // measure the (max-600) panel so SVG works in real px → round dots, no stretch
+  // stack vertically when the panel is too narrow for three stations in a row
   const boxRef = React.useRef<HTMLDivElement>(null)
-  const [size, setSize] = React.useState({ w: 0, h: 0 })
+  const [w, setW] = React.useState(0)
   React.useLayoutEffect(() => {
     const el = boxRef.current
     if (!el) return
-    const measure = () => setSize({ w: el.clientWidth, h: el.clientHeight })
+    const measure = () => setW(el.clientWidth)
     measure()
     const ro = new ResizeObserver(measure)
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
+  const vertical = w > 0 && w < 480
 
-  // entrance: hub (200) → lines (700) → nodes (1200)
-  const [step, setStep] = React.useState(reduce ? 3 : 0)
+  const active = useActive()
+  // phase: 0 task appears → 1 dot travels in → 2 core thinks → 3 dot travels
+  // out → 4 result lands; then the next scenario crossfades in
+  const [scn, setScn] = React.useState(0)
+  const [phase, setPhase] = React.useState(reduce ? 4 : 0)
   React.useEffect(() => {
     if (reduce) {
-      setStep(3)
+      setPhase(4)
       return
     }
-    if (!started) return
-    const t = [
-      setTimeout(() => setStep(1), 200),
-      setTimeout(() => setStep(2), 700),
-      setTimeout(() => setStep(3), 1200),
+    if (!started || !active) return
+    setPhase(0)
+    const T = [
+      setTimeout(() => setPhase(1), 600),
+      setTimeout(() => setPhase(2), 1450),
+      setTimeout(() => setPhase(3), 2750),
+      setTimeout(() => setPhase(4), 3600),
+      setTimeout(() => setScn((s) => (s + 1) % SCENARIOS.length), 6200),
     ]
-    return () => t.forEach(clearTimeout)
-  }, [reduce, started])
-
-  // active = hovered node, else a gentle auto-cycle so the map feels alive
-  const [hovered, setHovered] = React.useState<string | null>(null)
-  const [auto, setAuto] = React.useState<string | null>(null)
-  React.useEffect(() => {
-    if (reduce || step < 3 || hovered) return
-    setAuto((a) => a ?? NODES[0].id)
-    const id = setInterval(() => {
-      setAuto((a) => {
-        const idx = a ? NODES.findIndex((n) => n.id === a) : -1
-        return NODES[(idx + 1) % NODES.length].id
-      })
-    }, 2600)
-    return () => clearInterval(id)
+    return () => T.forEach(clearTimeout)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduce, step, hovered])
-  const active = hovered ?? (reduce ? null : auto)
+  }, [scn, reduce, started, active])
 
-  const { w, h } = size
-  const ready = w > 0 && h > 0
-  const cx = w / 2
-  const cy = h * 0.45
-  const coreR = 40
-  const nodeR = 30
+  const S = SCENARIOS[scn]
+  const thinking = phase === 2 || phase === 3
+  const done = phase >= 4
 
-  const geo = NODES.map((n, i) => {
-    const nx = (w * n.x) / 100
-    const ny = (h * n.y) / 100
-    const vx = nx - cx
-    const vy = ny - cy
-    const len = Math.hypot(vx, vy) || 1
-    const ux = vx / len
-    const uy = vy / len
-    const sx = cx + ux * coreR
-    const sy = cy + uy * coreR
-    const ex = nx - ux * nodeR
-    const ey = ny - uy * nodeR
-    const lineLen = Math.hypot(ex - sx, ey - sy)
-    return { ...n, i, nx, ny, sx, sy, ex, ey, lineLen }
+  const card = (on: boolean): React.CSSProperties => ({
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    width: vertical ? "min(78%, 250px)" : 168,
+    padding: "10px 12px",
+    borderRadius: 12,
+    background: C.surface,
+    border: `1.5px solid ${on ? C.accent : C.border}`,
+    transition: "border-color 0.3s ease, opacity 0.3s ease",
+  })
+  const iconTile = (on: boolean): React.CSSProperties => ({
+    display: "grid",
+    placeItems: "center",
+    width: 34,
+    height: 34,
+    borderRadius: 9,
+    flexShrink: 0,
+    color: on ? C.accent : C.dim,
+    background: C.bg,
+    border: `1px solid ${on ? C.accent : C.border}`,
+    transition: "color 0.3s ease, border-color 0.3s ease",
   })
 
-  const Star = ({ c }: { c: string }) => (
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden style={{ transition: "fill 0.3s ease" }}>
-      <path
-        d="M12 2 C 13 9 15 11 22 12 C 15 13 13 15 12 22 C 11 15 9 13 2 12 C 9 11 11 9 12 2 Z"
-        fill={c}
-        style={{ transition: "fill 0.3s ease" }}
-      />
-    </svg>
+  // connector with a data dot that travels across during its phase
+  const Connector = ({ run, passed }: { run: boolean; passed: boolean }) => (
+    <div
+      className="relative"
+      style={
+        vertical
+          ? { width: 1.5, flex: 1, minHeight: 18, background: passed || run ? C.accent : C.line, transition: "background 0.4s ease" }
+          : { height: 1.5, flex: 1, minWidth: 24, background: passed || run ? C.accent : C.line, transition: "background 0.4s ease" }
+      }
+      aria-hidden
+    >
+      {run && !reduce && (
+        <motion.span
+          className="absolute rounded-full"
+          style={{
+            width: 7,
+            height: 7,
+            background: C.accent,
+            boxShadow: `0 0 10px ${C.accent}`,
+            ...(vertical ? { left: -2.75, top: 0 } : { top: -2.75, left: 0 }),
+          }}
+          animate={vertical ? { top: ["0%", "96%"] } : { left: ["0%", "96%"] }}
+          transition={{ duration: 0.75, ease: "easeInOut" }}
+        />
+      )}
+    </div>
   )
 
   return (
@@ -1254,203 +1285,166 @@ function IntegrationHub({ reduce, started, lang }: Demo) {
         aria-hidden
       />
 
-      {/* centred map panel (≤600px) */}
-      <div ref={boxRef} className="relative mx-auto h-full w-full" style={{ maxWidth: 600 }}>
-        {ready && (
-          <>
-            {/* connectors + data dots */}
-            <svg className="absolute inset-0" width={w} height={h} viewBox={`0 0 ${w} ${h}`} fill="none">
-              {geo.map((g) => {
-                const on = active === g.id
-                return (
-                  <line
-                    key={g.id}
-                    x1={g.sx}
-                    y1={g.sy}
-                    x2={g.ex}
-                    y2={g.ey}
-                    stroke={on ? C.accent : C.line}
-                    strokeWidth={on ? 1.5 : 0.75}
-                    strokeLinecap="round"
-                    style={
-                      reduce
-                        ? { transition: "stroke 0.3s ease, stroke-width 0.3s ease" }
-                        : {
-                            strokeDasharray: g.lineLen,
-                            strokeDashoffset: g.lineLen,
-                            animation: step >= 2 ? `imap-draw 0.7s ease ${g.i * 0.12}s forwards` : "none",
-                            transition: "stroke 0.3s ease, stroke-width 0.3s ease",
-                          }
-                    }
-                  />
-                )
-              })}
-              {/* data dot runs centre → active node */}
-              {active &&
-                !reduce &&
-                geo
-                  .filter((g) => g.id === active)
-                  .map((g) => (
-                    <circle key={`dot-${g.id}`} r={2.5} fill={C.accent}>
-                      <animateMotion dur="2s" repeatCount="indefinite" path={`M${g.sx} ${g.sy} L${g.ex} ${g.ey}`} />
-                    </circle>
-                  ))}
-            </svg>
-
-            {/* pulse ring around the hub when a node is active */}
-            {active && !reduce && (
-              <span
-                className="pointer-events-none absolute rounded-full"
-                style={{
-                  left: cx,
-                  top: cy,
-                  width: 80,
-                  height: 80,
-                  border: `1px solid ${C.accent}`,
-                  animation: "imap-pulse 1.8s ease-out infinite",
-                }}
-                aria-hidden
-              />
-            )}
-
-            {/* central hub */}
-            <div
-              className="absolute"
+      <div ref={boxRef} className="relative mx-auto flex h-full w-full flex-col" style={{ maxWidth: 640 }}>
+        {/* scenario label — what business job is on the belt right now */}
+        <div className="flex items-center justify-center" style={{ paddingTop: vertical ? 10 : 18 }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={scn}
+              initial={reduce ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center gap-2"
               style={{
-                left: cx,
-                top: cy,
-                transform: "translate(-50%, -50%)",
-                opacity: step >= 1 ? 1 : 0,
-                transition: "opacity 0.5s ease",
+                padding: "5px 14px",
+                borderRadius: 999,
+                border: `1px solid ${C.border}`,
+                background: C.surface,
+                fontSize: 11.5,
+                fontWeight: 600,
+                letterSpacing: "0.04em",
+                color: C.text,
               }}
             >
-              <div
-                className="grid place-items-center rounded-full"
-                style={{
-                  width: 80,
-                  height: 80,
-                  background: C.surface,
-                  border: `1.5px solid ${active ? C.accent : C.border}`,
-                  transition: "border-color 0.3s ease",
-                }}
+              <Zap size={12} color={C.accent} aria-hidden />
+              {S.label}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* the belt: task → AI core → result */}
+        <div
+          className="flex flex-1 items-center"
+          style={{
+            flexDirection: vertical ? "column" : "row",
+            padding: vertical ? "12px 0 14px" : "0 22px",
+            gap: vertical ? 0 : 0,
+          }}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={scn}
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="flex w-full flex-1 items-center"
+              style={{ flexDirection: vertical ? "column" : "row" }}
+            >
+              {/* incoming task */}
+              <motion.div
+                initial={reduce ? false : { opacity: 0, [vertical ? "y" : "x"]: -12 }}
+                animate={phase >= 0 ? { opacity: 1, x: 0, y: 0 } : {}}
+                transition={{ duration: 0.4, ease: EASE }}
+                style={card(phase >= 1 && !done)}
               >
-                <Star c={active ? C.accent : C.dim} />
-              </div>
-            </div>
+                <span style={iconTile(phase >= 1 && !done)}>
+                  <S.InIcon size={16} />
+                </span>
+                <span style={{ minWidth: 0 }}>
+                  <span style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: C.text, lineHeight: 1.3 }}>
+                    {S.inTitle}
+                  </span>
+                  <span style={{ display: "block", fontSize: 11, color: C.dim, marginTop: 1 }}>{S.inSub}</span>
+                </span>
+              </motion.div>
 
-            {/* hub label + status (below the circle) */}
-            <div
-              className="absolute flex flex-col items-center text-center"
-              style={{
-                left: cx,
-                top: cy + 52,
-                transform: "translateX(-50%)",
-                opacity: step >= 1 ? 1 : 0,
-                transition: "opacity 0.5s ease",
-              }}
-            >
-              <div style={{ fontSize: 16, fontWeight: 600, color: C.text, letterSpacing: "-0.01em" }}>Aqly</div>
-              <div className="mt-1 flex items-center gap-1.5" style={{ fontSize: 11, color: C.dim, whiteSpace: "nowrap" }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.success, display: "inline-block" }} />
-                {active
-                  ? `${NODES.find((n) => n.id === active)?.label} ${tr(lang, "подключён", "connected", "пайваст шуд")}`
-                  : `${NODES.length} ${tr(lang, "интеграций активно", "integrations active", "интегратсия фаъол")}`}
-              </div>
-            </div>
+              <Connector run={phase === 1} passed={phase >= 2} />
 
-            {/* integration nodes */}
-            {geo.map((g) => {
-              const on = active === g.id
-              // Only top/bottom nodes get a vertical (above/below) tooltip; the
-              // left & right nodes open to the SIDE so the tooltip never spills
-              // off the top of the panel and gets clipped on small screens.
-              const isTop = g.y < 20
-              const isBottom = g.y > 80
-              const vertical = isTop || isBottom
-              const below = isTop // top node → tooltip below; bottom node → above
-              const toRight = g.x < 50 // left node opens right, right node opens left
-              const slide = on ? 0 : below ? -6 : 6
-              const sideSlide = on ? 0 : toRight ? -6 : 6
-              return (
+              {/* AI core */}
+              <div className="flex flex-col items-center" style={{ padding: vertical ? "0" : "0 4px" }}>
                 <div
-                  key={g.id}
-                  className="absolute flex flex-col items-center"
+                  className="relative grid place-items-center rounded-full"
                   style={{
-                    left: g.nx,
-                    top: g.ny,
-                    transform: "translate(-50%, -50%)",
-                    opacity: step >= 3 ? 1 : 0,
-                    transition: "opacity 0.4s ease",
+                    width: vertical ? 58 : 72,
+                    height: vertical ? 58 : 72,
+                    background: C.surface,
+                    border: `1.5px solid ${thinking || done ? C.accent : C.border}`,
+                    transition: "border-color 0.3s ease",
                   }}
-                  onMouseEnter={() => setHovered(g.id)}
-                  onMouseLeave={() => setHovered(null)}
                 >
-                  {/* tooltip — pure CSS so transform stays under our control
-                      (Framer would override translateX and mis-place it) */}
-                  <div
-                    className="pointer-events-none absolute z-20"
-                    style={{
-                      width: 176,
-                      maxWidth: "62vw",
-                      ...(vertical
-                        ? {
-                            left: "50%",
-                            [below ? "top" : "bottom"]: "calc(100% + 8px)",
-                            transform: `translateX(-50%) translateY(${slide}px)`,
-                          }
-                        : {
-                            [toRight ? "left" : "right"]: "calc(100% + 8px)",
-                            top: "50%",
-                            transform: `translateY(-50%) translateX(${sideSlide}px)`,
-                          }),
-                      opacity: on ? 1 : 0,
-                      visibility: on ? "visible" : "hidden",
-                      transition: reduce
-                        ? "none"
-                        : "opacity 0.25s ease, transform 0.25s ease, visibility 0.25s",
-                      background: "#2C2A26",
-                      border: `1px solid ${C.accent}`,
-                      borderRadius: 10,
-                      padding: "8px 10px",
-                      textAlign: "left",
-                      boxShadow: "0 10px 28px rgba(0,0,0,0.55)",
-                    }}
+                  {thinking && !reduce && (
+                    <span
+                      className="pointer-events-none absolute inset-0 rounded-full"
+                      style={{ border: `1px solid ${C.accent}`, animation: "imap-pulse 1.4s ease-out infinite" }}
+                      aria-hidden
+                    />
+                  )}
+                  <motion.svg
+                    width={vertical ? 24 : 30}
+                    height={vertical ? 24 : 30}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden
+                    animate={thinking && !reduce ? { rotate: 180, scale: [1, 1.12, 1] } : { rotate: 0 }}
+                    transition={{ duration: 1.1, ease: EASE }}
                   >
-                    <div style={{ fontSize: 11, fontWeight: 600, color: C.accent }}>{g.label}</div>
-                    <div style={{ fontSize: 12, lineHeight: 1.35, color: C.dim, marginTop: 2 }}>{g.desc}</div>
-                  </div>
-
-                  {/* icon tile */}
-                  <div
-                    className="grid place-items-center"
-                    style={{
-                      width: 56,
-                      height: 56,
-                      borderRadius: 14,
-                      background: C.surface,
-                      border: `1.5px solid ${on ? C.accent : C.border}`,
-                      transform: on ? "scale(1.08)" : "scale(1)",
-                      transition: "transform 0.3s ease, border-color 0.3s ease",
-                    }}
-                  >
-                    <g.Icon size={22} strokeWidth={1.5} style={{ color: on ? C.accent : C.dim, transition: "color 0.3s ease" }} />
-                  </div>
+                    <path
+                      d="M12 2 C 13 9 15 11 22 12 C 15 13 13 15 12 22 C 11 15 9 13 2 12 C 9 11 11 9 12 2 Z"
+                      fill={thinking || done ? C.accent : C.dim}
+                      style={{ transition: "fill 0.3s ease" }}
+                    />
+                  </motion.svg>
+                </div>
+                <div
+                  className="flex items-center gap-1.5"
+                  style={{ marginTop: 7, fontSize: 11, color: C.dim, whiteSpace: "nowrap" }}
+                >
                   <span
                     style={{
-                      marginTop: 8,
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: on ? C.text : C.dim,
-                      transition: "color 0.3s ease",
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      display: "inline-block",
+                      background: thinking ? C.accent : C.success,
+                      transition: "background 0.3s ease",
                     }}
-                  >
-                    {g.label}
-                  </span>
+                  />
+                  {thinking
+                    ? tr(lang, "AI обрабатывает…", "AI is working…", "AI кор карда истодааст…")
+                    : `Aqly AI · Claude`}
                 </div>
-              )
-            })}
-          </>
-        )}
+              </div>
+
+              <Connector run={phase === 3} passed={phase >= 4} />
+
+              {/* result */}
+              <motion.div
+                animate={{ opacity: done ? 1 : 0.45, scale: !reduce && done ? [0.96, 1] : 1 }}
+                transition={{ duration: 0.35, ease: EASE }}
+                style={card(done)}
+              >
+                <span style={iconTile(done)}>
+                  {done ? <S.OutIcon size={16} color={C.success} /> : <S.OutIcon size={16} />}
+                </span>
+                <span style={{ minWidth: 0 }}>
+                  <span style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: done ? C.text : C.dim, lineHeight: 1.3, transition: "color 0.3s ease" }}>
+                    {S.outTitle}
+                  </span>
+                  <span style={{ display: "block", fontSize: 11, color: C.dim, marginTop: 1 }}>{S.outSub}</span>
+                </span>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* scenario progress dots */}
+        <div className="flex items-center justify-center gap-1.5" style={{ paddingBottom: vertical ? 10 : 16 }}>
+          {SCENARIOS.map((_, i) => (
+            <span
+              key={i}
+              style={{
+                width: i === scn ? 16 : 5,
+                height: 5,
+                borderRadius: 999,
+                background: i === scn ? C.accent : C.line,
+                transition: "all 0.4s ease",
+              }}
+              aria-hidden
+            />
+          ))}
+        </div>
       </div>
     </div>
   )
