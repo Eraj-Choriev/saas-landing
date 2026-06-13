@@ -20,7 +20,9 @@ export function Approach() {
     offset: ["start 70%", "end 30%"],
   })
 
-  const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"])
+  // scaleY (compositor-only) instead of animating height (layout every scroll
+  // frame) — identical look on a 1px rail, no scroll jank
+  const lineScale = useTransform(scrollYProgress, [0, 1], [0, 1])
 
   return (
     <section id="approach" className="relative overflow-hidden bg-cream-50">
@@ -57,15 +59,15 @@ export function Approach() {
           {/* center rail */}
           <div className="pointer-events-none absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-ink/10 lg:block" />
           <motion.div
-            style={{ height: lineHeight }}
-            className="pointer-events-none absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-brand-blue via-brand-amber to-brand-coral shadow-[0_0_12px_rgba(209,122,0,0.5)] lg:block"
+            style={{ scaleY: lineScale, x: "-50%", transformOrigin: "top" }}
+            className="pointer-events-none absolute left-1/2 top-0 hidden h-full w-px bg-gradient-to-b from-brand-blue via-brand-amber to-brand-coral shadow-[0_0_12px_rgba(209,122,0,0.5)] lg:block"
           />
 
           {/* mobile rail */}
           <div className="pointer-events-none absolute left-5 top-0 h-full w-px bg-ink/10 lg:hidden" />
           <motion.div
-            style={{ height: lineHeight }}
-            className="pointer-events-none absolute left-5 top-0 w-px bg-gradient-to-b from-brand-blue via-brand-amber to-brand-coral lg:hidden"
+            style={{ scaleY: lineScale, transformOrigin: "top" }}
+            className="pointer-events-none absolute left-5 top-0 h-full w-px bg-gradient-to-b from-brand-blue via-brand-amber to-brand-coral lg:hidden"
           />
 
           <ul className="space-y-12 lg:space-y-16">

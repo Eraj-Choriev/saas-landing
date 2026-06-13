@@ -14,7 +14,20 @@ export function Navbar() {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    // rAF-coalesce: collapse a burst of scroll events into one read per frame,
+    // and only flip state on a real boundary crossing (no redundant renders)
+    let ticking = false
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        setScrolled((prev) => {
+          const next = window.scrollY > 24
+          return next === prev ? prev : next
+        })
+        ticking = false
+      })
+    }
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
