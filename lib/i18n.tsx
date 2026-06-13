@@ -537,7 +537,7 @@ const en = {
     socialTitle: "Connect",
     social: [
       { label: "Telegram", href: "https://t.me/aqly_io", icon: "telegram" },
-      { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
+      { label: "WhatsApp", href: "https://wa.me/992403742222", icon: "whatsapp" },
       { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
       { label: "LinkedIn", href: "https://linkedin.com/company/aqly", icon: "linkedin" },
     ],
@@ -599,6 +599,10 @@ const en = {
     text: "We use cookies to keep the site fast and remember your language. No ad trackers — promise.",
     accept: "Got it",
     decline: "Decline",
+  },
+  chat: {
+    label: "Chat on Telegram",
+    prompt: "Questions? Message us",
   },
 }
 
@@ -1113,7 +1117,7 @@ const ru: Dict = {
     socialTitle: "Мы в соцсетях",
     social: [
       { label: "Telegram", href: "https://t.me/aqly_io", icon: "telegram" },
-      { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
+      { label: "WhatsApp", href: "https://wa.me/992403742222", icon: "whatsapp" },
       { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
       { label: "LinkedIn", href: "https://linkedin.com/company/aqly", icon: "linkedin" },
     ],
@@ -1175,6 +1179,10 @@ const ru: Dict = {
     text: "Используем cookie, чтобы сайт работал быстро и помнил ваш язык. Без рекламных трекеров — обещаем.",
     accept: "Хорошо",
     decline: "Отклонить",
+  },
+  chat: {
+    label: "Написать в Telegram",
+    prompt: "Есть вопрос? Напишите нам",
   },
 }
 
@@ -1709,7 +1717,7 @@ const tj: Dict = {
     socialTitle: "Дар шабакаҳо",
     social: [
       { label: "Telegram", href: "https://t.me/aqly_io", icon: "telegram" },
-      { label: "WhatsApp", href: "https://wa.me/0000000000", icon: "whatsapp" },
+      { label: "WhatsApp", href: "https://wa.me/992403742222", icon: "whatsapp" },
       { label: "Instagram", href: "https://instagram.com/aqly", icon: "instagram" },
       { label: "LinkedIn", href: "https://linkedin.com/company/aqly", icon: "linkedin" },
     ],
@@ -1771,6 +1779,10 @@ const tj: Dict = {
     text: "Барои зуд кор кардани сайт ва дар ёд доштани забонатон cookie истифода мебарем. Бе трекерҳои реклама — ваъда медиҳем.",
     accept: "Хуб",
     decline: "Рад кардан",
+  },
+  chat: {
+    label: "Дар Telegram нависед",
+    prompt: "Савол доред? Ба мо нависед",
   },
 }
 

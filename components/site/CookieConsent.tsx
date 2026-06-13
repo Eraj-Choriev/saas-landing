@@ -37,6 +37,8 @@ export function CookieConsent() {
       /* ignore */
     }
     setOpen(false)
+    // let the WhatsApp FAB know the bottom-left corner is free now
+    window.dispatchEvent(new Event("aqly:cookie-resolved"))
   }
 
   return (

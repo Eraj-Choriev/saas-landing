@@ -5,6 +5,7 @@ import { I18nProvider } from "@/lib/i18n"
 import { SmoothScroll } from "@/components/site/SmoothScroll"
 import { VoiceAgent } from "@/components/site/VoiceAgent"
 import { CookieConsent } from "@/components/site/CookieConsent"
+import { InstantChat } from "@/components/site/InstantChat"
 import "./globals.css"
 
 // Display headings — Geologica: tight contemporary grotesque (replaced the wide
@@ -83,6 +84,7 @@ export default function RootLayout({
           {children}
           <VoiceAgent />
           <CookieConsent />
+          <InstantChat />
         </I18nProvider>
       </body>
     </html>
