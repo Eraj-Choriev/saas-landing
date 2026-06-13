@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { Check, Mail, Send, AlertCircle, Loader2 } from "lucide-react"
+import { Check, Mail, Send, Phone, AlertCircle, Loader2 } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -185,6 +185,13 @@ export function ContactForm() {
                 >
                   <Send className="h-3.5 w-3.5" />
                   @aqly_io
+                </a>
+                <a
+                  href="tel:+992403742222"
+                  className="inline-flex items-center gap-2 text-[14px] text-brand-amber hover:text-brand-coral transition-colors"
+                >
+                  <Phone className="h-3.5 w-3.5" />
+                  +992 40 374 22 22
                 </a>
               </div>
             </div>
