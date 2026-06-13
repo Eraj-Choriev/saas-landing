@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from "react"
+import { flushSync } from "react-dom"
 
 export type Lang = "ru" | "en" | "tj"
 
@@ -1786,7 +1787,6 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   // Always start at the default so SSR/static markup matches first client render
   // (no hydration mismatch); the stored choice is applied in an effect below.
   const [lang, setLangState] = useState<Lang>("ru")
-  const [pulse, setPulse] = useState(false)
   const langRef = useRef(lang)
   langRef.current = lang
 
@@ -1796,33 +1796,35 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (isLang(saved) && saved !== langRef.current) setLangState(saved)
   }, [])
 
-  // Switching language gives the content a brief opacity dip, masking the
-  // instant text swap so it reads as a graceful settle rather than a flicker.
-  // Opacity only (no filter/transform) — those would re-contain the fixed navbar.
+  // Language switch crossfades via the View Transitions API: the browser
+  // snapshots the old frame and fades the new one in ON TOP of it, so dark
+  // sections never blend toward the light <body> background. (The previous
+  // approach — dipping the whole page to opacity .78 — let the body show
+  // through and read as a white flash.) No support / reduced motion → the
+  // text just swaps instantly, which is flash-free by definition.
   const setLang = useCallback((l: Lang) => {
     if (l === langRef.current) return
-    setPulse(true)
-    setLangState(l)
-    try {
-      localStorage.setItem(LANG_KEY, l)
-    } catch {
-      // ignore (private mode / storage disabled)
+    const apply = () => {
+      setLangState(l)
+      try {
+        localStorage.setItem(LANG_KEY, l)
+      } catch {
+        // ignore (private mode / storage disabled)
+      }
+    }
+    const startVT = (
+      document as Document & { startViewTransition?: (cb: () => void) => void }
+    ).startViewTransition?.bind(document)
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    if (startVT && !reduce) {
+      // flushSync so the DOM is fully re-rendered inside the transition callback
+      startVT(() => flushSync(apply))
+    } else {
+      apply()
     }
   }, [])
 
-  useEffect(() => {
-    if (!pulse) return
-    const id = setTimeout(() => setPulse(false), 150)
-    return () => clearTimeout(id)
-  }, [pulse, lang])
-
-  return (
-    <I18nCtx.Provider value={{ lang, setLang, t: dicts[lang] }}>
-      <div className="lang-pulse" data-pulse={pulse ? "" : undefined}>
-        {children}
-      </div>
-    </I18nCtx.Provider>
-  )
+  return <I18nCtx.Provider value={{ lang, setLang, t: dicts[lang] }}>{children}</I18nCtx.Provider>
 }
 
 export const useI18n = () => useContext(I18nCtx)
