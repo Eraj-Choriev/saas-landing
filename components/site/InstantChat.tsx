@@ -70,7 +70,7 @@ export function InstantChat() {
           onMouseLeave={() => setExpanded(false)}
           // bottom-28 keeps clear of the CookieConsent card's footer row;
           // z below the cookie card (z-60) so it never sits on top of it
-          className="group fixed bottom-28 left-4 z-50 flex items-center gap-2.5 rounded-full bg-[#229ED9] py-2.5 pl-2.5 pr-2.5 text-white shadow-[0_12px_32px_-8px_rgba(34,158,217,0.6)] transition-[box-shadow,transform] duration-300 hover:shadow-[0_16px_40px_-8px_rgba(34,158,217,0.78)] active:scale-95 sm:bottom-6"
+          className="group fixed bottom-28 left-4 z-50 flex items-center rounded-full bg-[#229ED9] p-2.5 text-white shadow-[0_12px_32px_-8px_rgba(34,158,217,0.6)] transition-[box-shadow,transform] duration-300 hover:shadow-[0_16px_40px_-8px_rgba(34,158,217,0.78)] active:scale-95 sm:bottom-6"
         >
           {/* gentle attention pulse ring */}
           <span
@@ -84,19 +84,21 @@ export function InstantChat() {
               <path d="M21.94 4.3l-3.32 15.65c-.25 1.1-.9 1.38-1.83.86l-5.05-3.72-2.44 2.35c-.27.27-.5.5-1.02.5l.36-5.15L18.4 6.1c.41-.36-.09-.56-.63-.2L6.18 13.1l-5.02-1.57c-1.09-.34-1.11-1.09.23-1.61L20.53 2.7c.91-.34 1.7.2 1.41 1.6z" />
             </svg>
           </span>
-          <AnimatePresence>
-            {expanded && (
-              <motion.span
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: "auto", opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="relative overflow-hidden whitespace-nowrap pr-1.5 text-[14px] font-semibold"
-              >
-                {t.chat.prompt}
-              </motion.span>
-            )}
-          </AnimatePresence>
+          {/* label reveal — max-width 0↔Npx tweens smoothly in BOTH directions
+              (framer's width:auto couldn't and snapped shut on exit). Pure CSS,
+              no mount/unmount. 240px clears the longest localized label. */}
+          <span
+            className="overflow-hidden whitespace-nowrap text-[14px] font-semibold ease-smooth"
+            style={{
+              maxWidth: expanded ? 240 : 0,
+              opacity: expanded ? 1 : 0,
+              paddingLeft: expanded ? 8 : 0,
+              paddingRight: expanded ? 6 : 0,
+              transition: "max-width 0.34s cubic-bezier(0.16,1,0.3,1), opacity 0.26s ease, padding 0.34s ease",
+            }}
+          >
+            {t.chat.prompt}
+          </span>
         </motion.a>
       )}
     </AnimatePresence>
