@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useRef, useEffect } from "react"
+import { useState, useMemo, useRef, useEffect, useId } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Check, Mail, Send, Phone, AlertCircle, Loader2 } from "lucide-react"
@@ -76,6 +76,7 @@ function captureAttribution(): Attribution {
 
 export function ContactForm() {
   const { t, lang } = useI18n()
+  const challengeId = useId()
   const [form, setForm] = useState<FormState>(initial)
   const [submitted, setSubmitted] = useState(false)
   const [attempted, setAttempted] = useState(false)
@@ -336,10 +337,11 @@ export function ContactForm() {
 
             {/* challenge */}
             <FieldGroup invalid={err("challenge")} errorText={t.form.required}>
-              <Label required invalid={err("challenge")}>
+              <Label htmlFor={challengeId} required invalid={err("challenge")}>
                 {t.form.fields.challenge.label}
               </Label>
               <textarea
+                id={challengeId}
                 value={form.challenge}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, challenge: e.target.value }))
@@ -588,13 +590,16 @@ function Label({
   children,
   required,
   invalid,
+  htmlFor,
 }: {
   children: React.ReactNode
   required?: boolean
   invalid?: boolean
+  htmlFor?: string
 }) {
   return (
     <label
+      htmlFor={htmlFor}
       className={cn(
         "block text-[13px] font-medium transition-colors",
         invalid ? "text-danger" : "text-ink/85"
@@ -673,6 +678,7 @@ function PhoneField({
   invalid?: boolean
   errorText?: string
 }) {
+  const id = useId()
   const digits = value.replace(/\D/g, "")
   const local = digits.startsWith("992") ? digits.slice(3) : digits
   const grouped = formatLocal(local)
@@ -684,7 +690,7 @@ function PhoneField({
 
   return (
     <div data-invalid={invalid ? "true" : "false"} className={cn(invalid && "animate-shake")}>
-      <Label required invalid={invalid}>
+      <Label htmlFor={id} required invalid={invalid}>
         {label}
       </Label>
       <div
@@ -701,6 +707,7 @@ function PhoneField({
         </span>
         <span className="my-2 h-5 w-px shrink-0 bg-ink/15" aria-hidden />
         <input
+          id={id}
           type="tel"
           inputMode="numeric"
           value={grouped}
@@ -739,15 +746,17 @@ function Field({
   invalid?: boolean
   errorText?: string
 }) {
+  const id = useId()
   return (
     <div
       data-invalid={invalid ? "true" : "false"}
       className={cn(invalid && "animate-shake")}
     >
-      <Label required={required} invalid={invalid}>
+      <Label htmlFor={id} required={required} invalid={invalid}>
         {label}
       </Label>
       <input
+        id={id}
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}

@@ -14,3 +14,8 @@ next-env.d.ts
 /.agents/
 /.playwright-mcp/
 /design-audit/
+
+# web-verify skill artifacts
+e2e-results/
+test-results/
+playwright-report/

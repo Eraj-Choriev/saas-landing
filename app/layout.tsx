@@ -2,10 +2,7 @@ import type { Metadata } from "next"
 import { Geologica, Playfair_Display, Onest, Bricolage_Grotesque, Instrument_Serif, DM_Sans } from "next/font/google"
 import { GeistMono } from "geist/font/mono"
 import { I18nProvider } from "@/lib/i18n"
-import { SmoothScroll } from "@/components/site/SmoothScroll"
-import { VoiceAgent } from "@/components/site/VoiceAgent"
-import { CookieConsent } from "@/components/site/CookieConsent"
-import { InstantChat } from "@/components/site/InstantChat"
+import { GlobalChrome } from "@/components/site/GlobalChrome"
 import "./globals.css"
 
 // Display headings — Geologica: tight contemporary grotesque (replaced the wide
@@ -80,11 +77,8 @@ export default function RootLayout({
     >
       <body className="font-sans antialiased">
         <I18nProvider>
-          <SmoothScroll />
           {children}
-          <VoiceAgent />
-          <CookieConsent />
-          <InstantChat />
+          <GlobalChrome />
         </I18nProvider>
       </body>
     </html>
