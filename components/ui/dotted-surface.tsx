@@ -72,6 +72,12 @@ export function DottedSurface({
 			typeof window !== "undefined" &&
 			window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
 
+		// Even under prefers-reduced-motion we keep a *gentle* wave (slower phase,
+		// smaller amplitude) rather than a frozen frame — a dead-looking hero reads
+		// as "broken" to many viewers. Still calmer than the full motion.
+		const SPEED = reduceMotion ? 0.035 : 0.1
+		const AMP = reduceMotion ? 22 : 50
+
 		// Scene setup
 		const scene = new THREE.Scene()
 		// distance fog — only the very far edge dissolves; the converging rows
@@ -144,8 +150,8 @@ export function DottedSurface({
 			for (let ix = 0; ix < AMOUNTX; ix++) {
 				for (let iy = 0; iy < AMOUNTY; iy++) {
 					posArray[i * 3 + 1] =
-						Math.sin((ix + count) * 0.3) * 50 +
-						Math.sin((iy + count) * 0.5) * 50
+						Math.sin((ix + count) * 0.3) * AMP +
+						Math.sin((iy + count) * 0.5) * AMP
 					i++
 				}
 			}
@@ -169,22 +175,17 @@ export function DottedSurface({
 			}
 			animationId = requestAnimationFrame(animate)
 			renderFrame()
-			count += 0.1
+			count += SPEED
 		}
 
-		if (reduceMotion) {
-			// Static final frame — no rAF loop
-			renderFrame()
-		} else {
-			animate()
-		}
+		animate()
 
 		// pause the loop while the surface is off-screen (scrolled past the hero)
 		// or the tab is hidden — WebGL at 60fps is the most expensive thing on the
 		// page, no reason to pay for it when nobody can see it
 		const io = new IntersectionObserver(([entry]) => {
 			visible = entry.isIntersecting
-			if (visible && !reduceMotion && animationId === null && !disposed) {
+			if (visible && animationId === null && !disposed) {
 				animate()
 			}
 		})
@@ -192,7 +193,7 @@ export function DottedSurface({
 
 		const onVisibility = () => {
 			if (document.hidden) return // rAF already throttles; flag handles resume
-			if (!reduceMotion && animationId === null && !disposed && visible) animate()
+			if (animationId === null && !disposed && visible) animate()
 		}
 		document.addEventListener("visibilitychange", onVisibility)
 
