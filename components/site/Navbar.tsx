@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 import { Wordmark } from "@/components/ui/wordmark"
@@ -34,15 +33,12 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
-  // `route: true` → a real Next route (next/link applies basePath in prod);
-  // the rest are same-page hash anchors.
   const links = [
     { href: "#about", label: t.nav.about },
     { href: "#services", label: t.nav.services },
     { href: "#approach", label: t.nav.approach },
     { href: "#pricing", label: t.nav.pricing },
     { href: "#faq", label: t.nav.faq },
-    { href: "/gallery", label: t.nav.gallery, route: true },
     { href: "#contact", label: t.nav.contact },
   ]
 
@@ -85,20 +81,17 @@ export function Navbar() {
           </a>
 
           <ul className="relative hidden lg:flex items-center gap-1 text-[14px]">
-            {links.map((l) => {
-              const Cmp = l.route ? Link : "a"
-              return (
-                <li key={l.href}>
-                  <Cmp
-                    href={l.href}
-                    className="group relative inline-flex items-center rounded-full px-3.5 py-2 text-cream-100/75 transition-colors hover:text-cream-50"
-                  >
-                    {l.label}
-                    <span className="pointer-events-none absolute inset-x-3.5 -bottom-px h-px origin-left scale-x-0 rounded-full bg-gradient-to-r from-brand-coral to-brand-amber transition-transform duration-300 group-hover:scale-x-100" />
-                  </Cmp>
-                </li>
-              )
-            })}
+            {links.map((l) => (
+              <li key={l.href}>
+                <a
+                  href={l.href}
+                  className="group relative inline-flex items-center rounded-full px-3.5 py-2 text-cream-100/75 transition-colors hover:text-cream-50"
+                >
+                  {l.label}
+                  <span className="pointer-events-none absolute inset-x-3.5 -bottom-px h-px origin-left scale-x-0 rounded-full bg-gradient-to-r from-brand-coral to-brand-amber transition-transform duration-300 group-hover:scale-x-100" />
+                </a>
+              </li>
+            ))}
           </ul>
 
           <div className="relative flex items-center gap-2 pr-1">
@@ -151,20 +144,17 @@ export function Navbar() {
                 className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.02)_38%,transparent_60%)]"
               />
               <ul className="relative flex flex-col">
-                {links.map((l) => {
-                  const Cmp = l.route ? Link : "a"
-                  return (
-                    <li key={l.href}>
-                      <Cmp
-                        href={l.href}
-                        onClick={() => setOpen(false)}
-                        className="block rounded-2xl px-4 py-3 text-cream-100/75 transition-colors hover:bg-white/10 hover:text-cream-50"
-                      >
-                        {l.label}
-                      </Cmp>
-                    </li>
-                  )
-                })}
+                {links.map((l) => (
+                  <li key={l.href}>
+                    <a
+                      href={l.href}
+                      onClick={() => setOpen(false)}
+                      className="block rounded-2xl px-4 py-3 text-cream-100/75 transition-colors hover:bg-white/10 hover:text-cream-50"
+                    >
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
               </ul>
               <div className="relative flex items-center justify-between gap-2 p-2">
                 <LangToggle tone="cream" />

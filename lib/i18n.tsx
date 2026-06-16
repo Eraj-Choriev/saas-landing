@@ -18,7 +18,6 @@ const en = {
     approach: "Approach",
     pricing: "Pricing",
     faq: "FAQ",
-    gallery: "Gallery",
     contact: "Contact us",
   },
   hero: {
@@ -619,7 +618,6 @@ const ru: Dict = {
     approach: "Подход",
     pricing: "Тарифы",
     faq: "Вопросы",
-    gallery: "Галерея",
     contact: "Связаться",
   },
   hero: {
@@ -1200,7 +1198,6 @@ const tj: Dict = {
     approach: "Равиш",
     pricing: "Тарифҳо",
     faq: "Саволҳо",
-    gallery: "Галерея",
     contact: "Тамос",
   },
   hero: {
