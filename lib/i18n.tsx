@@ -492,8 +492,8 @@ const en = {
         options: ["ASAP", "1-3 months", "3-6 months", "Exploring"],
       },
       challenge: {
-        label: "Primary Business Challenge",
-        placeholder: "Tell us about the biggest challenge you'd like to solve...",
+        label: "What do you want to build?",
+        placeholder: "Describe your project or service — what you want to launch and the problem it should solve.",
       },
       budget: {
         label: "Estimated Budget",
@@ -1072,8 +1072,8 @@ const ru: Dict = {
         options: ["ASAP", "1-3 месяца", "3-6 месяцев", "Изучаю"],
       },
       challenge: {
-        label: "Главный бизнес-вызов",
-        placeholder: "Опишите главный вызов, который хотите решить...",
+        label: "Что хотите создать?",
+        placeholder: "Опишите проект или услугу — что хотите запустить и какую задачу это решит.",
       },
       budget: {
         label: "Бюджет",
@@ -1672,8 +1672,8 @@ const tj: Dict = {
         options: ["Ҳарчи зудтар", "1-3 моҳ", "3-6 моҳ", "Меомӯзам"],
       },
       challenge: {
-        label: "Мушкили асосии тиҷорат",
-        placeholder: "Дар бораи мушкили асосие, ки ҳал кардан мехоҳед, нависед...",
+        label: "Чӣ сохтан мехоҳед?",
+        placeholder: "Лоиҳа ё хидматро тавсиф кунед — чиро мехоҳед оғоз кунед ва кадом масъаларо ҳал мекунад.",
       },
       budget: {
         label: "Буҷети тахминӣ",

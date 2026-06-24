@@ -126,10 +126,16 @@ export function Navbar() {
         <AnimatePresence>
           {open && (
             <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              // Reveal by growing height (the menu unfolds) rather than a flat
+              // slide. Height eases on a long curve so it never snaps; opacity
+              // settles a touch faster so content isn't ghosting mid-grow.
+              transition={{
+                height: { duration: 0.42, ease: [0.16, 1, 0.3, 1] },
+                opacity: { duration: 0.25, ease: [0.16, 1, 0.3, 1] },
+              }}
               // `isolate` — same iOS Safari fix as CookieConsent: backdrop-filter
               // otherwise paints square corners without its own stacking context
               className={cn(
@@ -143,25 +149,45 @@ export function Navbar() {
                 aria-hidden
                 className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.02)_38%,transparent_60%)]"
               />
-              <ul className="relative flex flex-col">
+              {/* links cascade in one after another for a premium unfold */}
+              <motion.ul
+                className="relative flex flex-col"
+                initial="hidden"
+                animate="show"
+                variants={{
+                  show: { transition: { staggerChildren: 0.045, delayChildren: 0.1 } },
+                }}
+              >
                 {links.map((l) => (
-                  <li key={l.href}>
+                  <motion.li
+                    key={l.href}
+                    variants={{
+                      hidden: { opacity: 0, x: -10 },
+                      show: { opacity: 1, x: 0 },
+                    }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  >
                     <a
                       href={l.href}
                       onClick={() => setOpen(false)}
-                      className="block rounded-2xl px-4 py-3 text-cream-100/75 transition-colors hover:bg-white/10 hover:text-cream-50"
+                      className="block rounded-2xl px-4 py-3 text-cream-100/75 transition-colors duration-200 hover:bg-white/10 hover:text-cream-50 active:bg-white/[0.14]"
                     >
                       {l.label}
                     </a>
-                  </li>
+                  </motion.li>
                 ))}
-              </ul>
-              <div className="relative flex items-center justify-between gap-2 p-2">
+              </motion.ul>
+              <motion.div
+                className="relative flex items-center justify-between gap-2 p-2"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.1 + links.length * 0.045, ease: [0.16, 1, 0.3, 1] }}
+              >
                 <LangToggle tone="cream" />
                 <Button href="#contact" variant="primary" size="sm" onClick={() => setOpen(false)}>
                   {t.nav.contact}
                 </Button>
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

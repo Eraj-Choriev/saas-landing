@@ -7,12 +7,11 @@ import { useI18n } from "@/lib/i18n"
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
-const STAT_COLORS = ["#ff5b24", "#d17a00", "#a9caf9", "#fce88d"] as const
-const CARD_META: { Icon: LucideIcon; color: string }[] = [
-  { Icon: Globe, color: "#a9caf9" },
-  { Icon: Send, color: "#ff5b24" },
-  { Icon: Sparkles, color: "#d17a00" },
-]
+// One accent for the whole "cost of inaction" section — coral reads as urgency
+// here, and a single hue stops the stats from looking like a pie chart.
+const ACCENT = "#ff5b24"
+const STAT_COLORS = [ACCENT, ACCENT, ACCENT, ACCENT] as const
+const CARD_ICONS: LucideIcon[] = [Globe, Send, Sparkles]
 
 /** Count-up that fires once in view. */
 function Counter({ value, suffix }: { value: number; suffix: string }) {
@@ -148,7 +147,8 @@ export function WhyNow() {
 
         <div className="mt-10 grid gap-5 sm:grid-cols-3">
           {w.cards.map((c, i) => {
-            const { Icon, color } = CARD_META[i] ?? CARD_META[0]
+            const Icon = CARD_ICONS[i] ?? CARD_ICONS[0]
+            const color = ACCENT
             return (
               <motion.div
                 key={i}

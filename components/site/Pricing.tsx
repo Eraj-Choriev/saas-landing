@@ -9,7 +9,9 @@ import { PricingModal } from "./PricingModal"
 const ease = [0.22, 1, 0.36, 1] as const
 
 const PLAN_ICONS = [Rocket, TrendingUp, Bot, Building2] as const
-const PLAN_COLORS = ["#a9caf9", "#ff5b24", "#d17a00", "#fce88d"] as const
+// Only the featured plan wears coral; the rest take a quiet neutral so the eye
+// lands on "Рост" without four competing accent hues.
+const PLAN_COLORS = ["#A8B1BC", "#ff5b24", "#A8B1BC", "#A8B1BC"] as const
 
 export function Pricing() {
   const { t } = useI18n()
@@ -40,9 +42,7 @@ export function Pricing() {
           </p>
           <h2 className="mt-5 font-display text-[34px] leading-[1.18] tracking-tightest text-cream-50 sm:text-[52px] sm:leading-[1.15]">
             {p.title}{" "}
-            <span className="bg-gradient-to-r from-brand-coral via-brand-amber to-brand-gold bg-clip-text font-medium text-transparent">
-              {p.titleAccent}
-            </span>
+            <span className="font-medium text-brand-gold">{p.titleAccent}</span>
           </h2>
           <p className="mx-auto mt-7 max-w-xl text-pretty text-[15px] leading-[1.55] text-cream-100/65 sm:text-[16px]">
             {p.lead}
@@ -262,9 +262,14 @@ function PriceNumber({ value }: { value: string }) {
   const base =
     "font-display text-[27px] font-semibold leading-[1.06] tracking-tight text-cream-50 [font-variant-numeric:tabular-nums] [overflow-wrap:anywhere] sm:text-[31px]"
 
+  // Word-prices (e.g. "Индивидуально") get a smaller size and balanced wrap so
+  // they never hyphenate mid-word inside the narrow card column.
   if (!m) {
     return (
-      <div ref={ref} className={base}>
+      <div
+        ref={ref}
+        className="font-display text-[22px] font-semibold leading-[1.12] tracking-tight text-balance text-cream-50 [hyphens:none] sm:text-[24px]"
+      >
         {value}
       </div>
     )

@@ -307,8 +307,9 @@ export function ContactForm() {
                       type="button"
                       key={s}
                       onClick={() => toggleService(s)}
+                      aria-pressed={on}
                       className={cn(
-                        "rounded-2xl border px-3 py-2.5 text-[13px] text-left transition-all flex items-center gap-2",
+                        "group flex items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-left text-[13px] leading-tight transition-all duration-200 ease-smooth active:scale-[0.97]",
                         on
                           ? "border-brand-blue bg-brand-blue/10 text-ink"
                           : err("services")
@@ -318,17 +319,23 @@ export function ContactForm() {
                     >
                       <span
                         className={cn(
-                          "grid h-4 w-4 place-items-center rounded-md border transition-all",
+                          "grid h-[18px] w-[18px] shrink-0 place-items-center rounded-md border transition-colors duration-200",
                           on
-                            ? "bg-brand-blue border-brand-blue text-ink"
+                            ? "border-brand-blue bg-brand-blue text-ink"
                             : err("services")
                               ? "border-danger/70"
-                              : "border-ink/20"
+                              : "border-ink/20 group-hover:border-ink/40"
                         )}
                       >
-                        {on && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+                        <Check
+                          className={cn(
+                            "h-3 w-3 transition-transform duration-200 ease-smooth",
+                            on ? "scale-100" : "scale-0"
+                          )}
+                          strokeWidth={3}
+                        />
                       </span>
-                      {s}
+                      <span className="min-w-0">{s}</span>
                     </button>
                   )
                 })}

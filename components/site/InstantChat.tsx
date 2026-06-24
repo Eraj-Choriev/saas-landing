@@ -68,9 +68,12 @@ export function InstantChat() {
           transition={{ type: "spring", stiffness: 260, damping: 22 }}
           onMouseEnter={() => setExpanded(true)}
           onMouseLeave={() => setExpanded(false)}
-          // bottom-28 keeps clear of the CookieConsent card's footer row;
-          // z below the cookie card (z-60) so it never sits on top of it
-          className="group fixed bottom-28 left-4 z-50 flex items-center rounded-full bg-[#229ED9] p-2.5 text-white shadow-[0_12px_32px_-8px_rgba(34,158,217,0.6)] transition-[box-shadow,transform] duration-300 hover:shadow-[0_16px_40px_-8px_rgba(34,158,217,0.78)] active:scale-95 sm:bottom-6"
+          // bottom-7 (28px) so this FAB's centre lines up with the voice widget's
+          // launcher on the right (which sits 32px from the bottom, 48px tall →
+          // centre at 56px; this circle is 56px tall → centre also at 56px). The
+          // FAB only reveals after the CookieConsent card is dismissed, so the
+          // bottom-left corner is already clear — no need to perch it higher.
+          className="group fixed bottom-7 left-4 z-50 flex items-center rounded-full bg-[#229ED9] p-2.5 text-white shadow-[0_12px_32px_-8px_rgba(34,158,217,0.6)] transition-[box-shadow,transform] duration-300 hover:shadow-[0_16px_40px_-8px_rgba(34,158,217,0.78)] active:scale-95"
         >
           {/* gentle attention pulse ring */}
           <span

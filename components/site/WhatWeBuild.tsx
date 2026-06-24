@@ -15,14 +15,16 @@ import {
 import { useI18n } from "@/lib/i18n"
 import { ServiceModal } from "./ServiceModal"
 
-// icon + accent colour per service — gives each card its own identity
+// One accent across every service tile — identity comes from the icon and the
+// per-service line-art, not from a different hue per card.
+const ACCENT = "#ff5b24"
 const META: { Icon: LucideIcon; color: string }[] = [
-  { Icon: Send, color: "#a9caf9" },
-  { Icon: Globe, color: "#d17a00" },
-  { Icon: Mic, color: "#ff5b24" },
-  { Icon: Workflow, color: "#d17a00" },
-  { Icon: Sparkles, color: "#a9caf9" },
-  { Icon: PenTool, color: "#ff5b24" },
+  { Icon: Send, color: ACCENT },
+  { Icon: Globe, color: ACCENT },
+  { Icon: Mic, color: ACCENT },
+  { Icon: Workflow, color: ACCENT },
+  { Icon: Sparkles, color: ACCENT },
+  { Icon: PenTool, color: ACCENT },
 ]
 
 // bento tiling on a 6-col grid: two tall 2×2 corners (0,2), wide mid tiles
@@ -61,7 +63,7 @@ export function WhatWeBuild() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.9 }}
-            className="font-mono text-[12px] uppercase tracking-[0.22em] text-brand-amber"
+            className="font-mono text-[12px] uppercase tracking-[0.22em] text-brand-coral"
           >
             {t.build.kicker}
           </motion.p>
@@ -194,9 +196,6 @@ function ServiceCard({
         <div className="grid h-12 w-12 place-items-center rounded-2xl bg-ink text-cream-50 transition-all duration-300 group-hover:-rotate-6 group-hover:scale-110">
           <Icon className="h-5 w-5 transition-colors duration-300" style={{ color }} strokeWidth={1.75} />
         </div>
-        <span className="font-mono text-[12px] tracking-[0.2em] text-ink/25 transition-colors group-hover:text-ink/45">
-          {String(index + 1).padStart(2, "0")}
-        </span>
       </div>
 
       <h3
