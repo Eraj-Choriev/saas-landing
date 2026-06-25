@@ -140,7 +140,7 @@ export function Footer() {
             {t.footer.nav.map((n) => (
               <li key={n.label}>
                 {n.href.startsWith("/") ? (
-                  // internal route — Link applies the prod basePath (/saas-landing)
+                  // internal route — served at the domain root on Vercel
                   <Link href={n.href} className="link-underline hover:text-ink">
                     {n.label}
                   </Link>
