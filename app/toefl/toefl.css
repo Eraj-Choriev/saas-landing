@@ -1,0 +1,1246 @@
+/* ---------------------------------------------------------------------------
+   Reading trainer — scoped design system.
+
+   Two worlds, deliberately: a dark navy "desk" for everything around the test,
+   and a light paper exam screen that follows the TOEFL iBT chrome. Tokens live
+   on .tf-root so the marketing site's palette is never touched.
+--------------------------------------------------------------------------- */
+
+.tf-root {
+  --desk: #0b1b2b;
+  --desk-2: #102841;
+  --desk-3: #17395a;
+  --rule: #1e3b58;
+  --rule-soft: #16304a;
+
+  --paper: #f7f9fb;
+  --paper-2: #edf2f6;
+  --paper-edge: #d5e0e8;
+
+  --ink: #14202b;
+  --ink-2: #47596a;
+  --ink-3: #7a8b99;
+
+  --chrome-top: #1d4067;
+  --chrome-bottom: #132f4d;
+
+  --flag: #e8a33d;
+  --right: #1c7a5b;
+  --right-soft: #e7f3ee;
+  --wrong: #b13a2e;
+  --wrong-soft: #fbeceb;
+  --focus: #6aa9e8;
+
+  --display: var(--font-golos), "Golos Text", system-ui, sans-serif;
+  --reading: var(--font-source-serif), "Source Serif 4", Georgia, serif;
+  --mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+
+  --shell: 1180px;
+
+  background: var(--desk);
+  color: #e8eef4;
+  font-family: var(--display);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.tf-root *:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.tf-shell {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Letter cells: the signature ──────────────────────────────────────────── */
+
+.tf-cells {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: baseline;
+}
+
+.tf-cell {
+  font-family: var(--mono);
+  font-size: 0.78em;
+  line-height: 1;
+  width: 1.08em;
+  height: 1.5em;
+  transform: translateY(0.16em);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--paper-edge);
+  border-radius: 2px;
+  background: #fff;
+  color: var(--ink);
+  text-transform: lowercase;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.tf-cell[data-filled="true"] {
+  border-color: #9db4c6;
+  background: #fbfdff;
+}
+
+.tf-cell[data-state="right"] {
+  border-color: var(--right);
+  background: var(--right-soft);
+  color: var(--right);
+}
+
+.tf-cell[data-state="wrong"] {
+  border-color: var(--wrong);
+  background: var(--wrong-soft);
+  color: var(--wrong);
+  text-decoration: line-through;
+}
+
+/* On the dark desk the cells invert. */
+.tf-cells[data-tone="desk"] .tf-cell {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--rule);
+  color: #dce8f2;
+}
+
+.tf-cells[data-tone="desk"] .tf-cell[data-filled="true"] {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--desk-3);
+  color: #fff;
+}
+
+/* ── Wordmark ─────────────────────────────────────────────────────────────── */
+
+.tf-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.tf-wordmark-cells {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.tf-wordmark-cell {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  width: 17px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  color: #cfe0ee;
+  background: rgba(255, 255, 255, 0.02);
+  text-transform: uppercase;
+  transition: border-color 200ms ease, color 200ms ease, background-color 200ms ease;
+}
+
+.tf-wordmark:hover .tf-wordmark-cell,
+.tf-wordmark:focus-visible .tf-wordmark-cell {
+  border-color: var(--desk-3);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tf-wordmark-cell[data-lit="true"] {
+  border-color: var(--flag);
+  color: var(--flag);
+}
+
+/* ── Desk navigation ──────────────────────────────────────────────────────── */
+
+.tf-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(11, 27, 43, 0.86);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.tf-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 60px;
+}
+
+.tf-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tf-nav-link {
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  color: #9fb4c7;
+  text-decoration: none;
+  padding: 7px 12px;
+  border-radius: 6px;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+
+.tf-nav-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tf-nav-link[aria-current="page"] {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Type scale ───────────────────────────────────────────────────────────── */
+
+.tf-eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6f8ba3;
+}
+
+.tf-h1 {
+  font-family: var(--display);
+  font-size: clamp(34px, 5.2vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+  color: #fff;
+  text-wrap: balance;
+}
+
+.tf-h2 {
+  font-family: var(--display);
+  font-size: clamp(20px, 2.4vw, 26px);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+  color: #fff;
+}
+
+.tf-lede {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #9fb4c7;
+  max-width: 54ch;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.tf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  padding: 11px 20px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease,
+    transform 140ms ease;
+}
+
+.tf-btn:active {
+  transform: translateY(1px);
+}
+
+.tf-btn[data-variant="primary"] {
+  background: var(--flag);
+  color: #1e1403;
+  font-weight: 600;
+}
+
+.tf-btn[data-variant="primary"]:hover {
+  background: #f0b355;
+}
+
+.tf-btn[data-variant="ghost"] {
+  background: transparent;
+  border-color: var(--rule);
+  color: #cfe0ee;
+}
+
+.tf-btn[data-variant="ghost"]:hover {
+  border-color: var(--desk-3);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+}
+
+.tf-btn[data-variant="quiet"] {
+  background: transparent;
+  color: #7f95a8;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.tf-btn[data-variant="quiet"]:hover {
+  color: #cfe0ee;
+}
+
+.tf-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Cards on the desk ────────────────────────────────────────────────────── */
+
+.tf-card {
+  position: relative;
+  display: block;
+  text-align: left;
+  width: 100%;
+  background: linear-gradient(180deg, var(--desk-2), #0d2135);
+  border: 1px solid var(--rule-soft);
+  border-radius: 10px;
+  padding: 18px;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 160ms ease, transform 160ms ease, background-color 160ms ease;
+}
+
+/* A hairline along the top edge reads as the lit edge of a sheet of paper. */
+.tf-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+  border-radius: 10px 10px 0 0;
+}
+
+.tf-card:hover {
+  border-color: var(--desk-3);
+  transform: translateY(-2px);
+}
+
+.tf-card-title {
+  font-size: 15px;
+  font-weight: 550;
+  letter-spacing: -0.015em;
+  color: #eaf2f9;
+}
+
+.tf-card-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #6f8ba3;
+}
+
+.tf-card-bar {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--rule-soft);
+  overflow: hidden;
+}
+
+.tf-card-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--flag);
+  border-radius: 2px;
+  transition: width 400ms ease;
+}
+
+/* ── Measure rule: a section divider that carries the count ───────────────── */
+
+.tf-measure {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.tf-measure-index {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--flag);
+  text-transform: uppercase;
+}
+
+/* ── Exam chrome ──────────────────────────────────────────────────────────── */
+
+.tf-exam {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper-2);
+  color: var(--ink);
+}
+
+.tf-exam-bar {
+  flex: none;
+  background: linear-gradient(180deg, var(--chrome-top), var(--chrome-bottom));
+  border-bottom: 1px solid #0a1f34;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  color: #fff;
+  padding: 0 14px;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.tf-exam-brand {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.tf-exam-brand span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9dc0dd;
+}
+
+.tf-exam-counter {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #cfe4f5;
+  padding-left: 14px;
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+  white-space: nowrap;
+}
+
+.tf-exam-clock {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: #eaf4ff;
+  font-variant-numeric: tabular-nums;
+}
+
+.tf-exam-clock[data-low="true"] {
+  color: #ffcf8a;
+}
+
+.tf-exam-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The oval buttons in the real test bar. */
+.tf-oval {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 550;
+  letter-spacing: 0.01em;
+  color: #12314f;
+  background: linear-gradient(180deg, #ffffff, #dfe9f2);
+  border: 1px solid #0e2941;
+  border-radius: 999px;
+  padding: 7px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms ease, color 120ms ease, opacity 120ms ease;
+}
+
+.tf-oval:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ffffff, #eef4f9);
+}
+
+.tf-oval:disabled {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(219, 233, 246, 0.4);
+  cursor: not-allowed;
+}
+
+.tf-oval[data-tone="dark"] {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #dbe9f6;
+}
+
+.tf-oval[data-tone="dark"]:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.tf-oval[data-active="true"] {
+  background: linear-gradient(180deg, #f3c274, var(--flag));
+  border-color: #8a5c14;
+  color: #1e1403;
+}
+
+/* ── Exam body: passage | question ────────────────────────────────────────── */
+
+.tf-exam-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.tf-exam-body[data-single="true"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tf-pane {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 26px clamp(20px, 3vw, 40px) 40px;
+  background: var(--paper);
+  scroll-behavior: smooth;
+}
+
+.tf-pane + .tf-pane {
+  border-left: 1px solid var(--paper-edge);
+  background: var(--paper-2);
+}
+
+.tf-directions {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  padding-bottom: 10px;
+  margin-bottom: 18px;
+  border-bottom: 2px solid var(--ink);
+}
+
+/* ── Passages ─────────────────────────────────────────────────────────────── */
+
+.tf-passage {
+  font-family: var(--reading);
+  font-size: 17px;
+  line-height: 1.62;
+  color: var(--ink);
+  max-width: 62ch;
+}
+
+.tf-passage p + p {
+  margin-top: 1em;
+}
+
+.tf-passage-title {
+  font-family: var(--display);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+  color: var(--ink);
+}
+
+.tf-sheet {
+  background: #fff;
+  border: 1px solid var(--paper-edge);
+  border-radius: 6px;
+  padding: 20px 22px;
+  max-width: 62ch;
+  box-shadow: 0 1px 2px rgba(20, 32, 43, 0.05);
+}
+
+.tf-sheet-subject {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--paper-edge);
+}
+
+.tf-sheet-subject span {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.tf-sheet-signoff {
+  margin-top: 1em;
+  color: var(--ink-2);
+}
+
+/* Text chain */
+.tf-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 46ch;
+}
+
+.tf-chat-msg {
+  background: #fff;
+  border: 1px solid var(--paper-edge);
+  border-radius: 4px 12px 12px 12px;
+  padding: 10px 13px;
+}
+
+.tf-chat-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.tf-chat-name {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.tf-chat-time {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.tf-chat-text {
+  font-family: var(--reading);
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* Sentence-select highlighting inside the passage */
+.tf-sentence {
+  cursor: pointer;
+  border-radius: 2px;
+  padding: 1px 0;
+  box-shadow: inset 0 -1px 0 rgba(20, 32, 43, 0.22);
+  transition: background-color 120ms ease;
+}
+
+.tf-sentence:hover {
+  background: #fdf0d8;
+}
+
+.tf-sentence[data-selected="true"] {
+  background: #cfe4f7;
+  box-shadow: inset 0 -1px 0 #4d87bb;
+}
+
+/* ── Question pane ────────────────────────────────────────────────────────── */
+
+.tf-q-archetype {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+
+.tf-q-prompt {
+  font-family: var(--display);
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  white-space: pre-line;
+  max-width: 56ch;
+}
+
+.tf-q-note {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  margin-top: 8px;
+  padding-left: 10px;
+  border-left: 2px solid var(--paper-edge);
+  max-width: 52ch;
+}
+
+.tf-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+  max-width: 58ch;
+}
+
+.tf-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--paper-edge);
+  border-radius: 6px;
+  padding: 11px 14px;
+  cursor: pointer;
+  font-family: var(--reading);
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--ink);
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.tf-choice:hover {
+  border-color: #9db4c6;
+}
+
+.tf-choice[data-selected="true"] {
+  border-color: #2f6ea8;
+  background: #eaf3fb;
+  box-shadow: inset 0 0 0 1px #2f6ea8;
+}
+
+.tf-choice[data-verdict="right"] {
+  border-color: var(--right);
+  background: var(--right-soft);
+  box-shadow: inset 0 0 0 1px var(--right);
+}
+
+.tf-choice[data-verdict="wrong"] {
+  border-color: var(--wrong);
+  background: var(--wrong-soft);
+  box-shadow: inset 0 0 0 1px var(--wrong);
+}
+
+.tf-choice-key {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid #9db4c6;
+  color: var(--ink-2);
+  margin-top: 1px;
+  text-transform: lowercase;
+}
+
+.tf-choice[data-selected="true"] .tf-choice-key {
+  background: #2f6ea8;
+  border-color: #2f6ea8;
+  color: #fff;
+}
+
+.tf-choice[data-verdict="right"] .tf-choice-key {
+  background: var(--right);
+  border-color: var(--right);
+  color: #fff;
+}
+
+.tf-choice[data-verdict="wrong"] .tf-choice-key {
+  background: var(--wrong);
+  border-color: var(--wrong);
+  color: #fff;
+}
+
+/* Insert-text excerpt with clickable squares */
+.tf-insert {
+  font-family: var(--reading);
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--paper-edge);
+  border-radius: 6px;
+  padding: 16px 18px;
+  margin-top: 18px;
+  max-width: 60ch;
+}
+
+.tf-square {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  vertical-align: -1px;
+  margin: 0 2px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 120ms ease, transform 120ms ease;
+}
+
+.tf-square:hover {
+  transform: scale(1.18);
+}
+
+.tf-square[data-selected="true"] {
+  background: #2f6ea8;
+  border-color: #17405f;
+  transform: scale(1.18);
+}
+
+.tf-square[data-verdict="right"] {
+  background: var(--right);
+  border-color: var(--right);
+}
+
+.tf-square[data-verdict="wrong"] {
+  background: var(--wrong);
+  border-color: var(--wrong);
+}
+
+/* ── Cloze exercise ───────────────────────────────────────────────────────── */
+
+.tf-cloze {
+  font-family: var(--reading);
+  font-size: 19px;
+  line-height: 2.3;
+  color: var(--ink);
+  max-width: 58ch;
+  margin: 0 auto;
+}
+
+.tf-blank {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+.tf-blank[data-active="true"] {
+  background: #fdf0d8;
+  box-shadow: 0 0 0 3px #fdf0d8;
+}
+
+.tf-blank-stem {
+  font-family: var(--reading);
+}
+
+.tf-blank-input {
+  font-family: var(--mono);
+  font-size: 0.78em;
+  letter-spacing: 0.42em;
+  text-indent: 0.1em;
+  text-transform: lowercase;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--ink);
+  padding: 0;
+  margin-left: 2px;
+  caret-color: #2f6ea8;
+}
+
+/* The input sits invisibly over the cells so typing lands in the right slot. */
+.tf-blank-slot {
+  position: relative;
+  display: inline-flex;
+}
+
+.tf-blank-slot input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: text;
+}
+
+.tf-blank-hint {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-3);
+  vertical-align: super;
+  margin-right: 1px;
+  user-select: none;
+}
+
+/* ── Exam footer ──────────────────────────────────────────────────────────── */
+
+.tf-exam-foot {
+  flex: none;
+  background: #fff;
+  border-top: 1px solid var(--paper-edge);
+  padding: 9px clamp(14px, 3vw, 24px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.tf-pips {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.tf-pip {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  border: 1px solid var(--paper-edge);
+  background: #fff;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 120ms ease;
+}
+
+.tf-pip:hover {
+  transform: scale(1.25);
+}
+
+.tf-pip[data-state="answered"] {
+  background: #4d87bb;
+  border-color: #35678f;
+}
+
+.tf-pip[data-state="marked"] {
+  background: var(--flag);
+  border-color: #a97a24;
+}
+
+.tf-pip[data-current="true"] {
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+/* ── Review overlay ───────────────────────────────────────────────────────── */
+
+.tf-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: rgba(237, 242, 246, 0.97);
+  overflow-y: auto;
+  padding: 32px clamp(20px, 5vw, 56px) 48px;
+}
+
+.tf-review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.tf-review-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--paper-edge);
+  border-radius: 6px;
+  padding: 9px 12px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  color: var(--ink);
+  transition: border-color 120ms ease;
+}
+
+.tf-review-row:hover {
+  border-color: #9db4c6;
+}
+
+.tf-review-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  min-width: 30px;
+}
+
+.tf-review-status {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.tf-review-status[data-state="answered"] {
+  color: #2f6ea8;
+}
+
+.tf-review-status[data-state="marked"] {
+  color: #9a6b12;
+}
+
+/* ── Results ──────────────────────────────────────────────────────────────── */
+
+.tf-score-ring {
+  --value: 0;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(var(--flag) calc(var(--value) * 1%), var(--rule-soft) 0);
+  flex: none;
+}
+
+.tf-score-ring > div {
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: var(--desk);
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.tf-score-value {
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: #fff;
+  line-height: 1;
+}
+
+.tf-score-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6f8ba3;
+  margin-top: 5px;
+}
+
+.tf-result-item {
+  border: 1px solid var(--rule-soft);
+  border-radius: 10px;
+  background: linear-gradient(180deg, var(--desk-2), #0d2135);
+  padding: 16px 18px;
+}
+
+.tf-verdict {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.tf-verdict[data-v="right"] {
+  color: #7fd9b6;
+  background: rgba(28, 122, 91, 0.18);
+}
+
+.tf-verdict[data-v="wrong"] {
+  color: #f0a79c;
+  background: rgba(177, 58, 46, 0.2);
+}
+
+.tf-verdict[data-v="skipped"] {
+  color: #9fb4c7;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tf-explanation {
+  font-size: 14px;
+  line-height: 1.62;
+  color: #b6c8d8;
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule-soft);
+  max-width: 78ch;
+}
+
+/* ── Answer key ───────────────────────────────────────────────────────────── */
+
+.tf-field {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #eaf2f9;
+  font-family: var(--display);
+  font-size: 14px;
+}
+
+.tf-field::placeholder {
+  color: #6f8ba3;
+}
+
+.tf-chip {
+  font-family: var(--display);
+  font-size: 12.5px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: #9fb4c7;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 140ms ease, color 140ms ease, background-color 140ms ease;
+}
+
+.tf-chip:hover {
+  color: #fff;
+  border-color: var(--desk-3);
+}
+
+.tf-chip[aria-pressed="true"] {
+  background: rgba(232, 163, 61, 0.14);
+  border-color: var(--flag);
+  color: var(--flag);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  /* The passage keeps the larger share; the question pane is shorter by nature. */
+  .tf-exam-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+
+  .tf-pane {
+    padding: 16px 18px 28px;
+  }
+
+  .tf-pane + .tf-pane {
+    border-left: none;
+    border-top: 1px solid var(--paper-edge);
+  }
+
+  /* One compact row: brand, counter, clock, controls. */
+  .tf-exam-bar {
+    min-height: 0;
+    padding: 7px 10px;
+    gap: 8px;
+    row-gap: 6px;
+  }
+
+  .tf-exam-brand {
+    font-size: 11px;
+  }
+
+  .tf-exam-brand span {
+    font-size: 8.5px;
+  }
+
+  .tf-exam-counter {
+    padding-left: 8px;
+    font-size: 10.5px;
+  }
+
+  .tf-exam-clock {
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .tf-oval {
+    padding: 5px 11px;
+    font-size: 11px;
+  }
+
+  .tf-directions {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  .tf-passage,
+  .tf-cloze {
+    font-size: 16px;
+  }
+
+  .tf-cloze {
+    line-height: 2.15;
+  }
+
+  .tf-q-prompt {
+    font-size: 15px;
+  }
+
+  .tf-choice {
+    font-size: 14.5px;
+    padding: 9px 12px;
+  }
+
+  .tf-sheet {
+    padding: 14px 16px;
+  }
+}
+
+@media (max-width: 620px) {
+  .tf-nav-link {
+    padding: 7px 9px;
+    font-size: 12px;
+  }
+
+  /* Below this width the clock label and the hide control cost more than they give. */
+  .tf-clock-label,
+  .tf-exam-clock .tf-oval {
+    display: none;
+  }
+
+  .tf-exam-foot {
+    padding: 7px 12px;
+    gap: 10px;
+  }
+
+  .tf-pips {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tf-root *,
+  .tf-exam * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .tf-hero-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+.tf-clock-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8fb2ce;
+}
+
+/* Directions bar centres with the cloze column it introduces. */
+.tf-directions[data-centred="true"] {
+  max-width: 58ch;
+  margin-left: auto;
+  margin-right: auto;
+}

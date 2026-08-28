@@ -14,6 +14,7 @@ npm run build    # static export → ./out (also what CI runs)
 npm run preview  # build, then serve ./out under /saas-landing at :3000 (mimics prod basePath)
 npm run start    # serve an already-built ./out under /saas-landing at :3000
 npm run lint     # next lint
+npm run check:toefl  # validate the TOEFL question bank (159 items)
 ```
 
 There are no tests.
@@ -67,6 +68,38 @@ This is the content source of truth. Components read text via the `useI18n()` ho
 ### Contact form
 
 `ContactForm` POSTs the lead to `process.env.NEXT_PUBLIC_LEAD_ENDPOINT` (a Cloudflare Worker — see `telegram-worker.js`, which forwards to Telegram via the Bot API). If the env var is unset, submit resets local state only. No Next API route; see `.env.local.example`.
+
+## TOEFL Reading trainer (`/toefl`)
+
+A second, self-contained product living in the same Next app: **Passage**, a TOEFL iBT Reading
+practice platform. It shares only the root layout and `I18nProvider` with the marketing site —
+nothing else. Marketing overlays (`VoiceAgent`, `CookieConsent`, `InstantChat`) are suppressed
+under `/toefl` so nothing floats over a timed exam.
+
+- **Content** — `lib/toefl/content/`, transcribed from *100 Practice Questions for the TOEFL®
+  Reading Section* (TST Prep). 159 questions in the book's own numbering: 100 letter blanks
+  (`complete-the-words.ts`, 10 paragraphs × 10), 34 MCQs (`daily-life.ts`, 13 passages),
+  25 MCQs (`academic.ts`, 5 passages). `index.ts` assembles sections, the five full tests, and
+  the cloze parser. **Run `npm run check:toefl` after touching content** — it asserts numbering,
+  blank counts, choice/answer validity, insert-text squares, and that every sentence-select
+  option exists verbatim in its passage.
+- Cloze paragraphs are stored **solved**, with the missing letters in braces:
+  `"Wa{rm} air a{nd}"`. `parseCloze()` splits that into the on-screen stem plus one letter cell
+  per missing character. Adding a blank means adding braces — nothing else.
+- **Routes** — `app/toefl/` (overview), `app/toefl/practice/[setId]/` (any set id *or* exam id;
+  `generateStaticParams` prerenders all 33), `app/toefl/answers/` (searchable key).
+- **Engine** — `components/toefl/ExamRunner.tsx` drives everything: it flattens the run into
+  *steps* (a whole cloze paragraph is one step, an MCQ is one step), owns the clock (counts down
+  for exams, up for practice), review overlay, mark-for-review, keyboard shortcuts (`a`–`d`,
+  arrows), and scoring. `ResultsView` replaces it on submit.
+- **Styling** — `app/toefl/toefl.css`, scoped to `.tf-root`, plain CSS with `--tf` tokens.
+  Deliberately *not* Tailwind and not the marketing palette: a dark navy "desk" shell around a
+  light, ETS-accurate exam screen. Fonts are scoped in `app/toefl/layout.tsx` (Golos Text /
+  Source Serif 4 / JetBrains Mono) so the marketing site keeps Geologica + Onest.
+- **i18n** — shell copy is localized in `lib/toefl/ui.ts` (en/ru/tj, driven by the same
+  `useI18n()` lang). Exam content — passages, prompts, choices, explanations — stays English on
+  purpose: it is an English exam.
+- Progress lives in `localStorage` under `toefl-reading-progress-v1` (`lib/toefl/progress.ts`).
 
 ## Styling
 

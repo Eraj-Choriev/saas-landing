@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { usePathname } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
 import { Cookie, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
@@ -15,6 +16,10 @@ const STORAGE_KEY = "aqly-cookie-consent" // "accepted" | "declined"
  * competes with the hero reveal.
  */
 export function CookieConsent() {
+  const pathname = usePathname()
+  // Never over the Reading trainer's timed exam screen.
+  const onTrainer = pathname?.startsWith("/toefl") ?? false
+
   const { t } = useI18n()
   const [open, setOpen] = React.useState(false)
 
@@ -43,7 +48,7 @@ export function CookieConsent() {
 
   return (
     <AnimatePresence>
-      {open && (
+      {open && !onTrainer && (
         <motion.aside
           initial={{ opacity: 0, y: 28, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
