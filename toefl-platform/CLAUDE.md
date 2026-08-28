@@ -14,6 +14,19 @@ the marketing site at the repo root: separate `package.json`, dependencies, `tsc
 `@/*` root. **Never import from the parent directory** — if something is needed here, it gets
 copied here.
 
+Isolation is not automatic, because some tools resolve *upward* out of this folder and would
+otherwise find the marketing site's setup. Three files exist purely to stop that, and deleting
+any of them breaks the build only on a machine without `node_modules` at the repo root — which is
+every fresh clone:
+
+- `postcss.config.mjs` — empty on purpose. `postcss-load-config` walks up the tree; without this
+  file Next loads the root config, which requires `tailwindcss` and `autoprefixer`, and the build
+  dies in `getPostCssPlugins` on `require.resolve`.
+- `next.config.mjs` → `outputFileTracingRoot` — pins the workspace root here, since the second
+  lockfile one level up makes Next's inference ambiguous.
+- the parent's `tsconfig.json` excludes `toefl-platform`, and its `next.config.mjs` excludes this
+  folder from output file tracing.
+
 ## Commands
 
 ```bash
