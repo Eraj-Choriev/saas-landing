@@ -1,7 +1,7 @@
 "use client"
 
 import { Fragment } from "react"
-import type { PassageBlock } from "@/lib/toefl/types"
+import type { PassageBlock } from "@/lib/types"
 
 /**
  * Renders the four passage formats the book uses. Sentence-select questions

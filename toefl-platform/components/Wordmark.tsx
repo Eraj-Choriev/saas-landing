@@ -9,7 +9,7 @@ import Link from "next/link"
  */
 export function Wordmark() {
   return (
-    <Link href="/toefl" className="tf-wordmark" aria-label="Passage — TOEFL Reading trainer">
+    <Link href="/" className="tf-wordmark" aria-label="Passage — TOEFL Reading trainer">
       <span className="tf-wordmark-cells" aria-hidden="true">
         {"PASSAGE".split("").map((letter, i) => (
           <span key={i} className="tf-wordmark-cell" data-lit={i === 4 || i === 5}>

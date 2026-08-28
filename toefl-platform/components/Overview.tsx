@@ -1,10 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { exams, examsById, sections, setQuestionCount, setsById, totalQuestions } from "@/lib/toefl/content"
-import { bestAttempt, setStatus, useProgress } from "@/lib/toefl/progress"
-import { useToeflStrings } from "@/lib/toefl/ui"
+import { exams, examsById, sections, setQuestionCount, setsById, totalQuestions } from "@/lib/content"
+import { bestAttempt, setStatus, useProgress } from "@/lib/progress"
+import { useToeflStrings } from "@/lib/ui"
 import { HeroCloze } from "./HeroCloze"
+import { LangToggle } from "./LangToggle"
 import { Wordmark } from "./Wordmark"
 
 export function Overview() {
@@ -13,8 +14,8 @@ export function Overview() {
 
   const resumeHref = progress.lastRun
     ? progress.lastRun.kind === "exam"
-      ? `/toefl/practice/${progress.lastRun.id}`
-      : `/toefl/practice/${progress.lastRun.id}`
+      ? `/practice/${progress.lastRun.id}`
+      : `/practice/${progress.lastRun.id}`
     : null
   const resumeLabel = progress.lastRun
     ? (examsById[progress.lastRun.id]?.title ?? setsById[progress.lastRun.id]?.title ?? "")
@@ -26,18 +27,16 @@ export function Overview() {
         <div className="tf-shell tf-nav-inner">
           <Wordmark />
           <div className="tf-nav-links">
-            <Link className="tf-nav-link" href="/toefl" aria-current="page">
+            <Link className="tf-nav-link" href="/" aria-current="page">
               {t.nav.overview}
             </Link>
             <a className="tf-nav-link" href="#practice">
               {t.nav.practice}
             </a>
-            <Link className="tf-nav-link" href="/toefl/answers">
+            <Link className="tf-nav-link" href="/answers">
               {t.nav.answers}
             </Link>
-            <Link className="tf-nav-link" href="/" style={{ color: "#6f8ba3" }}>
-              Aqly ↗
-            </Link>
+            <LangToggle />
           </div>
         </div>
       </nav>
@@ -63,7 +62,7 @@ export function Overview() {
                 {t.home.lede}
               </p>
               <div style={{ display: "flex", gap: 10, marginTop: 26, flexWrap: "wrap" }}>
-                <Link className="tf-btn" data-variant="primary" href={`/toefl/practice/${exams[0].id}`}>
+                <Link className="tf-btn" data-variant="primary" href={`/practice/${exams[0].id}`}>
                   {t.home.startTest}
                 </Link>
                 <a className="tf-btn" data-variant="ghost" href="#practice">
@@ -133,7 +132,7 @@ export function Overview() {
             {exams.map((exam) => {
               const best = ready ? bestAttempt(progress, exam.id) : undefined
               return (
-                <Link key={exam.id} href={`/toefl/practice/${exam.id}`} className="tf-card">
+                <Link key={exam.id} href={`/practice/${exam.id}`} className="tf-card">
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
                     <span className="tf-card-meta">
                       {String(exam.index).padStart(2, "0")} · {exam.minutes} {t.home.minutes}
@@ -186,7 +185,7 @@ export function Overview() {
                   const count = setQuestionCount(set)
                   const pct = status && status.total ? (status.answered / status.total) * 100 : 0
                   return (
-                    <Link key={set.id} href={`/toefl/practice/${set.id}`} className="tf-card">
+                    <Link key={set.id} href={`/practice/${set.id}`} className="tf-card">
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
                         <span className="tf-card-meta">{String(set.index).padStart(2, "0")}</span>
                         <span className="tf-card-meta">

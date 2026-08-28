@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { completeTheWords } from "@/lib/toefl/content"
-import { parseCloze } from "@/lib/toefl/content"
-import { useToeflStrings } from "@/lib/toefl/ui"
+import { completeTheWords } from "@/lib/content"
+import { parseCloze } from "@/lib/content"
+import { useToeflStrings } from "@/lib/ui"
 
 /**
  * The hero is the exercise itself: the opening of question 1 types its own

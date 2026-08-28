@@ -2,11 +2,12 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import type { PracticeSet } from "@/lib/toefl/types"
-import { clozeBlanks, normalizeLetters } from "@/lib/toefl/content"
-import { useToeflStrings } from "@/lib/toefl/ui"
+import type { PracticeSet } from "@/lib/types"
+import { clozeBlanks, normalizeLetters } from "@/lib/content"
+import { useToeflStrings } from "@/lib/ui"
 import { LetterCells } from "./LetterCells"
 import { formatClock } from "./ExamRunner"
+import { LangToggle } from "./LangToggle"
 import { Wordmark } from "./Wordmark"
 
 export interface ScoredEntry {
@@ -44,9 +45,12 @@ export function ResultsView({
       <nav className="tf-nav">
         <div className="tf-shell tf-nav-inner">
           <Wordmark />
-          <Link className="tf-nav-link" href="/toefl">
-            {t.results.backHome}
-          </Link>
+          <div className="tf-nav-links">
+            <Link className="tf-nav-link" href="/">
+              {t.results.backHome}
+            </Link>
+            <LangToggle />
+          </div>
         </div>
       </nav>
 
@@ -89,10 +93,10 @@ export function ResultsView({
               <button type="button" className="tf-btn" data-variant="primary" onClick={onRetake}>
                 {t.results.retake}
               </button>
-              <Link className="tf-btn" data-variant="ghost" href="/toefl">
+              <Link className="tf-btn" data-variant="ghost" href="/">
                 {t.results.backHome}
               </Link>
-              <Link className="tf-btn" data-variant="quiet" href="/toefl/answers">
+              <Link className="tf-btn" data-variant="quiet" href="/answers">
                 {t.results.reviewAnswers}
               </Link>
             </div>

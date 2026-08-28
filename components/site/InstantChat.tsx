@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { usePathname } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 
@@ -17,10 +16,6 @@ const TG_URL = "https://t.me/aqly_io"
  * A one-time label bubble nudges attention, then collapses to a bare circle.
  */
 export function InstantChat() {
-  const pathname = usePathname()
-  // Never over the Reading trainer's timed exam screen.
-  const onTrainer = pathname?.startsWith("/toefl") ?? false
-
   const { t } = useI18n()
   const [shown, setShown] = React.useState(false)
   const [expanded, setExpanded] = React.useState(false)
@@ -61,7 +56,7 @@ export function InstantChat() {
 
   return (
     <AnimatePresence>
-      {shown && !onTrainer && (
+      {shown && (
         <motion.a
           href={href}
           target="_blank"

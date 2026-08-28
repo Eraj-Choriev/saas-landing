@@ -1,4 +1,4 @@
-import { Overview } from "@/components/toefl/Overview"
+import { Overview } from "@/components/Overview"
 
 export default function ToeflPage() {
   return <Overview />

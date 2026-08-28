@@ -9,7 +9,7 @@
  *
  *   npm run check:toefl
  */
-import { allSets, allItems, clozeBlanks, sections, totalQuestions, exams, setsById, parseCloze } from "@/lib/toefl/content"
+import { allSets, allItems, clozeBlanks, sections, totalQuestions, exams, setsById, parseCloze } from "@/lib/content"
 
 const problems: string[] = []
 

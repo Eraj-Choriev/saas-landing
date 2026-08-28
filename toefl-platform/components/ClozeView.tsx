@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import type { ClozeSet } from "@/lib/toefl/types"
-import { normalizeLetters, parseCloze } from "@/lib/toefl/content"
+import type { ClozeSet } from "@/lib/types"
+import { normalizeLetters, parseCloze } from "@/lib/content"
 
 /**
  * The Complete-the-Words exercise. Each gap shows the stem the book prints,

@@ -19,3 +19,7 @@ next-env.d.ts
 e2e-results/
 test-results/
 playwright-report/
+
+# toefl-platform is a separate app with its own build output
+/toefl-platform/node_modules/
+/toefl-platform/.next/

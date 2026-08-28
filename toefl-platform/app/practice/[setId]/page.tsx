@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
-import { exams, examsById, setsById, allSets } from "@/lib/toefl/content"
-import { RunPage } from "@/components/toefl/RunPage"
+import { exams, examsById, setsById, allSets } from "@/lib/content"
+import { RunPage } from "@/components/RunPage"
 
 /** Every set and every full test gets a real URL. */
 export function generateStaticParams() {

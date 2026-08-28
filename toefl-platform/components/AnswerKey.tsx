@@ -2,10 +2,11 @@
 
 import Link from "next/link"
 import { useMemo, useState } from "react"
-import type { PracticeSet, SectionId } from "@/lib/toefl/types"
-import { allSets, clozeBlanks, sections } from "@/lib/toefl/content"
-import { useToeflStrings } from "@/lib/toefl/ui"
+import type { PracticeSet, SectionId } from "@/lib/types"
+import { allSets, clozeBlanks, sections } from "@/lib/content"
+import { useToeflStrings } from "@/lib/ui"
 import { LetterCells } from "./LetterCells"
+import { LangToggle } from "./LangToggle"
 import { Wordmark } from "./Wordmark"
 
 /** Everything a set contributes to the key, flattened once for searching. */
@@ -56,15 +57,13 @@ export function AnswerKey() {
         <div className="tf-shell tf-nav-inner">
           <Wordmark />
           <div className="tf-nav-links">
-            <Link className="tf-nav-link" href="/toefl">
+            <Link className="tf-nav-link" href="/">
               {t.nav.overview}
             </Link>
-            <Link className="tf-nav-link" href="/toefl/answers" aria-current="page">
+            <Link className="tf-nav-link" href="/answers" aria-current="page">
               {t.nav.answers}
             </Link>
-            <Link className="tf-nav-link" href="/" style={{ color: "#6f8ba3" }}>
-              Aqly ↗
-            </Link>
+            <LangToggle />
           </div>
         </div>
       </nav>
@@ -139,7 +138,7 @@ export function AnswerKey() {
                   <span className="tf-card-meta" style={{ marginLeft: "auto" }}>
                     {sections.find((s) => s.id === set.section)?.name}
                   </span>
-                  <Link className="tf-btn" data-variant="quiet" href={`/toefl/practice/${set.id}`}>
+                  <Link className="tf-btn" data-variant="quiet" href={`/practice/${set.id}`}>
                     {t.home.open} →
                   </Link>
                 </header>

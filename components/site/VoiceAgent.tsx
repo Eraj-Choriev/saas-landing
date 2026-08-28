@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { usePathname } from "next/navigation"
 import { useI18n } from "@/lib/i18n"
 
 /**
@@ -29,9 +28,6 @@ const EL_ID = "aqly-convai-widget"
 
 export function VoiceAgent() {
   const { lang } = useI18n()
-  const pathname = usePathname()
-  // The Reading trainer is a timed exam. Nothing floats over it.
-  const hidden = pathname?.startsWith("/toefl") ?? false
 
   // Mount the script + element once, then keep the element alive and only sync
   // its attributes when `lang` changes. Never remove it (no aborted fetch).
@@ -70,13 +66,6 @@ export function VoiceAgent() {
     // ElevenLabs has no Tajik engine → use Russian for the tj UI locale
     el.setAttribute("override-language", lang === "tj" ? "ru" : lang)
   }, [lang])
-
-  // The element is never removed (that would abort its config fetch), so hide
-  // it instead while the learner is inside the trainer.
-  React.useEffect(() => {
-    const el = document.getElementById(EL_ID)
-    if (el) el.style.display = hidden ? "none" : ""
-  }, [hidden])
 
   // let other components open the agent
   React.useEffect(() => {

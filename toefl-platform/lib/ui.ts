@@ -1,6 +1,6 @@
 "use client"
 
-import { useI18n } from "@/lib/i18n"
+import { useLang } from "@/lib/lang"
 
 /**
  * Shell copy for the Reading trainer. Exam content — passages, prompts,
@@ -396,7 +396,7 @@ const tj: ToeflStrings = {
 const dictionaries = { en, ru, tj } as const
 
 export function useToeflStrings(): ToeflStrings {
-  const { lang } = useI18n()
+  const { lang } = useLang()
   return dictionaries[lang] ?? en
 }
 

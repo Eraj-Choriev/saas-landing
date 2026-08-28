@@ -1,0 +1,24 @@
+{
+  "name": "passage-toefl-reading",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3100",
+    "build": "next build",
+    "start": "next start -p 3100",
+    "lint": "next lint",
+    "check:content": "tsx scripts/validate-content.ts"
+  },
+  "dependencies": {
+    "next": "^15.5.19",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "tsx": "^4.23.12",
+    "typescript": "^5.6.3"
+  }
+}

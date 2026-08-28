@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { AnswerKey } from "@/components/toefl/AnswerKey"
+import { AnswerKey } from "@/components/AnswerKey"
 
 export const metadata: Metadata = {
   title: "Answer key — Passage",

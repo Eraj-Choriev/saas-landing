@@ -1,10 +1,65 @@
 /* ---------------------------------------------------------------------------
-   Reading trainer — scoped design system.
+   Passage — TOEFL Reading trainer.
 
-   Two worlds, deliberately: a dark navy "desk" for everything around the test,
-   and a light paper exam screen that follows the TOEFL iBT chrome. Tokens live
-   on .tf-root so the marketing site's palette is never touched.
+   A standalone app: this file carries its own reset, so nothing here depends on
+   a framework's preflight or on any other project's tokens.
 --------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  background: #0b1b2b;
+  line-height: 1.5;
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: break-word;
+}
+
+ul,
+ol {
+  list-style: none;
+  padding: 0;
+}
 
 .tf-root {
   --desk: #0b1b2b;
@@ -1243,4 +1298,34 @@
   max-width: 58ch;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* ── Language switch ──────────────────────────────────────────────────────── */
+
+.tf-lang {
+  display: inline-flex;
+  gap: 1px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 2px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tf-lang-btn {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #7f95a8;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+
+.tf-lang-btn:hover {
+  color: #fff;
+}
+
+.tf-lang-btn[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
 }

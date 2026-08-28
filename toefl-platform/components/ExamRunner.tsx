@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import type { Item, McqQuestion, PracticeSet } from "@/lib/toefl/types"
-import { clozeBlanks, itemsForSet, normalizeLetters, setsById } from "@/lib/toefl/content"
-import { useProgress } from "@/lib/toefl/progress"
-import { fill, useToeflStrings } from "@/lib/toefl/ui"
+import type { Item, McqQuestion, PracticeSet } from "@/lib/types"
+import { clozeBlanks, itemsForSet, normalizeLetters, setsById } from "@/lib/content"
+import { useProgress } from "@/lib/progress"
+import { fill, useToeflStrings } from "@/lib/ui"
 import { PassageView } from "./PassageView"
 import { ClozeView } from "./ClozeView"
 import { ResultsView } from "./ResultsView"
@@ -204,7 +204,7 @@ export function ExamRunner({ runId, runKind, title, setIds, minutes }: ExamRunne
             className="tf-oval"
             data-tone="dark"
             onClick={() => {
-              if (window.confirm(t.exam.exitConfirm)) router.push("/toefl")
+              if (window.confirm(t.exam.exitConfirm)) router.push("/")
             }}
           >
             {t.exam.exit}
